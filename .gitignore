@@ -1,0 +1,32 @@
+# SQLite Database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Data folder contents except .gitkeep
+data/*
+!data/.gitkeep
+
+# Target / Build outputs
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Environment & Logs
+.env
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
