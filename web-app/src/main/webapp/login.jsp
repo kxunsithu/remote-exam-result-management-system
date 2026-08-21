@@ -11,14 +11,27 @@
 </head>
 <body class="auth-page">
 
+<%
+  // Role comes from the dedicated role selection page (?role=ADMIN|STUDENT)
+  String preRole = request.getParameter("role");
+  boolean isStudent = "STUDENT".equalsIgnoreCase(preRole);
+%>
+
 <div class="auth-card" style="max-width: 26rem; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
   <!-- Logo + University Title -->
   <div class="auth-brand-header mb-4">
-    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: #2563eb;">
+    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: <%= isStudent ? "#10b981" : "#2563eb" %>;">
+      <% if (isStudent) { %>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
         <path d="M6 12v5c3 3 9 3 12 0v-5"/>
       </svg>
+      <% } else { %>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+      <% } %>
     </div>
     <div>
       <p style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;">
@@ -26,6 +39,14 @@
       </p>
       <span style="font-size: 0.75rem; color: #64748b;">University of Computer Studies (Hpa-an)</span>
     </div>
+  </div>
+
+  <!-- Selected role badge -->
+  <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; border-radius: 999px; background-color: <%= isStudent ? "#ecfdf5" : "#eff6ff" %>; border: 1px solid <%= isStudent ? "#a7f3d0" : "#bfdbfe" %>; margin-bottom: 0.75rem;">
+    <span style="width: 0.45rem; height: 0.45rem; border-radius: 50%; background-color: <%= isStudent ? "#10b981" : "#2563eb" %>;"></span>
+    <span style="font-size: 0.72rem; font-weight: 700; color: <%= isStudent ? "#047857" : "#1d4ed8" %>;">
+      <%= isStudent ? "Student အနေဖြင့် ဝင်ရောက်မည်" : "Admin အနေဖြင့် ဝင်ရောက်မည်" %>
+    </span>
   </div>
 
   <!-- Page Title -->
@@ -57,24 +78,18 @@
 
   <!-- Login Form -->
   <form method="post" action="${pageContext.request.contextPath}/login" data-validate novalidate class="d-flex flex-column gap-3">
+    <input type="hidden" name="role" value="<%= isStudent ? "STUDENT" : "ADMIN" %>"/>
+
     <div>
       <label class="auth-label" for="email">အီးမေးလ် အကောင့် (Email)</label>
       <input type="email" id="email" name="email" class="auth-input"
-             placeholder="e.g. admin@example.com" required autocomplete="email"/>
+             placeholder="<%= isStudent ? "john.doe@university.edu" : "admin@example.com" %>" required autocomplete="email"/>
     </div>
 
     <div>
       <label class="auth-label" for="password">စကားဝှက် (Password)</label>
       <input type="password" id="password" name="password" class="auth-input"
              placeholder="••••••••" required autocomplete="current-password"/>
-    </div>
-
-    <div>
-      <label class="auth-label" for="role">အသုံးပြုသူ အမျိုးအစား (Role)</label>
-      <select id="role" name="role" class="auth-input" required>
-        <option value="ADMIN">Administrator (မန်နေဂျာ/ဆရာ)</option>
-        <option value="STUDENT">Student (ကျောင်းသား/သူ)</option>
-      </select>
     </div>
 
     <div class="d-flex align-items-center justify-content-between pt-1">
@@ -84,25 +99,36 @@
           မှတ်သားထားရန်
         </label>
       </div>
-      <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #2563eb; font-weight: 600;" class="hover-underline">
-        ကျောင်းသား အကောင့်သစ် ပြုလုပ်ရန်
+      <% if (isStudent) { %>
+      <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #10b981; font-weight: 600;" class="hover-underline">
+        အကောင့်သစ် ပြုလုပ်ရန်
       </a>
+      <% } %>
     </div>
 
-    <button type="submit" class="btn-auth mt-2">ဝင်ရောက်မည်</button>
+    <button type="submit" class="btn-auth mt-2" style="<%= isStudent ? "background-color: #10b981;" : "" %>">ဝင်ရောက်မည်</button>
   </form>
 
   <!-- Demo credentials hint card -->
   <div style="margin-top: 1.5rem; padding: 0.875rem; background-color: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
     <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem;">
-      စမ်းသပ် အသုံးပြုနိုင်သော အကောင့်များ
+      စမ်းသပ် အသုံးပြုနိုင်သော အကောင့်
     </div>
-    <div style="font-size: 0.8125rem; color: #334155; margin-bottom: 0.25rem;">
+    <% if (isStudent) { %>
+    <div style="font-size: 0.8125rem; color: #334155;">
+      Student: <strong style="color: #10b981;">john.doe@university.edu</strong> / student123
+    </div>
+    <% } else { %>
+    <div style="font-size: 0.8125rem; color: #334155;">
       Admin: <strong style="color: #2563eb;">admin@example.com</strong> / admin123
     </div>
-    <div style="font-size: 0.8125rem; color: #334155;">
-      Student: <strong style="color: #2563eb;">student@example.com</strong> / student123
-    </div>
+    <% } %>
+  </div>
+
+  <div class="text-center mt-3">
+    <a href="${pageContext.request.contextPath}/welcome" style="font-size: 0.75rem; color: #94a3b8;" class="hover-underline">
+      &larr; ဘက် ပြန်ရွေးရန်
+    </a>
   </div>
 </div>
 
@@ -110,4 +136,3 @@
 <script src="${pageContext.request.contextPath}/assets/js/app.js"></script>
 </body>
 </html>
-

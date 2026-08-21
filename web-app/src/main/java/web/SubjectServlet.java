@@ -10,7 +10,10 @@ import java.io.IOException;
 
 /**
  * Admin Subject Management servlet.
- * GET  /admin/subjects            — list all subjects (with optional search)
+ * Subjects are created standalone (no academic year / semester input).
+ * They are attached to semesters later from the academic year page.
+ *
+ * GET  /admin/subjects            — list all subjects (with optional search / semester filter)
  * GET  /admin/subjects?action=edit&id=X — show edit form
  * POST /admin/subjects?action=add        — add subject
  * POST /admin/subjects?action=update     — update subject
@@ -22,8 +25,9 @@ public class SubjectServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String action  = req.getParameter("action");
-        String keyword = req.getParameter("search");
+        String action    = req.getParameter("action");
+        String keyword   = req.getParameter("search");
+        String semFilter = req.getParameter("semesterId");
 
         try {
             ExamResultService service = RMIClientManager.getService();
@@ -38,12 +42,17 @@ public class SubjectServlet extends HttpServlet {
                 }
             }
 
+            java.util.List<Subject> subjects;
             if (keyword != null && !keyword.isBlank()) {
-                req.setAttribute("subjects", service.searchSubjects(keyword));
+                subjects = service.searchSubjects(keyword);
                 req.setAttribute("searchKeyword", keyword);
+            } else if (semFilter != null && !semFilter.isBlank()) {
+                subjects = service.getSubjectsBySemester(Integer.parseInt(semFilter));
+                req.setAttribute("filterSemesterId", semFilter);
             } else {
-                req.setAttribute("subjects", service.getAllSubjects());
+                subjects = service.getAllSubjects();
             }
+            req.setAttribute("subjects", subjects);
 
         } catch (RuntimeException e) {
             req.setAttribute("rmiError", "RMI server unavailable.");
@@ -73,12 +82,12 @@ public class SubjectServlet extends HttpServlet {
 
             if ("add".equals(action)) {
                 boolean ok = service.addSubject(subject);
-                setFlash(req, ok, "Subject added successfully.", "Failed to add subject. Subject code may already exist.");
+                setFlash(req, ok, "ဘာသာရပ် အသစ် ထည့်သွင်းပြီးပါပြီ။", "ဘာသာရပ် ထည့်သွင်းမှု မအောင်မြင်ပါ။");
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 subject.setId(id);
                 boolean ok = service.updateSubject(subject);
-                setFlash(req, ok, "Subject updated successfully.", "Failed to update subject.");
+                setFlash(req, ok, "ဘာသာရပ် ပြင်ဆင်ပြီးပါပြီ။", "ဘာသာရပ် ပြင်ဆင်မှု မအောင်မြင်ပါ။");
             }
 
         } catch (RuntimeException e) {
@@ -97,14 +106,13 @@ public class SubjectServlet extends HttpServlet {
         String credit = req.getParameter("credit");
         if (credit != null && !credit.isBlank()) s.setCredit(Integer.parseInt(credit));
         s.setDepartment(req.getParameter("department"));
-        String semester = req.getParameter("semester");
-        if (semester != null && !semester.isBlank()) s.setSemester(Integer.parseInt(semester));
+        // No academic year / semester here — assignment happens on the academics page
         return s;
     }
 
     private void setFlash(HttpServletRequest req, boolean ok, String successMsg, String errorMsg) {
         HttpSession session = req.getSession();
         if (ok) session.setAttribute("flashSuccess", successMsg);
-        else     session.setAttribute("flashError", errorMsg);
+        else    session.setAttribute("flashError", errorMsg);
     }
 }

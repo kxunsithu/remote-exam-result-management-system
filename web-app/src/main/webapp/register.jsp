@@ -68,6 +68,12 @@
       ဝင်ရောက်မည်
     </a>
   </div>
+
+  <div class="text-center mt-3">
+    <a href="${pageContext.request.contextPath}/welcome" style="font-size: 0.75rem; color: #94a3b8;" class="hover-underline">
+      &larr; ဘက် ပြန်ရွေးရန်
+    </a>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -4,6 +4,8 @@
   request.setAttribute("pageTitle", "ရလဒ်အသေးစိတ်");
   java.util.List<common.ExamResult> results = (java.util.List<common.ExamResult>) request.getAttribute("studentResults");
   common.Student student = (common.Student) request.getAttribute("studentInfo");
+  java.util.List<common.AcademicYear> academicYears = (java.util.List<common.AcademicYear>) request.getAttribute("academicYears");
+  java.util.List<common.Semester> allSemesters = (java.util.List<common.Semester>) request.getAttribute("semesters");
 
   // Group by academic year, then semester
   java.util.LinkedHashMap<String, java.util.Map<Integer, java.util.List<common.ExamResult>>> byYear = new java.util.LinkedHashMap<>();
@@ -326,10 +328,10 @@
                       <button type="button" class="btn-action-icon edit" data-bs-toggle="modal" data-bs-target="#editResultModal"
                               data-id="<%= r.getId() %>"
                               data-subjectid="<%= r.getSubjectId() %>"
+                              data-academicyearid="<%= r.getAcademicYearId() %>"
+                              data-semesterid="<%= r.getSemesterId() %>"
                               data-marks="<%= r.getMarks() %>"
                               data-totalmarks="<%= r.getTotalMarks() %>"
-                              data-academicyear="<%= r.getAcademicYear() %>"
-                              data-semester="<%= r.getSemester() %>"
                               data-examtype="<%= r.getExamType() %>"
                               title="ပြင်ဆင်ရန်">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -404,28 +406,30 @@
             </div>
           </div>
 
-          <!-- Section: ပညာသင်နှစ် & Semester -->
+          <!-- Section: ပညာသင်နှစ် → Semester → Exam Type -->
           <div style="margin-bottom: 1.25rem;">
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid #f1f5f9;">
-              <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">၁။ ပညာသင်နှစ်, Semester & Exam Type</span>
+              <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">၁။ ပညာသင်နှစ် & Semester & Exam Type</span>
             </div>
-            <div style="display:grid; grid-template-columns:1.5fr 1fr 1.2fr; gap:0.75rem;">
+            <div style="display:grid; grid-template-columns:1.3fr 1fr 1.2fr; gap:0.75rem;">
               <div>
                 <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.4rem;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                   ပညာသင်နှစ် <span style="color:#dc2626;">*</span>
                 </label>
-                <input type="text" name="academicYear" id="det-add-academicYear" placeholder="e.g. 2024-2025" required style="width:100%;"/>
+                <select name="academicYearId" id="det-add-academicYear" required style="width:100%;">
+                  <option value="">— ရွေးပါ —</option>
+                  <% if (academicYears != null) for (common.AcademicYear ay : academicYears) { %>
+                    <option value="<%= ay.getId() %>"><%= ay.getYearName() %></option>
+                  <% } %>
+                </select>
               </div>
               <div>
                 <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
                   Semester <span style="color:#dc2626;">*</span>
                 </label>
-                <select name="semester" id="det-add-semester" required style="width:100%;">
-                  <option value="">— ရွေးပါ —</option>
-                  <% for (int i = 1; i <= 8; i++) { %>
-                    <option value="<%= i %>">Sem <%= i %></option>
-                  <% } %>
+                <select name="semesterId" id="det-add-semester" required disabled style="width:100%;">
+                  <option value="">— ပညာသင်နှစ်အရင်ရွေးပါ —</option>
                 </select>
               </div>
               <div>
@@ -454,7 +458,7 @@
               <select name="subjectId" required id="det-add-subjectId" style="width:100%;" disabled>
                 <option value="">— Semester အရင်ရွေးချယ်ပါ —</option>
                 <% if (allSubjects != null) for (common.Subject sub : allSubjects) { %>
-                  <option value="<%= sub.getId() %>" data-semester="<%= sub.getSemester() %>"><%= sub.getSubjectName() %> (<%= sub.getSubjectCode() %>)</option>
+                  <option value="<%= sub.getId() %>" data-semester-id="<%= sub.getSemesterId() %>"><%= sub.getSubjectName() %> (<%= sub.getSubjectCode() %>)</option>
                 <% } %>
               </select>
             </div>
@@ -545,28 +549,61 @@
           <!-- Section: ဘာသာရပ် -->
           <div style="margin-bottom: 1.25rem;">
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid #f1f5f9;">
-              <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">ဘာသာရပ်</span>
+              <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">ပညာသင်နှစ် → Semester → ဘာသာရပ်</span>
             </div>
-            <div>
-              <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.4rem;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                ဘာသာရပ် <span style="color:#dc2626;">*</span>
-              </label>
-              <select name="subjectId" required id="edit-result-subjectId" style="width:100%;">
-                <option value="">— ဘာသာရပ်ရွေးချယ်ပါ —</option>
-                <% if (allSubjects != null) for (common.Subject sub : allSubjects) { %>
-                  <option value="<%= sub.getId() %>"><%= sub.getSubjectName() %> (<%= sub.getSubjectCode() %>)</option>
-                <% } %>
-              </select>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+              <div>
+                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
+                  ပညာသင်နှစ် <span style="color:#dc2626;">*</span>
+                </label>
+                <select id="edit-academicYear" required style="width:100%;">
+                  <option value="">— ရွေးပါ —</option>
+                  <% if (academicYears != null) for (common.AcademicYear ay : academicYears) { %>
+                    <option value="<%= ay.getId() %>"><%= ay.getYearName() %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
+                  Semester <span style="color:#dc2626;">*</span>
+                </label>
+                <select id="edit-result-semester" required disabled style="width:100%;">
+                  <option value="">— ပညာသင်နှစ်အရင်ရွေးပါ —</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:0.75rem;">
+              <div>
+                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.4rem;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  ဘာသာရပ် <span style="color:#dc2626;">*</span>
+                </label>
+                <select name="subjectId" required id="edit-result-subjectId" style="width:100%;" disabled>
+                  <option value="">— Semester အရင်ရွေးချယ်ပါ —</option>
+                  <% if (allSubjects != null) for (common.Subject sub : allSubjects) { %>
+                    <option value="<%= sub.getId() %>" data-semester-id="<%= sub.getSemesterId() %>"><%= sub.getSubjectName() %> (<%= sub.getSubjectCode() %>)</option>
+                  <% } %>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
+                  အမျိုးအစား <span style="color:#dc2626;">*</span>
+                </label>
+                <select name="examType" id="edit-result-examType" required style="width:100%;">
+                  <option value="REGULAR">Regular</option>
+                  <option value="RE_EXAM">Re-exam</option>
+                  <option value="RETAKE">Retake</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <!-- Section: ရမှတ် -->
-          <div style="margin-bottom: 1.25rem;">
+          <div>
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid #f1f5f9;">
               <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">ရမှတ် & ရလဒ်</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
               <div>
                 <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.4rem;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -580,41 +617,6 @@
                   စုစုပေါင်းမှတ် <span style="color:#dc2626;">*</span>
                 </label>
                 <input type="number" id="edit-totalMarks" name="totalMarks" min="1" required style="width:100%;"/>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: ပညာသင်နှစ် & Semester -->
-          <div>
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid #f1f5f9;">
-              <span style="font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">ပညာသင်နှစ်, Semester & Exam Type</span>
-            </div>
-            <div style="display:grid; grid-template-columns:1.5fr 1fr 1.2fr; gap:0.75rem;">
-              <div>
-                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
-                  ပညာသင်နှစ် <span style="color:#dc2626;">*</span>
-                </label>
-                <input type="text" id="edit-academicYear" name="academicYear" required style="width:100%;"/>
-              </div>
-              <div>
-                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
-                  Semester <span style="color:#dc2626;">*</span>
-                </label>
-                <select name="semester" id="edit-result-semester" required style="width:100%;">
-                  <% for (int i = 1; i <= 8; i++) { %>
-                    <option value="<%= i %>">Sem <%= i %></option>
-                  <% } %>
-                </select>
-              </div>
-              <div>
-                <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:0.3rem;">
-                  အမျိုးအစား <span style="color:#dc2626;">*</span>
-                </label>
-                <select name="examType" id="edit-result-examType" required style="width:100%;">
-                  <option value="REGULAR">Regular</option>
-                  <option value="RE_EXAM">Re-exam</option>
-                  <option value="RETAKE">Retake</option>
-                </select>
               </div>
             </div>
           </div>
@@ -663,25 +665,21 @@
 </div>
 
 <%
-  // Build map of "semester_examType" -> academic_year for this student
-  java.util.Map<String, String> semTypeToYearMap = new java.util.HashMap<>();
-  if (results != null) {
-    for (common.ExamResult r : results) {
-      if (r.getAcademicYear() != null && !r.getAcademicYear().isBlank()) {
-        String key = r.getSemester() + "_" + (r.getExamType() != null ? r.getExamType() : "REGULAR");
-        semTypeToYearMap.putIfAbsent(key, r.getAcademicYear());
-      }
-    }
-  }
+  // Semester data for cascading dropdowns (id -> academic year + number)
+  // rendered by AcademicServlet data; subjects carry data-semester-id attributes.
 %>
 <script>
-  var studentSemTypeToYear = {
+  var SEMESTER_DATA = [
     <%
-      for (java.util.Map.Entry<String, String> entry : semTypeToYearMap.entrySet()) {
-        out.print("'" + entry.getKey() + "': '" + entry.getValue().replace("'", "\\'") + "',");
+      if (allSemesters != null) {
+        for (common.Semester sm : allSemesters) {
+          out.print("{ id: " + sm.getId() +
+                    ", yearId: " + sm.getAcademicYearId() +
+                    ", number: " + sm.getSemesterNumber() + " },");
+        }
       }
     %>
-  };
+  ];
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -730,118 +728,96 @@ document.getElementById('deleteResultModal').addEventListener('show.bs.modal', f
       if (!btn) return;
       var d = btn.dataset;
       document.getElementById('edit-result-id').value        = d.id || '';
-      document.getElementById('edit-result-subjectId').value = d.subjectid || '';
       document.getElementById('edit-marks').value            = d.marks || '';
       document.getElementById('edit-totalMarks').value       = d.totalmarks || '';
-      document.getElementById('edit-academicYear').value     = d.academicyear || '';
-      document.getElementById('edit-result-semester').value  = d.semester || '';
       document.getElementById('edit-result-examType').value  = d.examtype || 'REGULAR';
+      // Cascade: year -> semester -> subject, then preselect subject
+      var yrSel = document.getElementById('edit-academicYear');
+      var semSel = document.getElementById('edit-result-semester');
+      var subjSel = document.getElementById('edit-result-subjectId');
+      yrSel.value = d.academicyearid || '';
+      populateSemesterOptions(yrSel, semSel);
+      semSel.value = d.semesterid || '';
+      filterSubjectOptions(subjSel, semSel);
+      subjSel.value = d.subjectid || '';
     });
   }
 
-  // Filter semester & subject dropdowns
+  // ── Cascading Academic Year -> Semester -> Subject dropdowns ──
+  function populateSemesterOptions(yearSelect, semSelect) {
+    var yearVal = yearSelect.value;
+    semSelect.innerHTML = '';
+    var placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = yearVal ? '— Semester ရွေးချယ်ပါ —' : '— ပညာသင်နှစ်အရင်ရွေးပါ —';
+    semSelect.appendChild(placeholder);
+
+    var count = 0;
+    for (var i = 0; i < SEMESTER_DATA.length; i++) {
+      var s = SEMESTER_DATA[i];
+      if (String(s.yearId) === String(yearVal)) {
+        var opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = 'Semester ' + s.number;
+        semSelect.appendChild(opt);
+        count++;
+      }
+    }
+    if (count === 0 && yearVal) placeholder.textContent = '— ဤပညာသင်နှစ်တွင် Semester မရှိပါ —';
+    semSelect.disabled = !yearVal;
+  }
+
+  function filterSubjectOptions(subjSelect, semSelect) {
+    var semVal = String(semSelect.value || '');
+    if (!semVal) {
+      subjSelect.disabled = true;
+      subjSelect.value = '';
+      subjSelect.options[0].textContent = '— Semester အရင်ရွေးချယ်ပါ —';
+      for (var i = 1; i < subjSelect.options.length; i++) subjSelect.options[i].hidden = true;
+      return;
+    }
+    subjSelect.disabled = false;
+    subjSelect.options[0].textContent = '— ဘာသာရပ်ရွေးချယ်ပါ —';
+    var hasMatch = false;
+    for (var j = 1; j < subjSelect.options.length; j++) {
+      var opt = subjSelect.options[j];
+      if (opt.getAttribute('data-semester-id') === semVal) {
+        opt.hidden = false; opt.disabled = false; hasMatch = true;
+      } else {
+        opt.hidden = true; opt.disabled = true;
+      }
+    }
+    var selectedOpt = subjSelect.options[subjSelect.selectedIndex];
+    if (selectedOpt && selectedOpt.hidden) subjSelect.value = '';
+    if (!hasMatch) subjSelect.options[0].textContent = '— ဤ Semester အတွက် ဘာသာရပ်မရှိပါ —';
+  }
+
+  // Wire up Add modal cascade
   (function () {
-    var yearInput      = document.getElementById('det-add-academicYear');
-    var semSelect      = document.getElementById('det-add-semester');
-    var examTypeSelect = document.querySelector('#addResultModal select[name="examType"]');
-    var subjSelect     = document.getElementById('det-add-subjectId');
-    if (!semSelect || !subjSelect) return;
+    var yearSel = document.getElementById('det-add-academicYear');
+    var semSel  = document.getElementById('det-add-semester');
+    var subjSel = document.getElementById('det-add-subjectId');
+    if (!yearSel || !semSel || !subjSel) return;
 
-    function filterSemesters() {
-      var enteredYear = (yearInput ? yearInput.value : '').trim().toLowerCase();
-      var etVal = (examTypeSelect ? examTypeSelect.value : 'REGULAR') || 'REGULAR';
+    yearSel.addEventListener('change', function(){ populateSemesterOptions(yearSel, semSel); filterSubjectOptions(subjSel, semSel); });
+    semSel.addEventListener('change', function(){ filterSubjectOptions(subjSel, semSel); });
 
-      for (var i = 1; i < semSelect.options.length; i++) {
-        var opt = semSelect.options[i];
-        var semNum = parseInt(opt.value);
-        var key = semNum + '_' + etVal;
-        var assignedYear = studentSemTypeToYear[key];
-
-        if (assignedYear) {
-          if (enteredYear === '' || enteredYear === assignedYear.toLowerCase()) {
-            opt.hidden = false;
-            opt.disabled = false;
-            opt.textContent = 'Sem ' + semNum + ' (' + assignedYear + ')';
-          } else {
-            opt.hidden = true;
-            opt.disabled = true;
-          }
-        } else {
-          opt.hidden = false;
-          opt.disabled = false;
-          opt.textContent = 'Sem ' + semNum;
-        }
-      }
-
-      if (semSelect.selectedIndex > 0 && semSelect.options[semSelect.selectedIndex].hidden) {
-        semSelect.value = '';
-      }
-      filterSubjects();
+    // Wire up Edit modal cascade
+    var eYearSel = document.getElementById('edit-academicYear');
+    var eSemSel  = document.getElementById('edit-result-semester');
+    var eSubjSel = document.getElementById('edit-result-subjectId');
+    if (eYearSel && eSemSel && eSubjSel) {
+      eYearSel.addEventListener('change', function(){ populateSemesterOptions(eYearSel, eSemSel); filterSubjectOptions(eSubjSel, eSemSel); });
+      eSemSel.addEventListener('change', function(){ filterSubjectOptions(eSubjSel, eSemSel); });
     }
 
-    function filterSubjects() {
-      var semVal = semSelect.value;
-      if (!semVal) {
-        subjSelect.disabled = true;
-        subjSelect.value = '';
-        subjSelect.options[0].textContent = '— Semester အရင်ရွေးချယ်ပါ —';
-        for (var i = 1; i < subjSelect.options.length; i++) {
-          subjSelect.options[i].hidden = true;
-        }
-        return;
-      }
-
-      subjSelect.disabled = false;
-      subjSelect.options[0].textContent = '— ဘာသာရပ်ရွေးချယ်ပါ —';
-      var hasValidMatch = false;
-
-      for (var j = 1; j < subjSelect.options.length; j++) {
-        var opt = subjSelect.options[j];
-        var optSem = opt.getAttribute('data-semester');
-        if (optSem === semVal) {
-          opt.hidden = false;
-          opt.disabled = false;
-          hasValidMatch = true;
-        } else {
-          opt.hidden = true;
-          opt.disabled = true;
-        }
-      }
-
-      var selectedOpt = subjSelect.options[subjSelect.selectedIndex];
-      if (selectedOpt && selectedOpt.hidden) {
-        subjSelect.value = '';
-      }
-
-      if (!hasValidMatch) {
-        subjSelect.options[0].textContent = '— ဤ Semester အတွက် ဘာသာရပ်မရှိပါ —';
-      }
-    }
-
-    if (yearInput) {
-      yearInput.addEventListener('input', filterSemesters);
-    }
-    if (examTypeSelect) {
-      examTypeSelect.addEventListener('change', filterSemesters);
-    }
-
-    semSelect.addEventListener('change', function () {
-      var semNum = parseInt(semSelect.value);
-      var etVal = (examTypeSelect ? examTypeSelect.value : 'REGULAR') || 'REGULAR';
-      var key = semNum + '_' + etVal;
-      var assignedYear = studentSemTypeToYear[key];
-      if (assignedYear && yearInput && !yearInput.value.trim()) {
-        yearInput.value = assignedYear;
-      }
-      filterSubjects();
-    });
-
+    // Reset add modal on open
     var modal = document.getElementById('addResultModal');
     if (modal) {
       modal.addEventListener('show.bs.modal', function () {
-        if (yearInput) yearInput.value = '';
-        semSelect.value = '';
-        filterSemesters();
+        yearSel.value = '';
+        populateSemesterOptions(yearSel, semSel);
+        filterSubjectOptions(subjSel, semSel);
       });
     }
   })();

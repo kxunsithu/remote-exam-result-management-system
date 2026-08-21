@@ -21,8 +21,6 @@
 </head>
 <body>
 <div class="app-layout">
-  <%@ include file="sidebar.jsp" %>
-
   <main class="main-content">
     <%@ include file="navbar.jsp" %>
     <div class="page-body">
@@ -79,20 +77,12 @@
                     <strong style="font-size: 0.85rem; color: var(--foreground);"><%= student.getPhone() != null ? student.getPhone() : "N/A" %></strong>
                   </div>
                   <div class="col-6">
-                    <span style="font-size: 0.75rem; color: var(--muted-foreground); display: block;">Department</span>
-                    <strong style="font-size: 0.85rem; color: var(--foreground);"><%= student.getDepartment() %></strong>
-                  </div>
-                  <div class="col-6">
-                    <span style="font-size: 0.75rem; color: var(--muted-foreground); display: block;">Academic Year</span>
-                    <strong style="font-size: 0.85rem; color: var(--foreground);">Year <%= student.getYear() %></strong>
-                  </div>
-                  <div class="col-6">
                     <span style="font-size: 0.75rem; color: var(--muted-foreground); display: block;">Gender</span>
                     <strong style="font-size: 0.85rem; color: var(--foreground);"><%= student.getGender() != null ? student.getGender() : "N/A" %></strong>
                   </div>
                   <div class="col-6">
-                    <span style="font-size: 0.75rem; color: var(--muted-foreground); display: block;">Date of Birth</span>
-                    <strong style="font-size: 0.85rem; color: var(--foreground);"><%= student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : "N/A" %></strong>
+                    <span style="font-size: 0.75rem; color: var(--muted-foreground); display: block;">Member Since</span>
+                    <strong style="font-size: 0.85rem; color: var(--foreground);"><%= student.getCreatedAt() != null ? student.getCreatedAt().toLocalDate() : "N/A" %></strong>
                   </div>
                 </div>
               <% } else { %>

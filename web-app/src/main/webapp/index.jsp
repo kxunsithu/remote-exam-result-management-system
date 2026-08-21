@@ -10,6 +10,6 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css"/>
 </head>
 <body>
-<% response.sendRedirect(request.getContextPath() + "/login"); %>
+<% response.sendRedirect(request.getContextPath() + "/welcome"); %>
 </body>
 </html>

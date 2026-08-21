@@ -7,6 +7,25 @@
   session.removeAttribute("flashSuccess");
   session.removeAttribute("flashError");
   java.util.List<common.Subject> subjects = (java.util.List<common.Subject>) request.getAttribute("subjects");
+  String filterSemesterId = (String) request.getAttribute("filterSemesterId");
+%>
+<%!
+  // Group identical subjects (same code/name/credit/department) into one row.
+  private static java.util.LinkedHashMap<String, java.util.List<common.Subject>> groupSubjects(java.util.List<common.Subject> list) {
+    java.util.LinkedHashMap<String, java.util.List<common.Subject>> groups = new java.util.LinkedHashMap<>();
+    if (list == null) return groups;
+    for (common.Subject s : list) {
+      String key = s.getSubjectCode() + "|" + s.getSubjectName() + "|" + s.getCredit() + "|" + s.getDepartment();
+      groups.computeIfAbsent(key, k -> new java.util.ArrayList<>()).add(s);
+    }
+    return groups;
+  }
+
+  private static String esc(String v) {
+    if (v == null) return "";
+    return v.replace("&", "&amp;").replace("\\", "&#92;").replace("\"", "&quot;")
+            .replace("<", "&lt;").replace(">", "&gt;");
+  }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,7 +92,11 @@
 
             <!-- Right: Action Buttons -->
             <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
-
+              <% if (filterSemesterId != null) { %>
+                <a href="${pageContext.request.contextPath}/admin/subjects" class="badge badge-info" style="text-decoration: none; padding: 0.45rem 0.75rem; font-size: 0.78rem;">
+                  Semester ဖြင့် စစ်ထားသည် · အားလုံးကြည့်ရန် ✕
+                </a>
+              <% } %>
               <button type="button" class="btn-add-record" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -96,21 +119,41 @@
                 <th>ဘာသာရပ် အမည်</th>
                 <th>ခရက်ဒစ် (Credit)</th>
                 <th>ဌာန</th>
-                <th>Semester</th>
                 <th style="text-align: center;">လုပ်ဆောင်ချက်</th>
               </tr>
             </thead>
             <tbody>
-              <% if (subjects != null && !subjects.isEmpty()) {
-                 int idx = 1;
-                 for (common.Subject s : subjects) { %>
+              <%
+                java.util.LinkedHashMap<String, java.util.List<common.Subject>> subjectGroups = groupSubjects(subjects);
+                if (!subjectGroups.isEmpty()) {
+                  int idx = 1;
+                  for (java.util.List<common.Subject> grp : subjectGroups.values()) {
+                    common.Subject s = grp.get(0);
+                    // Collect year/semester assignments across duplicates (for the detail modal)
+                    StringBuilder assignmentsJson = new StringBuilder("[");
+                    boolean hasUnassigned = false;
+                    java.time.LocalDateTime earliest = null;
+                    for (common.Subject x : grp) {
+                      if (x.getSemesterId() > 0 && x.getAcademicYearName() != null) {
+                        int semNo = x.getSemesterNumber() != null ? x.getSemesterNumber() : 0;
+                        if (assignmentsJson.length() > 1) assignmentsJson.append(",");
+                        assignmentsJson.append("{\"y\":\"").append(esc(x.getAcademicYearName()))
+                                       .append("\",\"s\":").append(semNo).append("}");
+                      } else {
+                        hasUnassigned = true;
+                      }
+                      if (x.getCreatedAt() != null && (earliest == null || x.getCreatedAt().isBefore(earliest))) {
+                        earliest = x.getCreatedAt();
+                      }
+                    }
+                    assignmentsJson.append("]");
+              %>
               <tr>
                 <td style="color: #64748b; font-weight: 500;"><%= idx++ %></td>
                 <td><span style="font-weight: 700; color: #2563eb; font-family: monospace;"><%= s.getSubjectCode() %></span></td>
                 <td><span style="font-weight: 600; color: #0f172a;"><%= s.getSubjectName() %></span></td>
                 <td><span class="badge badge-info"><%= s.getCredit() %> Credits</span></td>
                 <td style="font-size: 0.82rem; color: #64748b;"><%= s.getDepartment() %></td>
-                <td><span class="badge badge-warning">Sem <%= s.getSemester() %></span></td>
                 <td style="text-align: center;">
                   <div class="action-buttons-group justify-content-center">
                     <button type="button" class="btn-action-icon edit" data-bs-toggle="modal"
@@ -120,7 +163,6 @@
                             data-subjectname="<%= s.getSubjectName() %>"
                             data-credit="<%= s.getCredit() %>"
                             data-department="<%= s.getDepartment() %>"
-                            data-semester="<%= s.getSemester() %>"
                             title="ပြင်ဆင်ရန်">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -141,8 +183,9 @@
                             data-name="<%= s.getSubjectName() %>"
                             data-credit="<%= s.getCredit() %>"
                             data-department="<%= s.getDepartment() %>"
-                            data-semester="<%= s.getSemester() %>"
-                            data-created="<%= s.getCreatedAt() != null ? s.getCreatedAt().toString().replace("T", " ") : "-" %>"
+                            data-assignments="<%= esc(assignmentsJson.toString()) %>"
+                            data-unassigned="<%= hasUnassigned %>"
+                            data-created="<%= earliest != null ? earliest.toString().replace("T", " ") : "-" %>"
                             title="အသေးစိတ်ကြည့်ရန်">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
@@ -153,7 +196,7 @@
               </tr>
               <% } } else { %>
               <tr>
-                <td colspan="7" style="text-align: center; padding: 2.5rem 1rem; color: var(--muted-foreground);">
+                <td colspan="6" style="text-align: center; padding: 2.5rem 1rem; color: var(--muted-foreground);">
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 opacity-50">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
@@ -170,7 +213,7 @@
         <!-- Pagination Footer Bar -->
         <div class="pagination-footer-bar">
           <div>
-            Showing <%= subjects != null && !subjects.isEmpty() ? 1 : 0 %> to <%= subjects != null ? subjects.size() : 0 %> of <%= subjects != null ? subjects.size() : 0 %> Entries
+            Showing <%= !subjectGroups.isEmpty() ? 1 : 0 %> to <%= subjectGroups.size() %> of <%= subjectGroups.size() %> Entries
           </div>
           <div class="pagination-controls-wrap">
             <select style="padding: 0.25rem 0.5rem; font-size: 0.78rem; border-radius: 0.375rem;">
@@ -241,15 +284,13 @@
                 <option value="6">6</option>
               </select>
             </div>
-            <div class="col-6">
-              <label class="form-label font-bold" for="add-semester">Semester *</label>
-              <select id="add-semester" name="semester" required
-                      style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.875rem;">
-                <option value="">-- ရွေးချယ်ပါ --</option>
-                <% for (int i = 1; i <= 8; i++) { %>
-                  <option value="<%= i %>">Sem <%= i %></option>
-                <% } %>
-              </select>
+            <div class="col-12">
+              <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.375rem; padding: 0.55rem 0.75rem; font-size: 0.78rem; color: #1d4ed8; display: flex; align-items: flex-start; gap: 0.45rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 0.1rem;">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>ဘာသာရပ်ကို အရင် create လုပ်ပါ။ ပညာသင်နှစ် page မှ ပညာသင်နှစ် → Semester အတွင်း ထည့်သွင်းနိုင်ပါသည်။</span>
+              </div>
             </div>
           </div>
         </div>
@@ -306,15 +347,13 @@
                 <% } %>
               </select>
             </div>
-            <div class="col-md-6">
-              <label class="form-label font-bold" for="edit-semester">Semester *</label>
-              <select name="semester" id="edit-semester" required
-                      style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.875rem;">
-                <option value="">-- ရွေးချယ်ပါ --</option>
-                <% for (int i = 1; i <= 8; i++) { %>
-                  <option value="<%= i %>">Sem <%= i %></option>
-                <% } %>
-              </select>
+            <div class="col-12">
+              <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.375rem; padding: 0.55rem 0.75rem; font-size: 0.78rem; color: #1d4ed8; display: flex; align-items: flex-start; gap: 0.45rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 0.1rem;">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>ပညာသင်နှစ် / Semester ကို ပညာသင်နှစ် page မှ စီမံနိုင်ပါသည်။</span>
+              </div>
             </div>
           </div>
         </div>
@@ -381,9 +420,9 @@
             <span style="color: #64748b; font-size: 0.875rem;">ခရက်ဒစ် (Credit):</span>
             <span id="view-subj-credit" class="badge badge-info"></span>
           </div>
-          <div class="d-flex justify-content-between border-bottom pb-2">
-            <span style="color: #64748b; font-size: 0.875rem;">Semester:</span>
-            <span id="view-subj-semester" class="badge badge-warning"></span>
+          <div class="border-bottom pb-2">
+            <span style="color: #64748b; font-size: 0.875rem;">ပညာသင်နှစ် / Semester:</span>
+            <div id="view-subj-assignments" class="d-flex flex-column gap-1 align-items-end mt-1"></div>
           </div>
           <div class="d-flex justify-content-between">
             <span style="color: #64748b; font-size: 0.875rem;">ထည့်သွင်းသည့်ရက်စွဲ (Created At):</span>
@@ -440,7 +479,6 @@ document.getElementById('editSubjectModal').addEventListener('show.bs.modal', fu
   for (let opt of deptSel.options) {
     opt.selected = (opt.value === d.department);
   }
-  document.getElementById('edit-semester').value       = d.semester || '';
 });
 
 document.getElementById('viewSubjectModal').addEventListener('show.bs.modal', function(e) {
@@ -451,8 +489,36 @@ document.getElementById('viewSubjectModal').addEventListener('show.bs.modal', fu
   document.getElementById('view-subj-name').textContent     = d.name || '-';
   document.getElementById('view-subj-dept').textContent     = d.department || '-';
   document.getElementById('view-subj-credit').textContent   = (d.credit || '-') + ' Credits';
-  document.getElementById('view-subj-semester').textContent = 'Sem ' + (d.semester || '-');
   document.getElementById('view-subj-created').textContent  = d.created || '-';
+
+  const wrap = document.getElementById('view-subj-assignments');
+  wrap.innerHTML = '';
+  let assignments = [];
+  try { assignments = JSON.parse(d.assignments || '[]'); } catch (err) { assignments = []; }
+
+  if (!assignments.length && d.unassigned !== 'true') {
+    wrap.innerHTML = '<span style="color: #94a3b8;">-</span>';
+    return;
+  }
+  if (assignments.length) {
+    const seen = {};
+    assignments.forEach(function(a) {
+      const key = (a.y || '-') + '|' + a.s;
+      if (seen[key]) return;
+      seen[key] = true;
+      const row = document.createElement('div');
+      row.className = 'd-flex align-items-center gap-1';
+      row.innerHTML =
+        '<span style="font-size: 0.8125rem; color: #334155;">' + (a.y || '-') + '</span>' +
+        '<span class="badge badge-warning" style="font-size: 0.72rem;">Sem ' + (a.s || '-') + '</span>';
+      wrap.appendChild(row);
+    });
+  }
+  if (d.unassigned === 'true') {
+    const un = document.createElement('div');
+    un.innerHTML = '<span class="badge" style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem;">မထည့်ရသေးပါ</span>';
+    wrap.appendChild(un.firstChild);
+  }
 });
 </script>
 </body>

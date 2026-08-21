@@ -37,9 +37,11 @@ public class ExamResultServlet extends HttpServlet {
                 List<ExamResult> studentResults = service.getStudentResults(sDbId);
                 req.setAttribute("studentInfo", student);
                 req.setAttribute("studentResults", studentResults);
-                // Also provide dropdown data for the add-result modal
+                // Dropdown data for the add-result modal (Academic Year -> Semester -> Subject)
                 req.setAttribute("students", service.getAllStudents());
                 req.setAttribute("subjects", service.getAllSubjects());
+                req.setAttribute("academicYears", service.getAllAcademicYears());
+                req.setAttribute("semesters", service.getAllSemesters());
                 req.getRequestDispatcher("/WEB-INF/views/admin/student-result-detail.jsp").forward(req, resp);
                 return;
             }
@@ -110,14 +112,12 @@ public class ExamResultServlet extends HttpServlet {
         String subjId = req.getParameter("subjectId");
         String marks = req.getParameter("marks");
         String totalMarks = req.getParameter("totalMarks");
-        String semester = req.getParameter("semester");
 
         if (sId != null && !sId.isBlank())     r.setStudentId(Integer.parseInt(sId));
         if (subjId != null && !subjId.isBlank()) r.setSubjectId(Integer.parseInt(subjId));
         if (marks != null && !marks.isBlank())  r.setMarks(Double.parseDouble(marks));
         if (totalMarks != null && !totalMarks.isBlank()) r.setTotalMarks(Double.parseDouble(totalMarks));
-        r.setAcademicYear(req.getParameter("academicYear"));
-        if (semester != null && !semester.isBlank()) r.setSemester(Integer.parseInt(semester));
+        // Academic year & semester are derived from the subject on the server
         String examType = req.getParameter("examType");
         if (examType != null && !examType.isBlank()) r.setExamType(examType.trim());
         // Grade is calculated server-side; leave it null here

@@ -78,6 +78,77 @@ public interface ExamResultService extends Remote {
     boolean deleteStudent(int id) throws RemoteException;
 
     // =========================================================================
+    // Academic Year Management
+    // =========================================================================
+
+    /**
+     * Returns all academic years ordered by name.
+     */
+    List<AcademicYear> getAllAcademicYears() throws RemoteException;
+
+    /**
+     * Returns an academic year by its primary key.
+     */
+    AcademicYear getAcademicYearById(int id) throws RemoteException;
+
+    /**
+     * Adds a new academic year.
+     * @return true on success
+     * @throws RemoteException if the year name already exists or is invalid
+     */
+    boolean addAcademicYear(AcademicYear year) throws RemoteException;
+
+    /**
+     * Updates an existing academic year name.
+     * @return true on success
+     */
+    boolean updateAcademicYear(AcademicYear year) throws RemoteException;
+
+    /**
+     * Deletes an academic year and its semesters, subjects and results.
+     * @return true on success
+     */
+    boolean deleteAcademicYear(int id) throws RemoteException;
+
+    // =========================================================================
+    // Semester Management
+    // =========================================================================
+
+    /**
+     * Returns all semesters (with their academic year names).
+     */
+    List<Semester> getAllSemesters() throws RemoteException;
+
+    /**
+     * Returns the semesters of a specific academic year.
+     */
+    List<Semester> getSemestersByAcademicYear(int academicYearId) throws RemoteException;
+
+    /**
+     * Returns a semester by its primary key.
+     */
+    Semester getSemesterById(int id) throws RemoteException;
+
+    /**
+     * Adds a new semester to an academic year.
+     * @return true on success
+     * @throws RemoteException if the semester number already exists in that year
+     */
+    boolean addSemester(Semester semester) throws RemoteException;
+
+    /**
+     * Updates an existing semester.
+     * @return true on success
+     */
+    boolean updateSemester(Semester semester) throws RemoteException;
+
+    /**
+     * Deletes a semester and its subjects/results.
+     * @return true on success
+     */
+    boolean deleteSemester(int id) throws RemoteException;
+
+    // =========================================================================
     // Subject Management
     // =========================================================================
 
@@ -90,6 +161,11 @@ public interface ExamResultService extends Remote {
      * Returns subjects matching the search keyword.
      */
     List<Subject> searchSubjects(String keyword) throws RemoteException;
+
+    /**
+     * Returns all subjects that belong to a specific semester.
+     */
+    List<Subject> getSubjectsBySemester(int semesterId) throws RemoteException;
 
     /**
      * Returns a subject by its primary key.
@@ -115,6 +191,30 @@ public interface ExamResultService extends Remote {
      */
     boolean deleteSubject(int id) throws RemoteException;
 
+    /**
+     * Returns all subjects that are not yet assigned to any semester.
+     * Subjects are created standalone first, then attached to a semester
+     * of an academic year from the academic year page.
+     */
+    List<Subject> getUnassignedSubjects() throws RemoteException;
+
+    /**
+     * Assigns existing subjects to a semester.
+     * @param semesterId target semester primary key
+     * @param subjectIds primary keys of subjects to attach
+     * @return number of subjects newly assigned
+     * @throws RemoteException if the semester does not exist, a subject is
+     *         already assigned to another semester, or a subject code
+     *         duplicates one already used in that semester
+     */
+    int assignSubjectsToSemester(int semesterId, int[] subjectIds) throws RemoteException;
+
+    /**
+     * Removes a subject from its semester (returns it to the unassigned pool).
+     * @return true on success
+     */
+    boolean detachSubjectFromSemester(int subjectId) throws RemoteException;
+
     // =========================================================================
     // Exam Result Management
     // =========================================================================
@@ -127,9 +227,10 @@ public interface ExamResultService extends Remote {
     /**
      * Returns exam results filtered by optional criteria.
      * Pass null or empty string to ignore a filter.
+     * Semester/academic-year filters match the subject's semester.
      */
     List<ExamResult> searchResults(String studentId, String subjectId,
-                                   String semester, String academicYear) throws RemoteException;
+                                   String semesterId, String academicYearId) throws RemoteException;
 
     /**
      * Returns an exam result by its primary key.

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 /**
  * Represents an exam result linking a student to a subject with marks and grade.
+ * The academic year and semester are derived from the subject
+ * (subject -> semester -> academic year) and populated as display fields.
  * Serializable for RMI transport.
  */
 public class ExamResult implements Serializable {
@@ -16,36 +18,30 @@ public class ExamResult implements Serializable {
     private double marks;
     private double totalMarks;
     private String grade;
-    private String academicYear;
-    private int semester;
     private String examType = "REGULAR";
     private LocalDateTime createdAt;
 
-    // Transient fields for display (populated by JOIN queries)
+    // Transient display fields (populated by JOIN queries)
+    private int    academicYearId;
+    private String academicYear;
+    private int    semesterId;     // semesters.id the subject belongs to
+    private int    semester;
     private String studentName;
     private String studentCode;
     private String subjectName;
     private String subjectCode;
     private int    subjectCredit;  // credit hours of the subject (from subjects JOIN)
 
-
     public ExamResult() {}
 
     public ExamResult(int id, int studentId, int subjectId, double marks, double totalMarks,
-                      String grade, String academicYear, int semester, LocalDateTime createdAt) {
-        this(id, studentId, subjectId, marks, totalMarks, grade, academicYear, semester, "REGULAR", createdAt);
-    }
-
-    public ExamResult(int id, int studentId, int subjectId, double marks, double totalMarks,
-                      String grade, String academicYear, int semester, String examType, LocalDateTime createdAt) {
+                      String grade, String examType, LocalDateTime createdAt) {
         this.id = id;
         this.studentId = studentId;
         this.subjectId = subjectId;
         this.marks = marks;
         this.totalMarks = totalMarks;
         this.grade = grade;
-        this.academicYear = academicYear;
-        this.semester = semester;
         this.examType = (examType != null && !examType.isBlank()) ? examType : "REGULAR";
         this.createdAt = createdAt;
     }
@@ -69,17 +65,23 @@ public class ExamResult implements Serializable {
     public String getGrade() { return grade; }
     public void setGrade(String grade) { this.grade = grade; }
 
-    public String getAcademicYear() { return academicYear; }
-    public void setAcademicYear(String academicYear) { this.academicYear = academicYear; }
-
-    public int getSemester() { return semester; }
-    public void setSemester(int semester) { this.semester = semester; }
-
     public String getExamType() { return examType != null ? examType : "REGULAR"; }
     public void setExamType(String examType) { this.examType = examType; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public int getAcademicYearId() { return academicYearId; }
+    public void setAcademicYearId(int academicYearId) { this.academicYearId = academicYearId; }
+
+    public String getAcademicYear() { return academicYear; }
+    public void setAcademicYear(String academicYear) { this.academicYear = academicYear; }
+
+    public int getSemesterId() { return semesterId; }
+    public void setSemesterId(int semesterId) { this.semesterId = semesterId; }
+
+    public int getSemester() { return semester; }
+    public void setSemester(int semester) { this.semester = semester; }
 
     public String getStudentName() { return studentName; }
     public void setStudentName(String studentName) { this.studentName = studentName; }

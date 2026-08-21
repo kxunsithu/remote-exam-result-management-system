@@ -251,8 +251,8 @@ http://localhost:8080/remote-exam-result-management-system/
 | Role | Email | Password | Access Rights |
 | :--- | :--- | :--- | :--- |
 | **ADMIN** | `admin@example.com` | `admin123` | Full administrative CRUD & statistics |
-| **STUDENT** | `student@example.com` | `student123` | View own exam results & academic profile |
-| **STUDENT (John)** | `john.doe@university.edu` | *(Registered via /register)* | Personal transcript view |
+| **STUDENT** | `john.doe@university.edu` | `student123` | View own exam results & academic profile (linked to student ST001 John Doe) |
+| **Other students** | `jane.smith@university.edu`, etc. | *(Register via /register)* | Personal transcript view after registration |
 
 ---
 
