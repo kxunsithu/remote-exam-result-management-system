@@ -171,9 +171,19 @@ public interface ExamResultService extends Remote {
 
     /**
      * Calculates the overall grade based on average percentage.
-     * Uses the standard university grading scale.
+     * Uses the UCS(Hpa-an) grading scale.
      */
     String calculateOverallGrade(double averagePercentage) throws RemoteException;
+
+    /**
+     * Calculates the credit-weighted CGPA for a list of results.
+     * Uses the UCS(Hpa-an) 4-point grading scale.
+     * Formula: Σ(grade_score × credit_units) / Σ(credit_units)
+     *
+     * @param results list of exam results with subject credit data populated
+     * @return CGPA value (0.0–4.0), or 0.0 if the list is empty
+     */
+    double calculateCGPA(List<ExamResult> results) throws RemoteException;
 
     // =========================================================================
     // Dashboard Statistics

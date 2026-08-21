@@ -57,9 +57,6 @@ public class DatabaseInitializer {
                 email         TEXT    NOT NULL UNIQUE,
                 phone         TEXT,
                 gender        TEXT,
-                date_of_birth TEXT,
-                department    TEXT    NOT NULL,
-                year          INTEGER NOT NULL,
                 created_at    TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
             )
             """);
@@ -88,16 +85,35 @@ public class DatabaseInitializer {
                 grade         TEXT    NOT NULL,
                 academic_year TEXT    NOT NULL,
                 semester      INTEGER NOT NULL,
+                exam_type     TEXT    NOT NULL DEFAULT 'REGULAR',
                 created_at    TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
             )
             """);
+
+        // Migration for existing tables
+        try {
+            stmt.execute("ALTER TABLE exam_results ADD COLUMN exam_type TEXT NOT NULL DEFAULT 'REGULAR'");
+        } catch (SQLException ignored) {
+            // Column already exists
+        }
     }
 
     private static void createIndexes(Statement stmt) throws SQLException {
         stmt.execute("CREATE INDEX IF NOT EXISTS idx_results_student ON exam_results(student_id)");
         stmt.execute("CREATE INDEX IF NOT EXISTS idx_results_subject ON exam_results(subject_id)");
         stmt.execute("CREATE INDEX IF NOT EXISTS idx_results_year    ON exam_results(academic_year)");
-        stmt.execute("CREATE INDEX IF NOT EXISTS idx_students_dept   ON students(department)");
+        // Drop old index if it exists
+        stmt.execute("DROP INDEX IF EXISTS idx_unique_student_subject_year_sem");
+        // Clean up duplicate records if any exist before creating UNIQUE index
+        stmt.execute("""
+            DELETE FROM exam_results
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM exam_results
+                GROUP BY student_id, subject_id, academic_year, semester, exam_type
+            )
+            """);
+        stmt.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_student_subject_year_sem_type ON exam_results(student_id, subject_id, academic_year, semester, exam_type)");
     }
 
     private static void insertSampleData(Connection conn) throws SQLException {
@@ -119,7 +135,7 @@ public class DatabaseInitializer {
     private static boolean tableIsEmpty(Connection conn, String table) throws SQLException {
         try (Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM " + table)) {
-            return rs.getInt(1) == 0;
+            return rs.next() && rs.getInt(1) == 0;
         }
     }
 
@@ -134,7 +150,7 @@ public class DatabaseInitializer {
             ps.setString(3, "ADMIN");
             ps.executeUpdate();
 
-            ps.setString(1, "student@example.com");
+            ps.setString(1, "john.doe@university.edu");
             ps.setString(2, studentHash);
             ps.setString(3, "STUDENT");
             ps.executeUpdate();
@@ -142,17 +158,18 @@ public class DatabaseInitializer {
         System.out.println("  ✓ Sample users inserted.");
     }
 
+
     private static void insertSampleStudents(Connection conn) throws SQLException {
         String sql = """
-            INSERT INTO students (student_id, name, email, phone, gender, date_of_birth, department, year)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO students (student_id, name, email, phone, gender)
+            VALUES (?, ?, ?, ?, ?)
             """;
         Object[][] data = {
-            {"ST001", "John Doe",   "john.doe@university.edu",   "555-0101", "Male",   "2001-03-15", "Computer Science", 3},
-            {"ST002", "Jane Smith", "jane.smith@university.edu", "555-0102", "Female", "2002-07-22", "Computer Science", 2},
-            {"ST003", "Alex Brown", "alex.brown@university.edu", "555-0103", "Male",   "2001-11-08", "Information Technology", 3},
-            {"ST004", "Maria Garcia", "maria.garcia@university.edu", "555-0104", "Female", "2003-01-30", "Software Engineering", 1},
-            {"ST005", "Liam Johnson", "liam.johnson@university.edu", "555-0105", "Male",   "2002-05-18", "Computer Science", 2},
+            {"ST001", "John Doe",     "john.doe@university.edu",     "555-0101", "Male"},
+            {"ST002", "Jane Smith",   "jane.smith@university.edu",   "555-0102", "Female"},
+            {"ST003", "Alex Brown",   "alex.brown@university.edu",   "555-0103", "Male"},
+            {"ST004", "Maria Garcia", "maria.garcia@university.edu", "555-0104", "Female"},
+            {"ST005", "Liam Johnson", "liam.johnson@university.edu", "555-0105", "Male"},
         };
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Object[] row : data) {
@@ -161,9 +178,6 @@ public class DatabaseInitializer {
                 ps.setString(3, (String) row[2]);
                 ps.setString(4, (String) row[3]);
                 ps.setString(5, (String) row[4]);
-                ps.setString(6, (String) row[5]);
-                ps.setString(7, (String) row[6]);
-                ps.setInt(8, (Integer) row[7]);
                 ps.executeUpdate();
             }
         }

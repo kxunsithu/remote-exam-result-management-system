@@ -15,13 +15,14 @@ public class ExamResultDAO {
 
     private static final String SELECT_WITH_JOINS = """
         SELECT er.id, er.student_id, er.subject_id, er.marks, er.total_marks,
-               er.grade, er.academic_year, er.semester, er.created_at,
+               er.grade, er.academic_year, er.semester, er.exam_type, er.created_at,
                s.name AS student_name, s.student_id AS student_code,
-               sub.subject_name, sub.subject_code
+               sub.subject_name, sub.subject_code, sub.credit AS subject_credit
         FROM exam_results er
         JOIN students s ON er.student_id = s.id
         JOIN subjects sub ON er.subject_id = sub.id
         """;
+
 
     public List<ExamResult> findAll() {
         List<ExamResult> list = new ArrayList<>();
@@ -122,8 +123,8 @@ public class ExamResultDAO {
 
     public boolean insert(ExamResult r) {
         String sql = """
-            INSERT INTO exam_results (student_id, subject_id, marks, total_marks, grade, academic_year, semester)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO exam_results (student_id, subject_id, marks, total_marks, grade, academic_year, semester, exam_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -138,13 +139,13 @@ public class ExamResultDAO {
     public boolean update(ExamResult r) {
         String sql = """
             UPDATE exam_results SET student_id=?, subject_id=?, marks=?, total_marks=?,
-                grade=?, academic_year=?, semester=?
+                grade=?, academic_year=?, semester=?, exam_type=?
             WHERE id=?
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setResultParams(ps, r);
-            ps.setInt(8, r.getId());
+            ps.setInt(9, r.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("ExamResultDAO.update error: " + e.getMessage());
@@ -164,11 +165,48 @@ public class ExamResultDAO {
         }
     }
 
+    public String getAcademicYearForStudentSemester(int studentId, int semester, String examType, int excludeId) {
+        String sql = "SELECT academic_year FROM exam_results WHERE student_id = ? AND semester = ? AND exam_type = ? AND id != ? LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, semester);
+            ps.setString(3, examType != null && !examType.isBlank() ? examType : "REGULAR");
+            ps.setInt(4, excludeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("academic_year");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ExamResultDAO.getAcademicYearForStudentSemester error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean existsDuplicate(int studentId, int subjectId, String academicYear, int semester, String examType, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM exam_results WHERE student_id = ? AND subject_id = ? AND academic_year = ? AND semester = ? AND exam_type = ? AND id != ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, subjectId);
+            ps.setString(3, academicYear);
+            ps.setInt(4, semester);
+            ps.setString(5, examType != null && !examType.isBlank() ? examType : "REGULAR");
+            ps.setInt(6, excludeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public int count() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM exam_results")) {
-            return rs.getInt(1);
+            return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
             return 0;
         }
@@ -182,9 +220,16 @@ public class ExamResultDAO {
         ps.setString(5, r.getGrade());
         ps.setString(6, r.getAcademicYear());
         ps.setInt(7, r.getSemester());
+        ps.setString(8, r.getExamType());
     }
 
     private ExamResult mapRow(ResultSet rs) throws SQLException {
+        String examType = "REGULAR";
+        try {
+            String et = rs.getString("exam_type");
+            if (et != null && !et.isBlank()) examType = et;
+        } catch (SQLException ignored) {}
+
         ExamResult er = new ExamResult(
             rs.getInt("id"),
             rs.getInt("student_id"),
@@ -194,12 +239,14 @@ public class ExamResultDAO {
             rs.getString("grade"),
             rs.getString("academic_year"),
             rs.getInt("semester"),
+            examType,
             LocalDateTime.parse(rs.getString("created_at").replace(" ", "T"))
         );
         er.setStudentName(rs.getString("student_name"));
         er.setStudentCode(rs.getString("student_code"));
         er.setSubjectName(rs.getString("subject_name"));
         er.setSubjectCode(rs.getString("subject_code"));
+        er.setSubjectCredit(rs.getInt("subject_credit"));
         return er;
     }
 }

@@ -1,31 +1,50 @@
 /* app.js — Remote Exam Result Management System */
 'use strict';
 
-// ── Flash message auto-dismiss ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Auto-dismiss flash alerts after 5 seconds
+  // ── Restore Sidebar Collapsed State from localStorage ─────
+  const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+  if (isCollapsed) {
+    document.body.classList.add('sidebar-collapsed');
+  }
+
+  // ── Sidebar Toggle Functionality ───────────────────────────
+  const toggleButtons = document.querySelectorAll('.sidebar-toggle-btn, #sidebar-toggle');
+  toggleButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.innerWidth <= 768) {
+        document.body.classList.toggle('sidebar-mobile-open');
+      } else {
+        document.body.classList.toggle('sidebar-collapsed');
+        const collapsedNow = document.body.classList.contains('sidebar-collapsed');
+        localStorage.setItem('sidebar-collapsed', collapsedNow ? 'true' : 'false');
+      }
+    });
+  });
+
+  // Close mobile sidebar when clicking outside
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && document.body.classList.contains('sidebar-mobile-open')) {
+      const sidebar = document.querySelector('.sidebar');
+      const isToggleClick = Array.from(toggleButtons).some(btn => btn.contains(e.target));
+      if (sidebar && !sidebar.contains(e.target) && !isToggleClick) {
+        document.body.classList.remove('sidebar-mobile-open');
+      }
+    }
+  });
+
+  // ── Flash message auto-dismiss ──────────────────────────────
   document.querySelectorAll('.flash-alert').forEach(el => {
     setTimeout(() => {
-      el.style.transition = 'opacity .5s, transform .5s';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       el.style.opacity    = '0';
       el.style.transform  = 'translateY(-8px)';
       setTimeout(() => el.remove(), 500);
     }, 5000);
   });
 
-  // Sidebar mobile toggle
-  const toggleBtn = document.getElementById('sidebar-toggle');
-  const sidebar   = document.querySelector('.sidebar');
-  if (toggleBtn && sidebar) {
-    toggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
-    document.addEventListener('click', (e) => {
-      if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
-        sidebar.classList.remove('open');
-      }
-    });
-  }
-
-  // Animate marks bars
+  // ── Animate marks bars if any ────────────────────────────────
   document.querySelectorAll('.marks-bar-fill').forEach(bar => {
     const pct = parseFloat(bar.dataset.pct || 0);
     bar.style.width = '0';
@@ -34,17 +53,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Confirmation dialogs for delete
+  // ── Global Modal Delete Confirmation ────────────────────────
+  let targetFormToDelete = null;
+  const deleteModalEl = document.getElementById('globalDeleteModal');
+  let deleteBsModal = null;
+
   document.querySelectorAll('.btn-confirm-delete').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const name = btn.dataset.name || 'this record';
-      if (!confirm(`Are you sure you want to delete ${name}?\nThis action cannot be undone.`)) {
-        e.preventDefault();
+      e.preventDefault();
+      const form = btn.closest('form');
+      if (!form) return;
+      targetFormToDelete = form;
+      const itemName = btn.dataset.name || 'ဤအချက်အလက်';
+      const targetNameEl = document.getElementById('globalDeleteTargetName');
+      if (targetNameEl) {
+        targetNameEl.textContent = itemName;
+      }
+      if (deleteModalEl && typeof bootstrap !== 'undefined') {
+        if (!deleteBsModal) {
+          deleteBsModal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
+        }
+        deleteBsModal.show();
+      } else if (confirm(`Are you sure you want to delete ${itemName}?`)) {
+        form.submit();
       }
     });
   });
 
-  // Form validation feedback
+  const confirmDeleteBtn = document.getElementById('globalConfirmDeleteBtn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', () => {
+      if (targetFormToDelete) {
+        targetFormToDelete.submit();
+      }
+    });
+  }
+
+  // ── Form validation feedback ────────────────────────────────
   document.querySelectorAll('form[data-validate]').forEach(form => {
     form.addEventListener('submit', (e) => {
       if (!form.checkValidity()) {
@@ -55,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Marks validation: marks cannot exceed totalMarks
+  // ── Marks validation: marks cannot exceed totalMarks ────────
   const marksInput = document.getElementById('marks');
   const totalInput = document.getElementById('totalMarks');
   if (marksInput && totalInput) {
@@ -74,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totalInput.addEventListener('input', validateMarks);
   }
 
-  // Password confirmation validation
+  // ── Password confirmation validation ────────────────────────
   const pw1 = document.getElementById('password');
   const pw2 = document.getElementById('confirmPassword');
   if (pw1 && pw2) {
@@ -86,26 +131,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Edit modal pre-fill (Bootstrap 5)
-  const editModal = document.getElementById('editModal');
-  if (editModal) {
-    editModal.addEventListener('show.bs.modal', (event) => {
-      const btn = event.relatedTarget;
-      if (!btn) return;
-      const data = btn.dataset;
-      editModal.querySelectorAll('[data-field]').forEach(el => {
-        const field = el.dataset.field;
-        if (data[field] !== undefined) el.value = data[field];
-      });
-    });
-  }
 });
-
-/* Grade badge helper (used in JS-rendered content if any) */
-function gradeBadgeClass(grade) {
-  const map = { 'A+': 'grade-aplus', 'A': 'grade-a', 'B+': 'grade-bplus',
-                'B': 'grade-b', 'C+': 'grade-cplus', 'C': 'grade-c',
-                'D': 'grade-d', 'F': 'grade-f' };
-  return map[grade] || 'grade-f';
-}

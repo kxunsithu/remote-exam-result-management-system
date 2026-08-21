@@ -15,7 +15,9 @@ import java.net.MalformedURLException;
  */
 public class RMIClientManager {
 
-    private static final String RMI_URL = "rmi://localhost:1099/ExamResultService";
+    private static final String RMI_HOST = System.getenv().getOrDefault("RMI_HOST", "localhost");
+    private static final String RMI_PORT = System.getenv().getOrDefault("RMI_PORT", "1099");
+    private static final String RMI_URL = "rmi://" + RMI_HOST + ":" + RMI_PORT + "/ExamResultService";
     private static ExamResultService serviceStub = null;
 
     private RMIClientManager() {}
@@ -30,6 +32,14 @@ public class RMIClientManager {
     public static synchronized ExamResultService getService() {
         if (serviceStub == null) {
             serviceStub = lookupService();
+        } else {
+            // Verify the cached stub is still alive; if not, reconnect.
+            try {
+                serviceStub.getTotalStudents();
+            } catch (java.rmi.RemoteException e) {
+                serviceStub = null;
+                serviceStub = lookupService();
+            }
         }
         return serviceStub;
     }

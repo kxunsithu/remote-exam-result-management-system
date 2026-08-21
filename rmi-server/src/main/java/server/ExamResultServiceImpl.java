@@ -170,6 +170,16 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     public boolean addExamResult(ExamResult result) throws RemoteException {
         if (result == null) return false;
         validateResult(result);
+        String existingYear = resultDAO.getAcademicYearForStudentSemester(
+                result.getStudentId(), result.getSemester(), result.getExamType(), 0);
+        if (existingYear != null && !existingYear.equalsIgnoreCase(result.getAcademicYear().trim())) {
+            throw new RemoteException("ဤကျောင်းသားအတွက် Semester " + result.getSemester() +
+                    " (" + result.getExamType() + ") ကို ပညာသင်နှစ် (" + existingYear + ") တွင် ထည့်သွင်းထားပြီးဖြစ်ပါသဖြင့် တခြားပညာသင်နှစ်တွင် ပြန်လည်သုံး၍ မရပါ။");
+        }
+        if (resultDAO.existsDuplicate(result.getStudentId(), result.getSubjectId(),
+                result.getAcademicYear(), result.getSemester(), result.getExamType(), 0)) {
+            throw new RemoteException("ဤကျောင်းသားအတွက် ယခုဘာသာရပ်၊ ပညာသင်နှစ်၊ Semester နှင့် Exam Type (" + result.getExamType() + ") ရလဒ် ထည့်သွင်းပြီးဖြစ်ပါသည်။");
+        }
         // Server calculates grade
         result.setGrade(computeGrade(result.getMarks(), result.getTotalMarks()));
         return resultDAO.insert(result);
@@ -179,6 +189,16 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     public boolean updateExamResult(ExamResult result) throws RemoteException {
         if (result == null || result.getId() <= 0) return false;
         validateResult(result);
+        String existingYear = resultDAO.getAcademicYearForStudentSemester(
+                result.getStudentId(), result.getSemester(), result.getExamType(), result.getId());
+        if (existingYear != null && !existingYear.equalsIgnoreCase(result.getAcademicYear().trim())) {
+            throw new RemoteException("ဤကျောင်းသားအတွက် Semester " + result.getSemester() +
+                    " (" + result.getExamType() + ") ကို ပညာသင်နှစ် (" + existingYear + ") တွင် ထည့်သွင်းထားပြီးဖြစ်ပါသဖြင့် တခြားပညာသင်နှစ်တွင် ပြန်လည်သုံး၍ မရပါ။");
+        }
+        if (resultDAO.existsDuplicate(result.getStudentId(), result.getSubjectId(),
+                result.getAcademicYear(), result.getSemester(), result.getExamType(), result.getId())) {
+            throw new RemoteException("ဤကျောင်းသားအတွက် ယခုဘာသာရပ်၊ ပညာသင်နှစ်၊ Semester နှင့် Exam Type (" + result.getExamType() + ") ရလဒ် ထည့်သွင်းပြီးဖြစ်ပါသည်။");
+        }
         // Server recalculates grade
         result.setGrade(computeGrade(result.getMarks(), result.getTotalMarks()));
         return resultDAO.update(result);
@@ -205,6 +225,20 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     @Override
     public String calculateOverallGrade(double averagePercentage) throws RemoteException {
         return computeGrade(averagePercentage, 100.0);
+    }
+    @Override
+    public double calculateCGPA(List<ExamResult> results) throws RemoteException {
+        if (results == null || results.isEmpty()) return 0.0;
+        double totalGradePoints = 0.0;
+        int    totalCredits     = 0;
+        for (ExamResult r : results) {
+            int credit = r.getSubjectCredit();
+            if (credit <= 0) continue;  // skip if credit info unavailable
+            totalGradePoints += gradeToPoints(r.getGrade()) * credit;
+            totalCredits     += credit;
+        }
+        if (totalCredits == 0) return 0.0;
+        return Math.round((totalGradePoints / totalCredits) * 100.0) / 100.0;
     }
 
     // =========================================================================
@@ -235,18 +269,35 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     // Internal helpers (also used by DatabaseInitializer)
     // =========================================================================
 
+    /**
+     * Computes grade based on percentage using the UCS(Hpa-an) official scale.
+     *
+     * Scale: A+(≥90), A(80-89), A-(75-79), B+(70-74), B(65-69),
+     *        B-(60-64), C+(55-59), C(50-54), D(40-49), F(<40)
+     */
     public static String computeGrade(double marks, double totalMarks) {
         if (totalMarks <= 0) return "F";
         double pct = (marks / totalMarks) * 100.0;
         if (pct >= 90) return "A+";
         if (pct >= 80) return "A";
-        if (pct >= 75) return "B+";
-        if (pct >= 70) return "B";
-        if (pct >= 65) return "C+";
-        if (pct >= 60) return "C";
-        if (pct >= 50) return "D";
+        if (pct >= 75) return "A-";
+        if (pct >= 70) return "B+";
+        if (pct >= 65) return "B";
+        if (pct >= 60) return "B-";
+        if (pct >= 55) return "C+";
+        if (pct >= 50) return "C";
+        if (pct >= 40) return "D";
         return "F";
     }
+
+    /**
+     * Maps a letter grade to its grade score on the UCS(Hpa-an) 4-point scale.
+     * Delegates to {@link common.ExamResult#gradeToPoints(String)} — single source of truth.
+     */
+    public static double gradeToPoints(String grade) {
+        return ExamResult.gradeToPoints(grade);
+    }
+
 
     // =========================================================================
     // Validation helpers
@@ -259,10 +310,6 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
             throw new RemoteException("Student name is required.");
         if (s.getEmail() == null || s.getEmail().isBlank() || !s.getEmail().contains("@"))
             throw new RemoteException("Valid email is required.");
-        if (s.getDepartment() == null || s.getDepartment().isBlank())
-            throw new RemoteException("Department is required.");
-        if (s.getYear() < 1 || s.getYear() > 6)
-            throw new RemoteException("Year must be between 1 and 6.");
     }
 
     private void validateSubject(Subject s) throws RemoteException {

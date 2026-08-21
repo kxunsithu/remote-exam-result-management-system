@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 /**
  * Admin Student Management servlet.
@@ -48,8 +47,10 @@ public class StudentServlet extends HttpServlet {
             }
 
         } catch (RuntimeException e) {
+            System.err.println("StudentServlet RMI error: " + e.getMessage());
             req.setAttribute("rmiError", "RMI server unavailable.");
         } catch (Exception e) {
+            System.err.println("StudentServlet doGet error: " + e.getMessage());
             req.setAttribute("error", "Failed to load students.");
         }
         req.getRequestDispatcher("/WEB-INF/views/admin/students.jsp").forward(req, resp);
@@ -66,7 +67,7 @@ public class StudentServlet extends HttpServlet {
             if ("delete".equals(action)) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 boolean ok = service.deleteStudent(id);
-                setFlash(req, ok, "Student deleted successfully.", "Failed to delete student.");
+                setFlash(req, ok, "ကျောင်းသား ပယ်ဖျက်ပြီးပါပြီ။", "ကျောင်းသား ပယ်ဖျက်၍ မရပါ။");
                 resp.sendRedirect(req.getContextPath() + "/admin/students");
                 return;
             }
@@ -75,12 +76,12 @@ public class StudentServlet extends HttpServlet {
 
             if ("add".equals(action)) {
                 boolean ok = service.addStudent(student);
-                setFlash(req, ok, "Student added successfully.", "Failed to add student. Student ID or email may already exist.");
+                setFlash(req, ok, "ကျောင်းသားအချက်အလက် အသစ် ထည့်သွင်းပြီးပါပြီ။", "ကျောင်းသား ထည့်သွင်း၍ မရပါ။ ခုံနံပါတ် (Roll Number) သို့မဟုတ် အီးမေးလ် ရှိနှင့်ပြီးဖြစ်ပါသည်။");
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 student.setId(id);
                 boolean ok = service.updateStudent(student);
-                setFlash(req, ok, "Student updated successfully.", "Failed to update student.");
+                setFlash(req, ok, "ကျောင်းသားအချက်အလက် ပြင်ဆင်ပြီးပါပြီ။", "ကျောင်းသား ပြင်ဆင်၍ မရပါ။");
             }
 
         } catch (RuntimeException e) {
@@ -99,15 +100,6 @@ public class StudentServlet extends HttpServlet {
         s.setEmail(req.getParameter("email"));
         s.setPhone(req.getParameter("phone"));
         s.setGender(req.getParameter("gender"));
-        String dob = req.getParameter("dateOfBirth");
-        if (dob != null && !dob.isBlank()) {
-            s.setDateOfBirth(LocalDate.parse(dob));
-        }
-        s.setDepartment(req.getParameter("department"));
-        String yearStr = req.getParameter("year");
-        if (yearStr != null && !yearStr.isBlank()) {
-            s.setYear(Integer.parseInt(yearStr));
-        }
         return s;
     }
 

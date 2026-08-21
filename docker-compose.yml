@@ -1,0 +1,28 @@
+services:
+  rmi-server:
+    build:
+      context: .
+      target: rmi-server
+    container_name: rmi-server
+    ports:
+      - "1099:1099"
+    volumes:
+      - db-data:/app/data
+
+  web-app:
+    build:
+      context: .
+      target: web-app
+    container_name: web-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - db-data:/app/data
+    environment:
+      - RMI_HOST=rmi-server
+      - RMI_PORT=1099
+    depends_on:
+      - rmi-server
+
+volumes:
+  db-data:

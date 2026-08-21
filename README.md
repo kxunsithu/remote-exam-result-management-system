@@ -234,7 +234,7 @@ RMI Server is ready.
 Open a new terminal window at the project root and run:
 ```bash
 cd web-app
-mvn cargo:run
+mvn exec:java
 ```
 *(Or deploy `web-app/target/remote-exam-result-management-system.war` to your local Apache Tomcat 10 installation)*.
 

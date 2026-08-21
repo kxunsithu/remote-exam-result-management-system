@@ -43,12 +43,14 @@ public class StudentResultServlet extends HttpServlet {
                         .mapToDouble(ExamResult::getTotalMarks).sum();
                     double avg = service.calculateAverage(results);
                     String grade = service.calculateOverallGrade(avg);
+                    double cgpa = service.calculateCGPA(results);
 
                     req.setAttribute("totalObtained", totalObtained);
                     req.setAttribute("totalPossible",  totalPossible);
                     req.setAttribute("average",        avg);
                     req.setAttribute("overallGrade",   grade);
                     req.setAttribute("overallStatus",  avg >= 50.0 ? "PASS" : "FAIL");
+                    req.setAttribute("cgpa",           cgpa);
                 }
             }
 

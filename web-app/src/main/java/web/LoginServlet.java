@@ -21,7 +21,7 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            redirectAfterLogin(user, resp);
+            redirectAfterLogin(req, user, resp);
             return;
         }
         req.getRequestDispatcher("/login.jsp").forward(req, resp);
@@ -59,7 +59,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userRole", user.getRole());
             session.setMaxInactiveInterval(30 * 60); // 30 minutes
 
-            redirectAfterLogin(user, resp);
+            redirectAfterLogin(req, user, resp);
 
         } catch (RuntimeException e) {
             req.setAttribute("error", "Service unavailable. Please ensure the RMI server is running.");
@@ -70,8 +70,8 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private void redirectAfterLogin(User user, HttpServletResponse resp) throws IOException {
-        String ctx = "";
+    private void redirectAfterLogin(HttpServletRequest req, User user, HttpServletResponse resp) throws IOException {
+        String ctx = req.getContextPath();
         if ("ADMIN".equals(user.getRole())) {
             resp.sendRedirect(ctx + "/admin/dashboard");
         } else {

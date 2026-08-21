@@ -25,6 +25,11 @@ public class RMIServer {
         System.out.println("=======================================================");
 
         try {
+            // Fix RMI hostname binding on Linux where the machine hostname often
+            // resolves to 127.0.1.1 instead of 127.0.0.1, causing "Connection refused"
+            // when clients try to invoke remote methods after a successful registry lookup.
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+
             // 1. Initialize database (creates tables + sample data)
             DatabaseInitializer.initialize();
 

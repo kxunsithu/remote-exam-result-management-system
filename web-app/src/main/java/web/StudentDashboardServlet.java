@@ -34,11 +34,13 @@ public class StudentDashboardServlet extends HttpServlet {
                 req.setAttribute("totalResults", results.size());
 
                 if (!results.isEmpty()) {
-                    double avg = service.calculateAverage(results);
+                    double avg  = service.calculateAverage(results);
                     String grade = service.calculateOverallGrade(avg);
-                    req.setAttribute("average", avg);
+                    double cgpa  = service.calculateCGPA(results);
+                    req.setAttribute("average",      avg);
                     req.setAttribute("overallGrade", grade);
                     req.setAttribute("overallStatus", avg >= 50.0 ? "PASS" : "FAIL");
+                    req.setAttribute("cgpa",         cgpa);
                 }
             }
 

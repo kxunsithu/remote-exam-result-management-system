@@ -110,7 +110,7 @@ public class SubjectDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM subjects")) {
-            return rs.getInt(1);
+            return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
             return 0;
         }

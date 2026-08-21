@@ -2,19 +2,21 @@ package web;
 
 import common.ExamResult;
 import common.ExamResultService;
+import common.Student;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Admin Exam Result Management servlet.
- * GET  /admin/results             — list/search results
- * GET  /admin/results?action=edit&id=X — show edit form
- * POST /admin/results?action=add         — add result
- * POST /admin/results?action=update      — update result
- * POST /admin/results?action=delete      — delete result
+ * GET  /admin/results                          — list all results (student-grouped)
+ * GET  /admin/results?action=studentDetail&studentId=X — show per-student detail page
+ * POST /admin/results?action=add               — add result
+ * POST /admin/results?action=update            — update result
+ * POST /admin/results?action=delete            — delete result
  */
 @WebServlet("/admin/results")
 public class ExamResultServlet extends HttpServlet {
@@ -24,42 +26,35 @@ public class ExamResultServlet extends HttpServlet {
             throws ServletException, IOException {
         String action      = req.getParameter("action");
         String studentId   = req.getParameter("studentId");
-        String subjectId   = req.getParameter("subjectId");
-        String semester    = req.getParameter("semester");
-        String academicYear = req.getParameter("academicYear");
 
         try {
             ExamResultService service = RMIClientManager.getService();
 
-            // Always load drop-down data for forms
-            req.setAttribute("students", service.getAllStudents());
-            req.setAttribute("subjects", service.getAllSubjects());
-
-            if ("edit".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
-                ExamResult result = service.getResultById(id);
-                if (result == null) {
-                    req.setAttribute("error", "Result not found.");
-                } else {
-                    req.setAttribute("editResult", result);
-                }
+            // ── Student Detail View ────────────────────────────────────────
+            if ("studentDetail".equals(action) && studentId != null && !studentId.isBlank()) {
+                int sDbId = Integer.parseInt(studentId);
+                Student student = service.getStudentById(sDbId);
+                List<ExamResult> studentResults = service.getStudentResults(sDbId);
+                req.setAttribute("studentInfo", student);
+                req.setAttribute("studentResults", studentResults);
+                // Also provide dropdown data for the add-result modal
+                req.setAttribute("students", service.getAllStudents());
+                req.setAttribute("subjects", service.getAllSubjects());
+                req.getRequestDispatcher("/WEB-INF/views/admin/student-result-detail.jsp").forward(req, resp);
+                return;
             }
 
-            // Filter or list all
-            boolean hasFilter = (studentId != null && !studentId.isBlank())
-                             || (subjectId != null && !subjectId.isBlank())
-                             || (semester != null && !semester.isBlank())
-                             || (academicYear != null && !academicYear.isBlank());
-
-            if (hasFilter) {
-                req.setAttribute("results", service.searchResults(studentId, subjectId, semester, academicYear));
-                req.setAttribute("filterStudentId", studentId);
-                req.setAttribute("filterSubjectId", subjectId);
-                req.setAttribute("filterSemester", semester);
-                req.setAttribute("filterAcademicYear", academicYear);
+            // ── Default: Student-Grouped Results List ──────────────────────
+            String keyword = req.getParameter("search");
+            if (keyword != null && !keyword.isBlank()) {
+                req.setAttribute("students", service.searchStudents(keyword));
+                req.setAttribute("searchKeyword", keyword);
             } else {
-                req.setAttribute("results", service.getAllResults());
+                req.setAttribute("students", service.getAllStudents());
             }
+
+            req.setAttribute("subjects", service.getAllSubjects());
+            req.setAttribute("results", service.getAllResults());
 
         } catch (RuntimeException e) {
             req.setAttribute("rmiError", "RMI server unavailable.");
@@ -73,6 +68,7 @@ public class ExamResultServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String action = req.getParameter("action");
+        String studentIdParam = req.getParameter("studentId");
 
         try {
             ExamResultService service = RMIClientManager.getService();
@@ -81,20 +77,18 @@ public class ExamResultServlet extends HttpServlet {
                 int id = Integer.parseInt(req.getParameter("id"));
                 boolean ok = service.deleteExamResult(id);
                 setFlash(req, ok, "Result deleted successfully.", "Failed to delete result.");
-                resp.sendRedirect(req.getContextPath() + "/admin/results");
-                return;
-            }
+            } else {
+                ExamResult result = buildResultFromRequest(req);
 
-            ExamResult result = buildResultFromRequest(req);
-
-            if ("add".equals(action)) {
-                boolean ok = service.addExamResult(result);
-                setFlash(req, ok, "Exam result added successfully.", "Failed to add result. Check marks and input values.");
-            } else if ("update".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
-                result.setId(id);
-                boolean ok = service.updateExamResult(result);
-                setFlash(req, ok, "Exam result updated successfully.", "Failed to update result.");
+                if ("add".equals(action)) {
+                    boolean ok = service.addExamResult(result);
+                    setFlash(req, ok, "Exam result added successfully.", "Failed to add result. Check marks and input values.");
+                } else if ("update".equals(action)) {
+                    int id = Integer.parseInt(req.getParameter("id"));
+                    result.setId(id);
+                    boolean ok = service.updateExamResult(result);
+                    setFlash(req, ok, "Exam result updated successfully.", "Failed to update result.");
+                }
             }
 
         } catch (RuntimeException e) {
@@ -103,7 +97,11 @@ public class ExamResultServlet extends HttpServlet {
             req.getSession().setAttribute("flashError", e.getMessage() != null ? e.getMessage() : "An error occurred.");
         }
 
-        resp.sendRedirect(req.getContextPath() + "/admin/results");
+        if (studentIdParam != null && !studentIdParam.isBlank()) {
+            resp.sendRedirect(req.getContextPath() + "/admin/results?action=studentDetail&studentId=" + studentIdParam);
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/admin/results");
+        }
     }
 
     private ExamResult buildResultFromRequest(HttpServletRequest req) {
@@ -120,6 +118,8 @@ public class ExamResultServlet extends HttpServlet {
         if (totalMarks != null && !totalMarks.isBlank()) r.setTotalMarks(Double.parseDouble(totalMarks));
         r.setAcademicYear(req.getParameter("academicYear"));
         if (semester != null && !semester.isBlank()) r.setSemester(Integer.parseInt(semester));
+        String examType = req.getParameter("examType");
+        if (examType != null && !examType.isBlank()) r.setExamType(examType.trim());
         // Grade is calculated server-side; leave it null here
         return r;
     }

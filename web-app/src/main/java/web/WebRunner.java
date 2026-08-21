@@ -1,6 +1,10 @@
 package web;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.webresources.DirResourceSet;
+import org.apache.catalina.webresources.StandardRoot;
 
 import java.io.File;
 
@@ -8,17 +12,17 @@ import java.io.File;
  * Embedded Tomcat server launcher for running the web application.
  *
  * <p>Start command:
- * {@code cd web-app && mvn exec:java -Dexec.mainClass="web.WebRunner"}
- * or from root:
- * {@code mvn exec:java -pl web-app}
+ * {@code cd web-app && mvn exec:java}
  * </p>
  */
 public class WebRunner {
 
     private static final int PORT = 8080;
-    private static final String CONTEXT_PATH = "/remote-exam-result-management-system";
+    private static final String CONTEXT_PATH = "";
 
     public static void main(String[] args) {
+        System.setProperty("file.encoding", "UTF-8");
+
         System.out.println("=======================================================");
         System.out.println("  Remote Exam Result Management System — Web Server    ");
         System.out.println("=======================================================");
@@ -42,14 +46,28 @@ public class WebRunner {
             tomcat.setPort(PORT);
             tomcat.setBaseDir(baseDir);
 
-            // Initialize default HTTP connector
-            tomcat.getConnector();
+            // Initialize default HTTP connector with UTF-8
+            tomcat.getConnector().setURIEncoding("UTF-8");
 
             // Add web application context
-            tomcat.addWebapp(CONTEXT_PATH, webappFile.getAbsolutePath());
+            Context ctx = tomcat.addWebapp(CONTEXT_PATH, webappFile.getAbsolutePath());
+            ctx.setParentClassLoader(WebRunner.class.getClassLoader());
 
-            System.out.println("Starting Apache Tomcat 10 on port " + PORT + "...");
-            System.out.println("Context URL: http://localhost:" + PORT + CONTEXT_PATH + "/");
+            // Mount compiled classes to WEB-INF/classes so Tomcat can find @WebServlet annotations
+            String classesDir = "web-app/target/classes";
+            if (!new File(classesDir).exists()) {
+                classesDir = "target/classes";
+            }
+            File additionWebInfClasses = new File(classesDir);
+            if (additionWebInfClasses.exists()) {
+                WebResourceRoot resources = new StandardRoot(ctx);
+                resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",
+                        additionWebInfClasses.getAbsolutePath(), "/"));
+                ctx.setResources(resources);
+            }
+
+            System.out.println("Starting Apache Tomcat 11 on port " + PORT + "...");
+            System.out.println("Web App URL: http://localhost:" + PORT + "/");
             System.out.println("=======================================================");
 
             tomcat.start();

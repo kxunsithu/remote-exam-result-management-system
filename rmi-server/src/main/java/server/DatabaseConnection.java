@@ -11,28 +11,32 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
 
-    private static final String DB_DIR = "data";
-    private static final String DB_FILE = DB_DIR + "/remote_exam_result.db";
-    private static final String JDBC_URL = "jdbc:sqlite:" + DB_FILE;
+    private static String getResolvedDbPath() {
+        String envPath = System.getProperty("db.path");
+        if (envPath != null && !envPath.isBlank()) {
+            return envPath;
+        }
+        File cwd = new File(".").getAbsoluteFile();
+        if (cwd.getName().equals("rmi-server") || cwd.getName().equals("web-app")) {
+            return new File(cwd.getParentFile(), "data/remote_exam_result.db").getAbsolutePath();
+        }
+        return new File("data/remote_exam_result.db").getAbsolutePath();
+    }
+
+    private static String getJdbcUrl() {
+        return "jdbc:sqlite:" + getResolvedDbPath();
+    }
 
     private DatabaseConnection() {}
 
-    /**
-     * Returns a new JDBC connection to the SQLite database.
-     * Creates the data directory if it doesn't exist.
-     */
     public static Connection getConnection() throws SQLException {
-        // Ensure data directory exists
-        File dataDir = new File(DB_DIR);
-        if (!dataDir.exists()) {
-            boolean created = dataDir.mkdirs();
-            if (!created) {
-                throw new SQLException("Failed to create data directory: " + dataDir.getAbsolutePath());
-            }
+        File dbFile = new File(getResolvedDbPath());
+        File dataDir = dbFile.getParentFile();
+        if (dataDir != null && !dataDir.exists()) {
+            dataDir.mkdirs();
         }
 
-        Connection conn = DriverManager.getConnection(JDBC_URL);
-        // Enable foreign key enforcement
+        Connection conn = DriverManager.getConnection(getJdbcUrl());
         try (var stmt = conn.createStatement()) {
             stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute("PRAGMA journal_mode = WAL");
@@ -40,10 +44,7 @@ public class DatabaseConnection {
         return conn;
     }
 
-    /**
-     * Returns the absolute path of the database file (for diagnostics).
-     */
     public static String getDatabasePath() {
-        return new File(DB_FILE).getAbsolutePath();
+        return getResolvedDbPath();
     }
 }

@@ -3,7 +3,6 @@ package server;
 import common.Student;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,7 @@ import java.util.List;
 public class StudentDAO {
 
     private static final String SELECT_ALL = """
-        SELECT id, student_id, name, email, phone, gender, date_of_birth,
-               department, year, created_at
+        SELECT id, student_id, name, email, phone, gender, created_at
         FROM students
         """;
 
@@ -25,7 +23,7 @@ public class StudentDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL + " ORDER BY student_id")) {
             while (rs.next()) list.add(mapRow(rs));
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("StudentDAO.findAll error: " + e.getMessage());
         }
         return list;
@@ -36,17 +34,17 @@ public class StudentDAO {
         String q = "%" + keyword.toLowerCase() + "%";
         String sql = SELECT_ALL + """
             WHERE lower(student_id) LIKE ? OR lower(name) LIKE ?
-               OR lower(email) LIKE ? OR lower(department) LIKE ?
+               OR lower(email) LIKE ?
             ORDER BY student_id
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, q); ps.setString(2, q);
-            ps.setString(3, q); ps.setString(4, q);
+            ps.setString(3, q);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapRow(rs));
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("StudentDAO.search error: " + e.getMessage());
         }
         return list;
@@ -62,6 +60,20 @@ public class StudentDAO {
             }
         } catch (SQLException e) {
             System.err.println("StudentDAO.findById error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Student findByStudentId(String studentId) {
+        String sql = SELECT_ALL + " WHERE student_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, studentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("StudentDAO.findByStudentId error: " + e.getMessage());
         }
         return null;
     }
@@ -82,8 +94,8 @@ public class StudentDAO {
 
     public boolean insert(Student s) {
         String sql = """
-            INSERT INTO students (student_id, name, email, phone, gender, date_of_birth, department, year)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO students (student_id, name, email, phone, gender)
+            VALUES (?, ?, ?, ?, ?)
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -97,14 +109,13 @@ public class StudentDAO {
 
     public boolean update(Student s) {
         String sql = """
-            UPDATE students SET student_id=?, name=?, email=?, phone=?, gender=?,
-                date_of_birth=?, department=?, year=?
+            UPDATE students SET student_id=?, name=?, email=?, phone=?, gender=?
             WHERE id=?
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setStudentParams(ps, s);
-            ps.setInt(9, s.getId());
+            ps.setInt(6, s.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("StudentDAO.update error: " + e.getMessage());
@@ -128,7 +139,7 @@ public class StudentDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM students")) {
-            return rs.getInt(1);
+            return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
             return 0;
         }
@@ -140,14 +151,19 @@ public class StudentDAO {
         ps.setString(3, s.getEmail());
         ps.setString(4, s.getPhone());
         ps.setString(5, s.getGender());
-        ps.setString(6, s.getDateOfBirth() != null ? s.getDateOfBirth().toString() : null);
-        ps.setString(7, s.getDepartment());
-        ps.setInt(8, s.getYear());
     }
 
     private Student mapRow(ResultSet rs) throws SQLException {
-        String dob = rs.getString("date_of_birth");
         String cat = rs.getString("created_at");
+        LocalDateTime createdAt = LocalDateTime.now();
+        if (cat != null && !cat.isBlank()) {
+            try {
+                String isoStr = cat.trim().replace(" ", "T");
+                createdAt = LocalDateTime.parse(isoStr);
+            } catch (Exception ignored) {
+                createdAt = LocalDateTime.now();
+            }
+        }
         return new Student(
             rs.getInt("id"),
             rs.getString("student_id"),
@@ -155,10 +171,7 @@ public class StudentDAO {
             rs.getString("email"),
             rs.getString("phone"),
             rs.getString("gender"),
-            dob != null && !dob.isEmpty() ? LocalDate.parse(dob) : null,
-            rs.getString("department"),
-            rs.getInt("year"),
-            cat != null ? LocalDateTime.parse(cat.replace(" ", "T")) : LocalDateTime.now()
+            createdAt
         );
     }
 }

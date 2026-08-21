@@ -26,6 +26,9 @@ public class AuthFilter implements Filter {
         HttpServletRequest  req  = (HttpServletRequest)  request;
         HttpServletResponse resp = (HttpServletResponse) response;
 
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+
         String path = req.getServletPath();
 
         // Allow public resources

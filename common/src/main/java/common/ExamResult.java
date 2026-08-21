@@ -18,6 +18,7 @@ public class ExamResult implements Serializable {
     private String grade;
     private String academicYear;
     private int semester;
+    private String examType = "REGULAR";
     private LocalDateTime createdAt;
 
     // Transient fields for display (populated by JOIN queries)
@@ -25,11 +26,18 @@ public class ExamResult implements Serializable {
     private String studentCode;
     private String subjectName;
     private String subjectCode;
+    private int    subjectCredit;  // credit hours of the subject (from subjects JOIN)
+
 
     public ExamResult() {}
 
     public ExamResult(int id, int studentId, int subjectId, double marks, double totalMarks,
                       String grade, String academicYear, int semester, LocalDateTime createdAt) {
+        this(id, studentId, subjectId, marks, totalMarks, grade, academicYear, semester, "REGULAR", createdAt);
+    }
+
+    public ExamResult(int id, int studentId, int subjectId, double marks, double totalMarks,
+                      String grade, String academicYear, int semester, String examType, LocalDateTime createdAt) {
         this.id = id;
         this.studentId = studentId;
         this.subjectId = subjectId;
@@ -38,6 +46,7 @@ public class ExamResult implements Serializable {
         this.grade = grade;
         this.academicYear = academicYear;
         this.semester = semester;
+        this.examType = (examType != null && !examType.isBlank()) ? examType : "REGULAR";
         this.createdAt = createdAt;
     }
 
@@ -66,6 +75,9 @@ public class ExamResult implements Serializable {
     public int getSemester() { return semester; }
     public void setSemester(int semester) { this.semester = semester; }
 
+    public String getExamType() { return examType != null ? examType : "REGULAR"; }
+    public void setExamType(String examType) { this.examType = examType; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -81,8 +93,12 @@ public class ExamResult implements Serializable {
     public String getSubjectCode() { return subjectCode; }
     public void setSubjectCode(String subjectCode) { this.subjectCode = subjectCode; }
 
+    public int getSubjectCredit() { return subjectCredit; }
+    public void setSubjectCredit(int subjectCredit) { this.subjectCredit = subjectCredit; }
+
+
     /**
-     * Returns pass/fail status based on marks >= 50.
+     * Returns pass/fail status. Pass threshold is 50% (C grade or better).
      */
     public String getStatus() {
         return marks >= 50.0 ? "PASS" : "FAIL";
@@ -95,6 +111,28 @@ public class ExamResult implements Serializable {
         if (totalMarks == 0) return 0;
         return (marks / totalMarks) * 100;
     }
+
+    /**
+     * Maps a letter grade to its grade score on the UCS(Hpa-an) 4-point scale.
+     * A+=4.0, A=4.0, A-=3.67, B+=3.33, B=3.0, B-=2.67,
+     * C+=2.33, C=2.0, D=1.0, F=0.0
+     */
+    public static double gradeToPoints(String grade) {
+        if (grade == null) return 0.0;
+        return switch (grade.trim()) {
+            case "A+" -> 4.0;
+            case "A"  -> 4.0;
+            case "A-" -> 3.67;
+            case "B+" -> 3.33;
+            case "B"  -> 3.0;
+            case "B-" -> 2.67;
+            case "C+" -> 2.33;
+            case "C"  -> 2.0;
+            case "D"  -> 1.0;
+            default   -> 0.0;  // F, Abs, I
+        };
+    }
+
 
     @Override
     public String toString() {

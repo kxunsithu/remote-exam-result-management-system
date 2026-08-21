@@ -1,0 +1,9 @@
+.git
+.gitignore
+**/target/
+**/*.db
+.idea
+*.iml
+.vscode
+README.md
+data/.gitkeep
