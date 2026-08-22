@@ -60,7 +60,7 @@
 
     <!-- Student Card -->
     <a href="${pageContext.request.contextPath}/login?role=STUDENT" class="role-card">
-      <span class="role-card-icon" style="background-color: #ecfdf5; color: #10b981;">
+      <span class="role-card-icon" style="background-color: #eff6ff; color: #2563eb;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
           <path d="M6 12v5c3 3 9 3 12 0v-5"/>
@@ -81,7 +81,7 @@
   <!-- Register hint -->
   <div class="text-center mt-4 pt-3 border-top">
     <span style="font-size: 0.8125rem; color: #64748b;">ကျောင်းသား အကောင့် မရှိသေးပါက</span>
-    <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #10b981; font-weight: 600;" class="ms-1 hover-underline">
+    <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #2563eb; font-weight: 600;" class="ms-1 hover-underline">
       အကောင့်သစ် ပြုလုပ်မည်
     </a>
   </div>

@@ -14,7 +14,7 @@
 <div class="auth-card" style="max-width: 26rem; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
   <!-- Logo + University Title Header -->
   <div class="auth-brand-header mb-4">
-    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: #10b981;">
+    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: #2563eb;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
         <circle cx="9" cy="7" r="4"/>
@@ -59,7 +59,7 @@
              placeholder="စကားဝှက် ပြန်လည်ရိုက်ထည့်ပါ" required autocomplete="new-password"/>
     </div>
 
-    <button type="submit" class="btn-auth mt-2" style="background-color: #10b981;">အကောင့်ပြုလုပ်မည်</button>
+    <button type="submit" class="btn-auth mt-2" style="background-color: #2563eb;">အကောင့်ပြုလုပ်မည်</button>
   </form>
 
   <div class="text-center mt-4 pt-3 border-top">

@@ -20,7 +20,7 @@
 <div class="auth-card" style="max-width: 26rem; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
   <!-- Logo + University Title -->
   <div class="auth-brand-header mb-4">
-    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: <%= isStudent ? "#10b981" : "#2563eb" %>;">
+    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: #2563eb;">
       <% if (isStudent) { %>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
@@ -42,9 +42,9 @@
   </div>
 
   <!-- Selected role badge -->
-  <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; border-radius: 999px; background-color: <%= isStudent ? "#ecfdf5" : "#eff6ff" %>; border: 1px solid <%= isStudent ? "#a7f3d0" : "#bfdbfe" %>; margin-bottom: 0.75rem;">
-    <span style="width: 0.45rem; height: 0.45rem; border-radius: 50%; background-color: <%= isStudent ? "#10b981" : "#2563eb" %>;"></span>
-    <span style="font-size: 0.72rem; font-weight: 700; color: <%= isStudent ? "#047857" : "#1d4ed8" %>;">
+  <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; border-radius: 999px; background-color: #eff6ff; border: 1px solid #bfdbfe; margin-bottom: 0.75rem;">
+    <span style="width: 0.45rem; height: 0.45rem; border-radius: 50%; background-color: #2563eb;"></span>
+    <span style="font-size: 0.72rem; font-weight: 700; color: #1d4ed8;">
       <%= isStudent ? "Student အနေဖြင့် ဝင်ရောက်မည်" : "Admin အနေဖြင့် ဝင်ရောက်မည်" %>
     </span>
   </div>
@@ -100,13 +100,13 @@
         </label>
       </div>
       <% if (isStudent) { %>
-      <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #10b981; font-weight: 600;" class="hover-underline">
+      <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #2563eb; font-weight: 600;" class="hover-underline">
         အကောင့်သစ် ပြုလုပ်ရန်
       </a>
       <% } %>
     </div>
 
-    <button type="submit" class="btn-auth mt-2" style="<%= isStudent ? "background-color: #10b981;" : "" %>">ဝင်ရောက်မည်</button>
+    <button type="submit" class="btn-auth mt-2">ဝင်ရောက်မည်</button>
   </form>
 
   <!-- Demo credentials hint card -->
@@ -116,7 +116,7 @@
     </div>
     <% if (isStudent) { %>
     <div style="font-size: 0.8125rem; color: #334155;">
-      Student: <strong style="color: #10b981;">john.doe@university.edu</strong> / student123
+      Student: <strong style="color: #2563eb;">john.doe@university.edu</strong> / student123
     </div>
     <% } else { %>
     <div style="font-size: 0.8125rem; color: #334155;">

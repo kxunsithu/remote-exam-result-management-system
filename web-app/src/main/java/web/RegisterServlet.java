@@ -59,17 +59,21 @@ public class RegisterServlet extends HttpServlet {
             boolean success = service.registerStudent(email.trim(), password);
 
             if (success) {
-                req.setAttribute("success", "Account created successfully. You can now login.");
+                req.setAttribute("success", "အကောင့်ပြုလုပ်ခြင်း အောင်မြင်ပါသည်။ ဝင်ရောက်နိုင်ပါပြီ။");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);
             } else {
-                req.setAttribute("error", "Email already registered. Please use a different email.");
+                req.setAttribute("error", "အကောင့်ပြုလုပ်ခြင်း မအောင်မြင်ပါ။");
                 req.getRequestDispatcher("/register.jsp").forward(req, resp);
             }
-        } catch (RuntimeException e) {
-            req.setAttribute("error", "Service unavailable. Please ensure the RMI server is running.");
+        } catch (java.rmi.RemoteException e) {
+            String msg = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+            if (msg != null && msg.contains(":")) {
+                msg = msg.substring(msg.lastIndexOf(":") + 1).trim();
+            }
+            req.setAttribute("error", msg != null && !msg.isBlank() ? msg : "အကောင့်ပြုလုပ်ခြင်း မအောင်မြင်ပါ။");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
         } catch (Exception e) {
-            req.setAttribute("error", "Registration failed. Please try again.");
+            req.setAttribute("error", e.getMessage() != null ? e.getMessage() : "Registration failed. Please try again.");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
         }
     }

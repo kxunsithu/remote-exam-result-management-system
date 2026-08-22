@@ -934,70 +934,226 @@ document.getElementById('deleteResultModal').addEventListener('show.bs.modal', f
     if (!semBlock) return;
 
     var rows = semBlock.querySelectorAll('.result-row');
-    var tableHtml = '';
+    var tableRows = '';
     var sr = 1;
+    var totalCredits = 0;
+    var totalGradePoint = 0;
+
+    // Grade → Grade Score mapping (matching result.png scale)
+    function gradeToScore(grade) {
+      var map = {'A+':4.00,'A':4.00,'A-':3.67,'B+':3.33,'B':3.00,'B-':2.67,'C+':2.33,'C':2.00,'D':1.00,'F':0,'F/Abs/I':0};
+      return map[grade] !== undefined ? map[grade] : 0;
+    }
+
+    // Determine credit unit from marks (default 3 unless stored)
+    var subjectCredits = [];
 
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
       if (r.querySelector('.col-header')) continue;
       var nameEl = r.querySelector('.subj-name');
       var name = nameEl ? nameEl.childNodes[0].textContent.trim() : '-';
-      var typeBadge = nameEl ? nameEl.querySelector('.badge') : null;
-      var examType = typeBadge ? typeBadge.textContent.trim() : 'Regular';
       var code = r.querySelector('.subj-code') ? r.querySelector('.subj-code').textContent.trim() : '-';
-      var marks = r.querySelector('.marks-cell') ? r.querySelector('.marks-cell').textContent.trim() : '-';
-      var grade = r.querySelector('.grade-cell') ? r.querySelector('.grade-cell').textContent.trim() : '-';
-      var status = r.querySelector('.status-cell') ? r.querySelector('.status-cell').textContent.trim() : '-';
+      var gradeEl = r.querySelector('.grade-cell');
+      var grade = gradeEl ? gradeEl.textContent.trim() : '-';
+      var marksEl = r.querySelector('.marks-cell');
+      var marksText = marksEl ? marksEl.textContent.trim() : '0/100';
+      var marksParts = marksText.split('/');
+      var obtained = parseFloat(marksParts[0]) || 0;
+      var total    = parseFloat(marksParts[1]) || 100;
+      var pct      = total > 0 ? (obtained / total * 100) : 0;
 
-      tableHtml += '<tr>' +
-        '<td style="text-align:center; padding: 8px;">' + (sr++) + '</td>' +
-        '<td style="padding: 8px; font-family: monospace; font-weight: bold;">' + code + '</td>' +
-        '<td style="padding: 8px;">' + name + '</td>' +
-        '<td style="text-align:center; padding: 8px; font-size: 0.85rem;">' + examType + '</td>' +
-        '<td style="text-align:center; padding: 8px;">' + marks + '</td>' +
-        '<td style="text-align:center; padding: 8px; font-weight: bold;">' + grade + '</td>' +
-        '<td style="text-align:center; padding: 8px;">' + status + '</td>' +
+      // Derive grade obtained from percentage if grade is missing
+      var gradeObtained = grade && grade !== '-' ? grade : (function(p){
+        if(p>=90)return'A+'; if(p>=80)return'A'; if(p>=75)return'A-';
+        if(p>=70)return'B+'; if(p>=65)return'B'; if(p>=60)return'B-';
+        if(p>=55)return'C+'; if(p>=50)return'C'; if(p>=40)return'D'; return'F';
+      })(pct);
+
+      var credit    = 3; // default credit unit
+      var gradeScore = gradeToScore(gradeObtained);
+      var gradePoint = gradeScore * credit;
+
+      totalCredits   += credit;
+      totalGradePoint += gradePoint;
+      subjectCredits.push(credit);
+
+      tableRows +=
+        '<tr>' +
+        '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + (sr++) + '</td>' +
+        '<td style="padding:7px 8px; font-family:monospace; font-weight:bold; border:1px solid #000;">' + code + '</td>' +
+        '<td style="padding:7px 8px; border:1px solid #000;">' + name + '</td>' +
+        '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + credit + '</td>' +
+        '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + gradeObtained + '</td>' +
+        '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + gradeScore.toFixed(2) + '</td>' +
+        '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + gradePoint.toFixed(2) + '</td>' +
         '</tr>';
     }
 
-    var printWindow = window.open('', '_blank', 'width=900,height=750');
+    var semesterGPA  = totalCredits > 0 ? (totalGradePoint / totalCredits).toFixed(2) : '0.00';
+    var issueDate = new Date();
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var issueDateStr = issueDate.getDate() + '-' + months[issueDate.getMonth()] + '-' + issueDate.getFullYear();
+
+    var printWindow = window.open('', '_blank', 'width=820,height=1100');
     var doc = printWindow.document;
 
-    doc.write('<!DOCTYPE html><html><head><title>Semester Result - ' + studentName + '</title>');
+    doc.write('<!DOCTYPE html><html><head>');
+    doc.write('<meta charset="UTF-8">');
+    doc.write('<title>Academic Record - ' + studentName + '</title>');
     doc.write('<style>');
-    doc.write('body { font-family: "Inter", system-ui, sans-serif; padding: 35px; color: #0f172a; line-height: 1.5; }');
-    doc.write('.header-title { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }');
-    doc.write('.header-title h2 { margin: 0 0 5px 0; font-size: 1.4rem; color: #1e3a8a; }');
-    doc.write('.header-title h3 { margin: 0; font-size: 1.1rem; color: #334155; font-weight: 600; }');
-    doc.write('.meta-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 0.95rem; }');
-    doc.write('.meta-table td { padding: 6px 12px; }');
-    doc.write('.result-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }');
-    doc.write('.result-table th, .result-table td { border: 1px solid #cbd5e1; }');
-    doc.write('.result-table th { background-color: #f1f5f9; padding: 10px; text-align: left; }');
-    doc.write('.footer-sig { margin-top: 70px; display: flex; justify-content: space-between; text-align: center; font-size: 0.9rem; font-weight: 600; }');
-    doc.write('.sig-box { width: 200px; border-top: 1px dashed #64748b; padding-top: 8px; }');
+    doc.write('@import url("https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Georgia&display=swap");');
+    doc.write('* { box-sizing: border-box; margin: 0; padding: 0; }');
+    doc.write('body {');
+    doc.write('  font-family: "Times New Roman", Times, serif;');
+    doc.write('  font-size: 13px;');
+    doc.write('  color: #000;');
+    doc.write('  padding: 30px 45px;');
+    doc.write('  background: #fff;');
+    doc.write('  line-height: 1.5;');
+    doc.write('}');
+    // University header
+    doc.write('.page-header { text-align: center; margin-bottom: 18px; }');
+    doc.write('.page-header .univ-name { font-size: 16px; font-weight: bold; margin-bottom: 3px; }');
+    doc.write('.page-header .acad-year { font-size: 13px; font-weight: bold; margin-bottom: 2px; }');
+    doc.write('.page-header .doc-title { font-size: 14px; font-weight: bold; text-decoration: underline; margin-top: 4px; }');
+    // Student info
+    doc.write('.student-info { width: 100%; margin-bottom: 16px; border-collapse: collapse; font-size: 13px; }');
+    doc.write('.student-info td { padding: 3px 6px; vertical-align: top; }');
+    doc.write('.student-info td.label { font-weight: normal; white-space: nowrap; }');
+    doc.write('.student-info td.colon { width: 8px; padding: 3px 2px; }');
+    doc.write('.student-info td.value { font-weight: bold; }');
+    // Divider
+    doc.write('.divider { border: none; border-top: 1px solid #000; margin: 8px 0; }');
+    // Results table
+    doc.write('.result-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }');
+    doc.write('.result-table th, .result-table td { border: 1px solid #000; padding: 6px 8px; }');
+    doc.write('.result-table th { background: #fff; font-weight: bold; text-align: center; vertical-align: middle; }');
+    doc.write('.result-table td.no { text-align: center; }');
+    doc.write('.result-table td.num { text-align: center; }');
+    doc.write('.result-table .total-row td { font-weight: bold; background: #fff; }');
+    doc.write('.result-table .summary-row td { font-weight: bold; text-align: right; padding: 5px 8px; }');
+    doc.write('.result-table .summary-row td.summary-label { border-left: 1px solid #000; font-weight: bold; text-align: right; }');
+    doc.write('.result-table .summary-row td.summary-val { text-align: center; font-weight: bold; }');
+    // Grading scale
+    doc.write('.grading-section { margin-top: 22px; }');
+    doc.write('.grading-title { font-weight: bold; text-decoration: underline; margin-bottom: 6px; font-size: 12.5px; }');
+    doc.write('.grading-grid { display: grid; grid-template-columns: repeat(6, auto); gap: 2px 18px; font-size: 12px; width: fit-content; }');
+    doc.write('.grading-grid .gp { display: flex; gap: 6px; }');
+    doc.write('.grading-grid .gv { font-weight: bold; }');
+    // Issue date & signature
+    doc.write('.issue-date { margin-top: 20px; font-size: 12.5px; font-weight: bold; }');
+    doc.write('.signature-block { margin-top: 55px; text-align: right; font-size: 12.5px; }');
+    doc.write('.signature-block .sig-role { font-weight: bold; }');
+    doc.write('.signature-block .sig-title { font-size: 12px; }');
+    doc.write('@media print {');
+    doc.write('  body { padding: 20px 35px; }');
+    doc.write('  @page { margin: 1.2cm; size: A4; }');
+    doc.write('}');
     doc.write('</style></head><body>');
 
-    doc.write('<div class="header-title">');
-    doc.write('<h2>ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</h2>');
-    doc.write('<h3>University of Computer Studies (Hpa-an)</h3>');
-    doc.write('<p style="margin: 8px 0 0 0; font-weight: bold; color: #2563eb; font-size: 1.05rem;">ကျောင်းသား စာမေးပွဲရလဒ် အမှတ်စာရင်း (Semester Transcript)</p>');
+    // ── Header ──────────────────────────────────────────────────
+    doc.write('<div class="page-header">');
+    doc.write('<div class="univ-name">University of Computer Studies (Hpa-an)</div>');
+    doc.write('<div class="acad-year">' + year + ' Academic Year</div>');
+    doc.write('<div class="doc-title">Academic Record</div>');
     doc.write('</div>');
 
-    doc.write('<table class="meta-table">');
-    doc.write('<tr><td><strong>ကျောင်းသားအမည်:</strong> ' + studentName + '</td><td><strong>ပညာသင်နှစ်:</strong> ' + year + '</td></tr>');
-    doc.write('<tr><td><strong>ခုံနံပါတ်:</strong> ' + rollNo + '</td><td><strong>Semester:</strong> Semester ' + sem + '</td></tr>');
+    doc.write('<hr class="divider">');
+
+    // ── Student Info ─────────────────────────────────────────────
+    doc.write('<table class="student-info">');
+    doc.write('<tr>');
+    doc.write('<td class="label" style="width:140px;">Roll Number</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value" style="width:220px;">' + rollNo + '</td>');
+    doc.write('<td class="label" style="width:120px; padding-left:30px;">Academic Year</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value">' + year + '</td>');
+    doc.write('</tr>');
+    doc.write('<tr>');
+    doc.write('<td class="label">Student Name</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value">' + studentName + '</td>');
+    doc.write('<td class="label" style="padding-left:30px;">Semester</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value">' + sem + '</td>');
+    doc.write('</tr>');
+    doc.write('<tr>');
+    doc.write('<td class="label">Degree Program</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value">(B.C.Sc.)</td>');
+    doc.write('<td></td><td></td><td></td>');
+    doc.write('</tr>');
+    doc.write('<tr>');
+    doc.write('<td class="label">Specialization</td>');
+    doc.write('<td class="colon">:</td>');
+    doc.write('<td class="value">Computer Science</td>');
+    doc.write('<td></td><td></td><td></td>');
+    doc.write('</tr>');
     doc.write('</table>');
 
+    // ── Results Table ────────────────────────────────────────────
     doc.write('<table class="result-table">');
-    doc.write('<thead><tr><th style="text-align:center; width:50px;">စဉ်</th><th>ဘာသာရပ် သင်္ကေတ</th><th>ဘာသာရပ် အမည်</th><th style="text-align:center;">အမျိုးအစား</th><th style="text-align:center;">ရမှတ်</th><th style="text-align:center;">Grade</th><th style="text-align:center;">အခြေအနေ</th></tr></thead>');
-    doc.write('<tbody>' + tableHtml + '</tbody>');
-    doc.write('</table>');
+    doc.write('<thead>');
+    doc.write('<tr>');
+    doc.write('<th style="width:38px;">No.</th>');
+    doc.write('<th style="width:100px;">Course Code</th>');
+    doc.write('<th>Course Name</th>');
+    doc.write('<th style="width:70px;">Academic Credit Unit</th>');
+    doc.write('<th style="width:62px;">Grade Obtained</th>');
+    doc.write('<th style="width:58px;">Grade Score</th>');
+    doc.write('<th style="width:58px;">Grade Point</th>');
+    doc.write('</tr>');
+    doc.write('</thead>');
+    doc.write('<tbody>');
+    doc.write(tableRows);
 
-    doc.write('<div class="footer-sig">');
-    doc.write('<div class="sig-box">စိစစ်သူ</div>');
-    doc.write('<div class="sig-box">ဌာနမှူး</div>');
-    doc.write('<div class="sig-box">ပါမောက္ခချုပ် / ဒုတိယပါမောက္ခချုပ်</div>');
+    // Total row
+    doc.write('<tr class="total-row">');
+    doc.write('<td colspan="3" style="text-align:right; padding:7px 8px; border:1px solid #000; font-weight:bold;">Total Credit Units</td>');
+    doc.write('<td class="num" style="border:1px solid #000; font-weight:bold;">' + totalCredits + '</td>');
+    doc.write('<td colspan="2" style="text-align:right; padding:7px 8px; border:1px solid #000; font-weight:bold;">Total Grade Point</td>');
+    doc.write('<td class="num" style="border:1px solid #000; font-weight:bold;">' + totalGradePoint.toFixed(2) + '</td>');
+    doc.write('</tr>');
+
+    // Cumulative GPA (semester GPA)
+    doc.write('<tr class="summary-row">');
+    doc.write('<td colspan="5" style="border:none;"></td>');
+    doc.write('<td class="summary-label" style="border:1px solid #000; font-weight:bold; text-align:right;">Cumulative GPA</td>');
+    doc.write('<td class="summary-val" style="border:1px solid #000;">' + semesterGPA + '</td>');
+    doc.write('</tr>');
+
+    // Overall GPA (same for single semester)
+    doc.write('<tr class="summary-row">');
+    doc.write('<td colspan="5" style="border:none;"></td>');
+    doc.write('<td class="summary-label" style="border:1px solid #000; font-weight:bold; text-align:right;">Overall GPA</td>');
+    doc.write('<td class="summary-val" style="border:1px solid #000;">' + semesterGPA + '</td>');
+    doc.write('</tr>');
+
+    doc.write('</tbody></table>');
+
+    // ── Grading Scale ────────────────────────────────────────────
+    doc.write('<div class="grading-section">');
+    doc.write('<div class="grading-title">GRADING SCALE</div>');
+    doc.write('<div class="grading-grid">');
+    var grades = [['>=90','A+'],['80-89','A'],['75-79','A-'],['70-74','B+'],['65-69','B'],['60-64','B-'],
+                  ['55-59','C+'],['50-54','C'],['40-49','D'],['0-39','F/Abs/I']];
+    grades.forEach(function(g) {
+      doc.write('<div class="gp"><span>' + g[0] + '</span><span class="gv">' + g[1] + '</span></div>');
+    });
+    doc.write('</div>');
+    doc.write('</div>');
+
+    // ── Issue Date ───────────────────────────────────────────────
+    doc.write('<div class="issue-date">ISSUE DATE &nbsp;: &nbsp;' + issueDateStr + '</div>');
+
+    // ── Registrar Signature ──────────────────────────────────────
+    doc.write('<div class="signature-block">');
+    doc.write('<div style="margin-bottom:45px;"></div>');
+    doc.write('<div class="sig-role">REGISTRAR</div>');
+    doc.write('<div class="sig-title">Academic Department</div>');
+    doc.write('<div class="sig-title">University of Computer Studies(Hpa-an)</div>');
     doc.write('</div>');
 
     doc.write('</body></html>');

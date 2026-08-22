@@ -141,12 +141,12 @@
                                   </div>
                                 </a>
 
-                                <!-- Card 2: Total Subjects -->
+                                 <!-- Card 2: Total Subjects -->
                                 <a href="${pageContext.request.contextPath}/admin/subjects" class="stat-card-item">
                                   <div class="stat-card-header">
                                     <span class="stat-card-label" style="font-size: 0.85rem;">ဘာသာရပ် အရေအတွက်</span>
                                     <div class="stat-card-icon-wrap"
-                                      style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                      style="background-color: rgba(37, 99, 235, 0.1); color: #2563eb;">
                                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
                                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -159,7 +159,7 @@
                                       <%= request.getAttribute("totalSubjects") !=null ?
                                         request.getAttribute("totalSubjects") : "0" %>
                                     </div>
-                                    <span style="font-size: 0.78rem; font-weight: 600; color: #10b981;">ကြည့်ရန်
+                                    <span style="font-size: 0.78rem; font-weight: 600; color: #2563eb;">ကြည့်ရန်
                                       →</span>
                                   </div>
                                 </a>
@@ -211,7 +211,7 @@
 
                                   <a href="${pageContext.request.contextPath}/admin/subjects" class="quick-action-card">
                                     <div class="quick-action-icon"
-                                      style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                      style="background-color: rgba(37, 99, 235, 0.1); color: #2563eb;">
                                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
                                         <line x1="12" y1="5" x2="12" y2="19" />

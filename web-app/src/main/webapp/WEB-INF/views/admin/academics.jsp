@@ -34,13 +34,14 @@
       cursor: pointer; user-select: none;
       border: none; width: 100%; text-align: left;
       transition: opacity 0.15s;
+      border-radius: 0; /* override card-container radius for top */
     }
     .year-header:hover { opacity: 0.92; }
     .year-badge {
       background: rgba(255,255,255,0.18); border-radius: 999px;
       padding: 0.1rem 0.65rem; font-size: 0.78rem; margin-left: auto;
     }
-    .year-actions { display: flex; gap: 0.25rem; margin-left: 0.5rem; }
+    .year-actions { display: flex; gap: 0.25rem; margin-left: 0.35rem; flex-shrink: 0; }
     .year-body { border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 0.5rem 0.5rem; overflow: hidden; }
     .sem-row {
       display: flex; align-items: center; gap: 0.75rem;
@@ -158,14 +159,33 @@
              String collapseId = "year-collapse-" + yearIdx;
       %>
         <div class="year-section card-container year-card" style="padding:0;" data-year-id="<%= y.getId() %>">
-          <button class="year-header" type="button" data-bs-toggle="collapse" data-bs-target="#<%= collapseId %>" aria-expanded="<%= yearIdx == 0 ? "true" : "false" %>">
+          <div class="year-header" role="button" tabindex="0" data-bs-toggle="collapse" data-bs-target="#<%= collapseId %>" aria-expanded="<%= yearIdx == 0 ? "true" : "false" %>">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
             <span>ပညာသင်နှစ် <%= y.getYearName() %></span>
             <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
             <span class="year-badge"><%= sems.size() %> Semester · <%= y.getSubjectCount() %> ဘာသာရပ်</span>
-          </button>
+            <!-- Per-year actions inside the header -->
+            <span class="year-actions" onclick="event.stopPropagation()">
+              <button type="button" class="btn-action-icon edit" data-bs-toggle="modal" data-bs-target="#editYearModal"
+                      data-id="<%= y.getId() %>" data-yearname="<%= y.getYearName() %>"
+                      title="ပညာသင်နှစ် ပြင်ဆင်ရန်" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color:#fff;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button type="button" class="btn-action-icon delete" data-bs-toggle="modal" data-bs-target="#deleteYearModal"
+                      data-id="<%= y.getId() %>" data-name="ပညာသင်နှစ် <%= y.getYearName() %>"
+                      title="ပညာသင်နှစ် ဖျက်ရန်" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color:#fff;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+              </button>
+            </span>
+          </div>
           <div class="collapse <%= yearIdx == 0 ? "show" : "" %>" id="<%= collapseId %>">
             <div class="year-body">
               <% for (common.Semester s : sems) {
@@ -254,27 +274,6 @@
             </div>
           </div>
 
-          <!-- Per-year header actions -->
-          <div style="position: relative;">
-            <div class="d-flex gap-1" style="position:absolute; top:-2.45rem; right: 0.75rem;">
-              <button type="button" class="btn-action-icon edit" data-bs-toggle="modal" data-bs-target="#editYearModal"
-                      data-id="<%= y.getId() %>" data-yearname="<%= y.getYearName() %>"
-                      title="ပညာသင်နှစ် ပြင်ဆင်ရန်" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color:#fff;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </button>
-              <button type="button" class="btn-action-icon delete" data-bs-toggle="modal" data-bs-target="#deleteYearModal"
-                      data-id="<%= y.getId() %>" data-name="ပညာသင်နှစ် <%= y.getYearName() %>"
-                      title="ပညာသင်နှစ် ဖျက်ရန်" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color:#fff;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"/>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                </svg>
-              </button>
-            </div>
-          </div>
         </div>
       <%   yearIdx++;
            }

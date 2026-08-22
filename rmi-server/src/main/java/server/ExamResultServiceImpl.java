@@ -49,14 +49,23 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     @Override
     public boolean registerStudent(String email, String password) throws RemoteException {
         if (email == null || password == null || email.isBlank() || password.isBlank()) {
-            return false;
+            throw new RemoteException("အချက်အလက်များကို ပြည့်စုံစွာ ဖြည့်သွင်းပါ။");
         }
-        // Check if email already exists
-        if (userDAO.findByEmail(email.trim()) != null) {
-            return false;
+        String cleanEmail = email.trim().toLowerCase();
+
+        // 1. Check if user account already registered
+        if (userDAO.findByEmail(cleanEmail) != null) {
+            throw new RemoteException("ဤအီးမေးလ် (" + cleanEmail + ") ဖြင့် အကောင့်ပြုလုပ်ပြီးသား ဖြစ်နေပါသည်။");
         }
+
+        // 2. Check if student exists in the admitted student list
+        Student student = studentDAO.findByEmail(cleanEmail);
+        if (student == null) {
+            throw new RemoteException("ဤအီးမေးလ် (" + cleanEmail + ") သည် ဝင်ခွင့်ရကျောင်းသား စာရင်းတွင် မရှိပါ။ စီမံခန့်ခွဲသူထံ ဆက်သွယ်ပါ။");
+        }
+
         String hashed = BCrypt.hashpw(password, BCrypt.gensalt(12));
-        return userDAO.insert(email.trim().toLowerCase(), hashed, "STUDENT") > 0;
+        return userDAO.insert(cleanEmail, hashed, "STUDENT") > 0;
     }
 
     // =========================================================================
