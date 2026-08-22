@@ -17,7 +17,7 @@ import java.io.File;
  */
 public class WebRunner {
 
-    private static final int PORT = 8080;
+    private static final int PORT = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
     private static final String CONTEXT_PATH = "";
 
     public static void main(String[] args) {

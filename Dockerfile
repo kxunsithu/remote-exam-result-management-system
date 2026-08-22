@@ -32,3 +32,16 @@ ENV RMI_HOST=rmi-server
 ENV RMI_PORT=1099
 EXPOSE 8080
 ENTRYPOINT ["java", "-cp", "src/main/webapp/WEB-INF/classes:src/main/webapp/WEB-INF/lib/*", "web.WebRunner"]
+
+# Stage 4: All-in-one runtime (single-container deployment, e.g. Railway)
+FROM eclipse-temurin:17-jre AS all-in-one
+WORKDIR /app
+RUN mkdir -p data src/main/webapp
+COPY --from=build /app/rmi-server/target/rmi-server-1.0.0.jar app/rmi-server.jar
+COPY --from=build /app/rmi-server/target/libs/ app/libs/
+COPY --from=build /app/web-app/target/remote-exam-result-management-system/ src/main/webapp/
+COPY start.sh .
+ENV RMI_HOST=127.0.0.1 \
+    RMI_PORT=1099
+EXPOSE 8080
+ENTRYPOINT ["./start.sh"]
