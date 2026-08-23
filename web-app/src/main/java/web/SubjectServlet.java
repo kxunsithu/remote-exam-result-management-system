@@ -106,9 +106,14 @@ public class SubjectServlet extends HttpServlet {
         String credit = req.getParameter("credit");
         if (credit != null && !credit.isBlank()) s.setCredit(Integer.parseInt(credit));
         s.setDepartment(req.getParameter("department"));
-        // No academic year / semester here — assignment happens on the academics page
+        // Optional semester number (1-8) stored for auto-linking on academic year creation
+        String semNo = req.getParameter("semesterNumber");
+        if (semNo != null && !semNo.isBlank()) {
+            try { s.setSemesterNumber(Integer.parseInt(semNo)); } catch (NumberFormatException ignored) {}
+        }
         return s;
     }
+
 
     private void setFlash(HttpServletRequest req, boolean ok, String successMsg, String errorMsg) {
         HttpSession session = req.getSession();

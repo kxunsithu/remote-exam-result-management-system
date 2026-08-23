@@ -138,6 +138,46 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     }
 
     @Override
+    public int addAcademicYearWithAutoLink(AcademicYear year, int[] semesterNumbers) throws RemoteException {
+        if (year == null) return 0;
+        validateAcademicYear(year);
+        if (academicYearDAO.findByName(year.getYearName()) != null) {
+            throw new RemoteException("ပညာသင်နှစ် (" + year.getYearName().trim() + ") ရှိပြီးသား ဖြစ်နေပါသည်။");
+        }
+        // Step 1: Insert academic year
+        if (!academicYearDAO.insert(year)) return 0;
+        AcademicYear created = academicYearDAO.findByName(year.getYearName().trim());
+        if (created == null) return 0;
+        int yearId = created.getId();
+
+        // Step 2: No semester numbers selected — just create the year
+        if (semesterNumbers == null || semesterNumbers.length == 0) return 0;
+
+        int totalAssigned = 0;
+        for (int semNo : semesterNumbers) {
+            if (semNo < 1 || semNo > 8) continue;
+
+            // Step 3: Auto-create semester for this year
+            Semester sem = new Semester();
+            sem.setAcademicYearId(yearId);
+            sem.setSemesterNumber(semNo);
+            if (!semesterDAO.insert(sem)) continue;
+
+            // Step 4: Find the created semester ID
+            Semester created2 = semesterDAO.findUnique(yearId, semNo);
+            if (created2 == null) continue;
+            int semId = created2.getId();
+
+            // Step 5: Auto-assign unassigned subjects with matching semester_number
+            List<Subject> toLink = subjectDAO.findByStoredSemesterNumber(semNo);
+            for (Subject sub : toLink) {
+                if (subjectDAO.assignToSemester(sub.getId(), semId)) totalAssigned++;
+            }
+        }
+        return totalAssigned;
+    }
+
+    @Override
     public boolean updateAcademicYear(AcademicYear year) throws RemoteException {
         if (year == null || year.getId() <= 0) return false;
         validateAcademicYear(year);
@@ -183,7 +223,17 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
             throw new RemoteException("ယခုပညာသင်နှစ်တွင် Semester " + semester.getSemesterNumber() +
                     " ကို ထည့်သွင်းပြီးသား ဖြစ်နေပါသည်။");
         }
-        return semesterDAO.insert(semester);
+        boolean ok = semesterDAO.insert(semester);
+        if (ok) {
+            Semester created = semesterDAO.findUnique(semester.getAcademicYearId(), semester.getSemesterNumber());
+            if (created != null) {
+                List<Subject> toLink = subjectDAO.findByStoredSemesterNumber(semester.getSemesterNumber());
+                for (Subject sub : toLink) {
+                    subjectDAO.assignToSemester(sub.getId(), created.getId());
+                }
+            }
+        }
+        return ok;
     }
 
     @Override
@@ -235,8 +285,34 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     public boolean addSubject(Subject subject) throws RemoteException {
         if (subject == null) return false;
         validateSubject(subject);
-        ensureSubjectCodeAvailable(subject.getSubjectCode(), subject.getSemesterId(), 0);
-        return subjectDAO.insert(subject);
+
+        int semNo = subject.getSemesterNumber() != null ? subject.getSemesterNumber() : 0;
+        List<Semester> matchingSemesters = semNo > 0 ? semesterDAO.findBySemesterNumber(semNo) : java.util.Collections.emptyList();
+
+        if (matchingSemesters.isEmpty()) {
+            ensureSubjectCodeAvailable(subject.getSubjectCode(), 0, 0);
+            return subjectDAO.insert(subject);
+        } else {
+            boolean success = false;
+            for (int i = 0; i < matchingSemesters.size(); i++) {
+                Semester sem = matchingSemesters.get(i);
+                if (i == 0) {
+                    subject.setSemesterId(sem.getId());
+                    ensureSubjectCodeAvailable(subject.getSubjectCode(), sem.getId(), 0);
+                    success = subjectDAO.insert(subject);
+                } else {
+                    Subject copy = new Subject();
+                    copy.setSubjectCode(subject.getSubjectCode());
+                    copy.setSubjectName(subject.getSubjectName());
+                    copy.setCredit(subject.getCredit());
+                    copy.setDepartment(subject.getDepartment());
+                    copy.setSemesterNumber(semNo);
+                    copy.setSemesterId(sem.getId());
+                    subjectDAO.insert(copy);
+                }
+            }
+            return success;
+        }
     }
 
     @Override
@@ -506,10 +582,13 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
             throw new RemoteException("Credit must be between 1 and 6.");
         if (s.getDepartment() == null || s.getDepartment().isBlank())
             throw new RemoteException("Department is required.");
-        // Semester assignment is optional — subjects are created standalone
-        // and attached to a semester later from the academic year page.
+        // Semester number is now required (1–8)
+        Integer semNo = s.getSemesterNumber();
+        if (semNo == null || semNo < 1 || semNo > 8)
+            throw new RemoteException("Semester (1-8) \u101b\u103d\u1031\u1038\u1001\u103b\u101a\u103a\u101b\u1014\u103a \u101c\u102d\u102f\u1015\u103a\u1021\u1015\u102b\u101e\u100a\u103a\u104b");
+        // If a semester FK is already set, verify it exists
         if (s.getSemesterId() > 0 && semesterDAO.findById(s.getSemesterId()) == null)
-            throw new RemoteException("ရွေးချယ်ထားသော Semester ကို ရှာမတွေ့ပါ။");
+            throw new RemoteException("\u101b\u103d\u1031\u1038\u1001\u103b\u101a\u103a\u1011\u102c\u1038\u101e\u1031\u102c Semester \u1000\u102d\u102f \u101b\u103e\u102c\u1019\u1010\u103d\u1031\u1037\u1015\u102b\u104b");
     }
 
     private void validateResult(ExamResult r) throws RemoteException {

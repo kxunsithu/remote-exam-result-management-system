@@ -1,128 +1,76 @@
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="my">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ဘက်ရွေးချယ်ရန် — ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</title>
-  <meta name="description" content="Select your role to continue"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css"/>
+  <meta name="description" content="Select your role to continue" />
+  <%@ include file="WEB-INF/views/common/tailwind-setup.jsp" %>
 </head>
-<body class="auth-page">
 
-<div class="auth-card" style="max-width: 34rem; padding: 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
+<body
+  class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 font-sans antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-slate-50 to-slate-100">
 
-  <!-- Logo + University Title Header -->
-  <div class="auth-brand-header mb-4">
-    <div class="sidebar-logo" style="width: 44px; height: 44px; border-radius: 50%; background-color: #2563eb;">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-      </svg>
+  <div class="w-full max-w-lg bg-white border border-slate-200 roundedl p-8 shadow-xl">
+
+    <!-- Role Cards -->
+    <div class="space-y-3.5">
+      <!-- Admin Card -->
+      <a href="${pageContext.request.contextPath}/login?role=ADMIN"
+        class="group flex items-center gap-4 p-4 rounded bg-slate-50 border border-slate-200 hover:border-blue-500 hover:bg-blue-50/60 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+        <div
+          class="w-12 h-12 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-105 transition-transform">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <strong class="text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Admin</strong>
+          <span class="text-xs text-slate-500">ဆရာ / စီမံခန့်ခွဲသူ ဘက် — ဝင်ရောက်မည်</span>
+        </div>
+        <div class="ml-auto text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </div>
+      </a>
+
+      <!-- Student Card -->
+      <a href="${pageContext.request.contextPath}/login?role=STUDENT"
+        class="group flex items-center gap-4 p-4 rounded bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/60 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+        <div
+          class="w-12 h-12 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-105 transition-transform">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <strong
+            class="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Student</strong>
+          <span class="text-xs text-slate-500">ကျောင်းသား / သူ ဘက် — ဝင်ရောက်မည်</span>
+        </div>
+        <div class="ml-auto text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </div>
+      </a>
     </div>
-    <div>
-      <p style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;">
-        ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)
-      </p>
-      <span style="font-size: 0.75rem; color: #64748b;">University of Computer Studies (Hpa-an)</span>
-    </div>
+
   </div>
 
-  <!-- Page Title -->
-  <h1 class="auth-title mb-1" style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">
-    ဆက်လက်ရန် အသုံးပြုသူ ဘက်ကို ရွေးချယ်ပါ
-  </h1>
-  <p style="font-size: 0.8125rem; color: #64748b; margin-bottom: 1.75rem;">
-    Select your role to login or register
-  </p>
-
-  <!-- Role Cards -->
-  <div class="role-cards">
-    <!-- Admin Card -->
-    <a href="${pageContext.request.contextPath}/login?role=ADMIN" class="role-card">
-      <span class="role-card-icon" style="background-color: #eff6ff; color: #2563eb;">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
-        </svg>
-      </span>
-      <span class="role-card-body">
-        <strong>Admin</strong>
-        <small>ဆရာ / စီမံခန့်ခွဲသူ ဘက် — ဝင်ရောက်မည်</small>
-      </span>
-      <span class="role-card-arrow">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </span>
-    </a>
-
-    <!-- Student Card -->
-    <a href="${pageContext.request.contextPath}/login?role=STUDENT" class="role-card">
-      <span class="role-card-icon" style="background-color: #eff6ff; color: #2563eb;">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
-      </span>
-      <span class="role-card-body">
-        <strong>Student</strong>
-        <small>ကျောင်းသား / သူ ဘက် — ဝင်ရောက်မည်</small>
-      </span>
-      <span class="role-card-arrow">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </span>
-    </a>
-  </div>
-
-  <!-- Register hint -->
-  <div class="text-center mt-4 pt-3 border-top">
-    <span style="font-size: 0.8125rem; color: #64748b;">ကျောင်းသား အကောင့် မရှိသေးပါက</span>
-    <a href="${pageContext.request.contextPath}/register" style="font-size: 0.8125rem; color: #2563eb; font-weight: 600;" class="ms-1 hover-underline">
-      အကောင့်သစ် ပြုလုပ်မည်
-    </a>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/app.js"></script>
-<style>
-  .role-cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-  }
-  .role-card {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 1rem 1.1rem;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 0.75rem;
-    background: #f8fafc;
-    text-decoration: none;
-    transition: all 0.15s ease;
-  }
-  .role-card:hover {
-    border-color: #93c5fd;
-    background: #eff6ff;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px -6px rgba(37, 99, 235, 0.25);
-  }
-  .role-card-icon {
-    width: 3rem; height: 3rem;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .role-card-body { display: flex; flex-direction: column; line-height: 1.35; }
-  .role-card-body strong { font-size: 0.95rem; color: #0f172a; }
-  .role-card-body small { font-size: 0.72rem; color: #94a3b8; }
-  .role-card-arrow { margin-left: auto; color: #cbd5e1; transition: all 0.15s ease; }
-  .role-card:hover .role-card-arrow { color: #2563eb; transform: translateX(3px); }
-</style>
+  <script src="${pageContext.request.contextPath}/assets/js/app.js"></script>
 </body>
+
 </html>

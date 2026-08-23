@@ -47,6 +47,21 @@ public class SemesterDAO {
         return list;
     }
 
+    public List<Semester> findBySemesterNumber(int semesterNumber) {
+        List<Semester> list = new ArrayList<>();
+        String sql = SELECT_ALL + " WHERE sm.semester_number = ? ORDER BY ay.year_name";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, semesterNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("SemesterDAO.findBySemesterNumber error: " + e.getMessage());
+        }
+        return list;
+    }
+
     public Semester findById(int id) {
         String sql = SELECT_ALL + " WHERE sm.id = ?";
         try (Connection conn = DatabaseConnection.getConnection();

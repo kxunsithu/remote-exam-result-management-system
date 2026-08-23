@@ -105,6 +105,19 @@ public interface ExamResultService extends Remote {
     boolean updateAcademicYear(AcademicYear year) throws RemoteException;
 
     /**
+     * Adds a new academic year and optionally auto-creates semesters, then
+     * assigns subjects whose stored semester_number matches each semester.
+     *
+     * @param year            the new academic year (name required)
+     * @param semesterNumbers semester numbers (1-8) to auto-create and link;
+     *                        pass null or empty to behave like addAcademicYear()
+     * @return number of subjects auto-assigned across all semesters
+     * @throws RemoteException if year name already exists, is invalid, or a
+     *                         semester number is out of range
+     */
+    int addAcademicYearWithAutoLink(AcademicYear year, int[] semesterNumbers) throws RemoteException;
+
+    /**
      * Deletes an academic year and its semesters, subjects and results.
      * @return true on success
      */

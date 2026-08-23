@@ -1,277 +1,234 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
   <%@ taglib prefix="c" uri="jakarta.tags.core" %>
     <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-      <% request.setAttribute("pageTitle", "Dashboard" ); String flashSuccess=(String)
-        session.getAttribute("flashSuccess"); String flashError=(String) session.getAttribute("flashError");
-        session.removeAttribute("flashSuccess"); session.removeAttribute("flashError"); %>
+      <% request.setAttribute("pageTitle", "Dashboard" ); %>
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="my">
 
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Admin Dashboard — RERMS</title>
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-          <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css" />
+          <%@ include file="../common/tailwind-setup.jsp" %>
         </head>
 
-        <body>
-          <div class="app-layout">
-            <div class="admin-body-row">
-              <%@ include file="sidebar.jsp" %>
-              <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased">
+          <div class="flex min-h-screen">
+            <%@ include file="sidebar.jsp" %>
 
-              <main class="main-content">
+              <main class="flex-1 flex flex-col min-w-0">
                 <%@ include file="header.jsp" %>
-                <div class="page-body">
 
-                  <!-- Alerts -->
-                  <% if (flashSuccess !=null) { %>
-                    <div class="alert-custom alert-success-custom flash-alert">
-                      <%= flashSuccess %>
+                  <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+                    <!-- Breadcrumb & Nav Row -->
+                    <div class="flex items-center justify-between text-xs text-slate-500">
+                      <div class="flex items-center gap-2">
+                        <span>ဒက်ရှ်ဘုတ်</span>
+                        <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                        <span class="text-slate-900 font-medium">ပင်မအကျဉ်းချုပ်</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <button onclick="history.back()" aria-label="Go back" type="button"
+                          class="w-7 h-7 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-sm">
+                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="19" y1="12" x2="5" y2="12" />
+                            <polyline points="12 19 5 12 12 5" />
+                          </svg>
+                        </button>
+                        <button onclick="history.forward()" aria-label="Go forward" type="button"
+                          class="w-7 h-7 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-sm">
+                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                    <% } %>
-                      <% if (flashError !=null) { %>
-                        <div class="alert-custom alert-danger-custom flash-alert">
-                          <%= flashError %>
+
+                    <!-- Welcome Banner -->
+                    <div
+                      class="p-6 roundedl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md space-y-4">
+                      <div class="flex items-start gap-4">
+                        <div
+                          class="w-14 h-14 roundedl bg-white/20 border border-white/30 flex items-center justify-center text-white shrink-0 shadow-inner">
+                          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                          </svg>
                         </div>
-                        <% } %>
-                          <% if (request.getAttribute("rmiError") !=null) { %>
-                            <div class="alert-custom alert-warning-custom flash-alert">
-                              <%= request.getAttribute("rmiError") %>
-                            </div>
-                            <% } %>
-                              <!-- Breadcrumb Nav & History Controls Row -->
-                              <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div class="d-flex align-items-center gap-2"
-                                  style="font-size: 0.8125rem; color: #64748b;">
-                                  <span>ဒက်ရှ်ဘုတ်</span>
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <polyline points="9 18 15 12 9 6" />
-                                  </svg>
-                                  <span style="color: #0f172a; font-weight: 500;">ပင်မအကျဉ်းချုပ်</span>
-                                </div>
+                        <div class="space-y-1">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span
+                              class="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/30 text-[10px] font-bold text-white">UCS
+                              (Hpa-an)</span>
+                            <span class="text-xs text-blue-100">University of Computer Studies (Hpa-an)</span>
+                          </div>
+                          <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                            ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) — စာမေးပွဲရလဒ် စီမံခန့်ခွဲမှု စနစ်
+                          </h1>
+                        </div>
+                      </div>
 
-                                <div class="d-flex align-items-center gap-1">
-                                  <button onclick="history.back()" aria-label="Go back" type="button"
-                                    class="btn-action-icon" style="width: 1.65rem; height: 1.65rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                      stroke-width="2.5">
-                                      <line x1="19" y1="12" x2="5" y2="12" />
-                                      <polyline points="12 19 5 12 12 5" />
-                                    </svg>
-                                  </button>
-                                  <button onclick="history.forward()" aria-label="Go forward" type="button"
-                                    class="btn-action-icon" style="width: 1.65rem; height: 1.65rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                      stroke-width="2.5">
-                                      <line x1="5" y1="12" x2="19" y2="12" />
-                                      <polyline points="12 5 19 12 12 19" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                              <div class="banner-card">
-                                <div class="d-flex flex-column gap-3">
-                                  <div class="banner-identity">
-                                    <div class="banner-logo-box" style="border-radius: 50%; border-color: #2563eb;">
-                                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
-                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                                      </svg>
-                                    </div>
-                                    <div class="d-flex flex-column gap-1">
-                                      <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="banner-tag-pill">UCS (Hpa-an)</span>
-                                        <span style="font-size: 0.75rem; color: var(--muted-foreground);">University of Computer Studies (Hpa-an)</span>
-                                      </div>
-                                      <h1 class="page-title-heading" style="font-size: 1.35rem; color: #0f172a; margin: 0;">
-                                        ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) — စာမေးပွဲရလဒ် စီမံခန့်ခွဲမှု စနစ်
-                                      </h1>
-                                    </div>
-                                  </div>
+                      <p class="text-xs sm:text-sm text-blue-100 leading-relaxed max-w-3xl">
+                        ကြိုဆိုပါသည်၊ <strong class="text-white font-bold">Administrator</strong>။
+                        ကျောင်းသားအချက်အလက်များ၊ ဘာသာရပ်များ၊ သင်ရိုးညွှန်းတမ်းနှင့် စာမေးပွဲရလဒ်များကို
+                        အချိန်နှင့်တပြေးညီ လွယ်ကူစွာ စီမံခန့်ခွဲနိုင်ပါသည်။
+                      </p>
 
-                                  <p style="font-size: 0.875rem; color: #64748b; line-height: 1.6; margin: 0;">
-                                    ကြိုဆိုပါသည်၊ <strong style="color: #0f172a;">Administrator</strong>။
-                                    ကျောင်းသားအချက်အလက်များ၊ ဘာသာရပ်များ၊ သင်ရိုးညွှန်းတမ်းနှင့် စာမေးပွဲရလဒ်များကို
-                                    အချိန်နှင့်တပြေးညီ လွယ်ကူစွာ စီမံခန့်ခွဲနိုင်ပါသည်။
-                                  </p>
+                      <div class="flex items-center gap-3 flex-wrap pt-3 border-t border-white/20">
+                        <span
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-semibold text-white">
+                          <svg class="w-3.5 h-3.5 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                          </svg>
+                          admin@example.com
+                        </span>
+                        <span
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-300/30 text-xs font-semibold text-white">
+                          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                          Java RMI Server Connected
+                        </span>
+                      </div>
+                    </div>
 
-                                  <div class="d-flex align-items-center gap-2 flex-wrap pt-2 border-top">
-                                    <span class="badge badge-info">
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                                        <polyline points="22,6 12,13 2,6" />
-                                      </svg>
-                                      admin@example.com
-                                    </span>
-                                    <span class="badge badge-success">
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                      </svg>
-                                      Java RMI Server Connected
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
+                    <!-- Overview Statistics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                      <!-- Card 1: Total Students -->
+                      <a href="${pageContext.request.contextPath}/admin/students"
+                        class="group p-5 roundedl bg-white border border-slate-200 hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-semibold text-slate-500">ကျောင်းသား/သူ ဦးရေ</span>
+                          <div
+                            class="w-9 h-9 rounded bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                          <span class="text-2xl font-black text-slate-900">
+                            <%= request.getAttribute("totalStudents") !=null ? request.getAttribute("totalStudents") : "0" %>
+                          </span>
+                          <span
+                            class="text-xs font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်
+                            &rarr;</span>
+                        </div>
+                      </a>
 
-                              <!-- Overview Statistics Grid -->
-                              <div class="stats-grid">
-                                <!-- Card 1: Total Students -->
-                                <a href="${pageContext.request.contextPath}/admin/students" class="stat-card-item">
-                                  <div class="stat-card-header">
-                                    <span class="stat-card-label" style="font-size: 0.85rem;">ကျောင်းသား/သူ ဦးရေ</span>
-                                    <div class="stat-card-icon-wrap">
-                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                        <circle cx="9" cy="7" r="4" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div class="d-flex align-items-baseline justify-content-between">
-                                    <div class="stat-card-value">
-                                      <%= request.getAttribute("totalStudents") !=null ?
-                                        request.getAttribute("totalStudents") : "0" %>
-                                    </div>
-                                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--primary);">ကြည့်ရန်
-                                      →</span>
-                                  </div>
-                                </a>
+                      <!-- Card 2: Total Subjects -->
+                      <a href="${pageContext.request.contextPath}/admin/subjects"
+                        class="group p-5 roundedl bg-white border border-slate-200 hover:border-purple-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-semibold text-slate-500">ဘာသာရပ် အရေအတွက်</span>
+                          <div
+                            class="w-9 h-9 rounded bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                          <span class="text-2xl font-black text-slate-900">
+                            <%= request.getAttribute("totalSubjects") !=null ? request.getAttribute("totalSubjects") : "0" %>
+                          </span>
+                          <span
+                            class="text-xs font-semibold text-purple-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်
+                            &rarr;</span>
+                        </div>
+                      </a>
 
-                                 <!-- Card 2: Total Subjects -->
-                                <a href="${pageContext.request.contextPath}/admin/subjects" class="stat-card-item">
-                                  <div class="stat-card-header">
-                                    <span class="stat-card-label" style="font-size: 0.85rem;">ဘာသာရပ် အရေအတွက်</span>
-                                    <div class="stat-card-icon-wrap"
-                                      style="background-color: rgba(37, 99, 235, 0.1); color: #2563eb;">
-                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div class="d-flex align-items-baseline justify-content-between">
-                                    <div class="stat-card-value">
-                                      <%= request.getAttribute("totalSubjects") !=null ?
-                                        request.getAttribute("totalSubjects") : "0" %>
-                                    </div>
-                                    <span style="font-size: 0.78rem; font-weight: 600; color: #2563eb;">ကြည့်ရန်
-                                      →</span>
-                                  </div>
-                                </a>
+                      <!-- Card 3: Exam Results -->
+                      <a href="${pageContext.request.contextPath}/admin/results"
+                        class="group p-5 roundedl bg-white border border-slate-200 hover:border-emerald-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-semibold text-slate-500">စာမေးပွဲ ရလဒ်များ</span>
+                          <div
+                            class="w-9 h-9 rounded bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                          <span class="text-2xl font-black text-slate-900">
+                            <%= request.getAttribute("totalResults") !=null ? request.getAttribute("totalResults") : "0" %>
+                          </span>
+                          <span
+                            class="text-xs font-semibold text-emerald-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်
+                            &rarr;</span>
+                        </div>
+                      </a>
+                    </div>
 
-                                <!-- Card 3: Exam Results -->
-                                <a href="${pageContext.request.contextPath}/admin/results" class="stat-card-item">
-                                  <div class="stat-card-header">
-                                    <span class="stat-card-label" style="font-size: 0.85rem;">စာမေးပွဲ ရလဒ်များ</span>
-                                    <div class="stat-card-icon-wrap"
-                                      style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div class="d-flex align-items-baseline justify-content-between">
-                                    <div class="stat-card-value">
-                                      <%= request.getAttribute("totalResults") !=null ?
-                                        request.getAttribute("totalResults") : "0" %>
-                                    </div>
-                                    <span style="font-size: 0.78rem; font-weight: 600; color: #8b5cf6;">ကြည့်ရန်
-                                      →</span>
-                                  </div>
-                                </a>
-                              </div>
+                    <!-- Quick Actions Grid -->
+                    <div class="space-y-4">
+                      <h2 class="text-sm font-bold text-slate-900">လျင်မြန်စွာ ဆောင်ရွက်ရန်</h2>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <a href="${pageContext.request.contextPath}/admin/students"
+                          class="group p-4 roundedl bg-white border border-slate-200 hover:border-blue-500 hover:bg-blue-50/30 transition-all flex items-center gap-3.5 shadow-sm">
+                          <div
+                            class="w-10 h-10 rounded bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+                              ကျောင်းသား/သူ စီမံခန့်ခွဲမှု</h3>
+                            <p class="text-[11px] text-slate-500">ကျောင်းသားအချက်အလက်များ ထည့်သွင်းခြင်း၊ ပြင်ဆင်ခြင်း
+                            </p>
+                          </div>
+                        </a>
 
-                              <!-- Quick Actions Grid -->
-                              <div class="d-flex flex-column gap-3">
-                                <h2 style="font-size: 0.95rem; font-weight: 700; color: #0f172a;">
-                                  လျင်မြန်စွာ ဆောင်ရွက်ရန်
-                                </h2>
-                                <div class="quick-actions-grid">
-                                  <a href="${pageContext.request.contextPath}/admin/students" class="quick-action-card">
-                                    <div class="quick-action-icon">
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                        <circle cx="9" cy="7" r="4" />
-                                      </svg>
-                                    </div>
-                                    <div class="d-flex flex-column gap-1">
-                                      <div style="font-size: 0.875rem; font-weight: 700; color: var(--foreground);">
-                                        ကျောင်းသား/သူ စီမံခန့်ခွဲမှု</div>
-                                      <div style="font-size: 0.75rem; color: var(--muted-foreground);">
-                                        ကျောင်းသားအချက်အလက်များ ထည့်သွင်းခြင်း၊ ပြင်ဆင်ခြင်း</div>
-                                    </div>
-                                  </a>
+                        <a href="${pageContext.request.contextPath}/admin/subjects"
+                          class="group p-4 roundedl bg-white border border-slate-200 hover:border-purple-500 hover:bg-purple-50/30 transition-all flex items-center gap-3.5 shadow-sm">
+                          <div
+                            class="w-10 h-10 rounded bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <line x1="12" y1="5" x2="12" y2="19" />
+                              <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 class="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
+                              ဘာသာရပ် စီမံခန့်ခွဲမှု</h3>
+                            <p class="text-[11px] text-slate-500">သင်ရိုးညွှန်းတမ်း ဘာသာရပ်များနှင့် Credit
+                              သတ်မှတ်ချက်များ</p>
+                          </div>
+                        </a>
 
-                                  <a href="${pageContext.request.contextPath}/admin/subjects" class="quick-action-card">
-                                    <div class="quick-action-icon"
-                                      style="background-color: rgba(37, 99, 235, 0.1); color: #2563eb;">
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                      </svg>
-                                    </div>
-                                    <div class="d-flex flex-column gap-1">
-                                      <div style="font-size: 0.875rem; font-weight: 700; color: var(--foreground);">
-                                        ဘာသာရပ် စီမံခန့်ခွဲမှု</div>
-                                      <div style="font-size: 0.75rem; color: var(--muted-foreground);">သင်ရိုးညွှန်းတမ်း
-                                        ဘာသာရပ်များနှင့် Credit သတ်မှတ်ချက်များ</div>
-                                    </div>
-                                  </a>
+                        <a href="${pageContext.request.contextPath}/admin/results"
+                          class="group p-4 roundedl bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all flex items-center gap-3.5 shadow-sm">
+                          <div
+                            class="w-10 h-10 rounded bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                              စာမေးပွဲ ရလဒ် ထည့်သွင်းရန်</h3>
+                            <p class="text-[11px] text-slate-500">အမှတ်များ စိစစ်ခြင်းနှင့် Grade တွက်ချက်ခြင်း</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
 
-                                  <a href="${pageContext.request.contextPath}/admin/results" class="quick-action-card">
-                                    <div class="quick-action-icon"
-                                      style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                      </svg>
-                                    </div>
-                                    <div class="d-flex flex-column gap-1">
-                                      <div style="font-size: 0.875rem; font-weight: 700; color: var(--foreground);">
-                                        စာမေးပွဲ ရလဒ် ထည့်သွင်းရန်</div>
-                                      <div style="font-size: 0.75rem; color: var(--muted-foreground);">အမှတ်များ
-                                        စိစစ်ခြင်းနှင့် Grade တွက်ချက်ခြင်း</div>
-                                    </div>
-                                  </a>
-                                </div>
-                              </div>
-
-
-
-                </div>
+                  </div>
               </main>
-            </div>
           </div>
 
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
           <script src="${pageContext.request.contextPath}/assets/js/app.js"></script>
-          <script>
-            (function(){
-              var COLLAPSED_KEY = 'sidebarCollapsed';
-              var btn = document.getElementById('sidebarToggleBtn');
-              var overlay = document.getElementById('sidebarOverlay');
-              if (localStorage.getItem(COLLAPSED_KEY) === '1') document.body.classList.add('sidebar-collapsed');
-              if (btn) {
-                btn.addEventListener('click', function(){
-                  if (window.innerWidth <= 768) {
-                    document.body.classList.toggle('sidebar-open');
-                  } else {
-                    var collapsed = document.body.classList.toggle('sidebar-collapsed');
-                    localStorage.setItem(COLLAPSED_KEY, collapsed ? '1' : '0');
-                  }
-                });
-              }
-              if (overlay) overlay.addEventListener('click', function(){ document.body.classList.remove('sidebar-open'); });
-            })();
-          </script>
         </body>
 
         </html>

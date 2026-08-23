@@ -32,6 +32,8 @@ public class DatabaseInitializer {
             createTables(stmt);
             migrateLegacySchema(conn);
             migrateSubjectsNullableSemester(conn);
+            migrateSubjectsSemesterNumber(conn);
+            autoLinkUnassignedSubjects(conn);
             createIndexes(stmt);
             insertSampleData(conn);
 
@@ -91,13 +93,14 @@ public class DatabaseInitializer {
         // Subjects table  (created standalone; optionally attached to a semester later)
         stmt.execute("""
             CREATE TABLE IF NOT EXISTS subjects (
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
-                subject_code TEXT    NOT NULL,
-                subject_name TEXT    NOT NULL,
-                credit       INTEGER NOT NULL,
-                department   TEXT    NOT NULL,
-                semester_id  INTEGER REFERENCES semesters(id) ON DELETE CASCADE,
-                created_at   TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                subject_code    TEXT    NOT NULL,
+                subject_name    TEXT    NOT NULL,
+                credit          INTEGER NOT NULL,
+                department      TEXT    NOT NULL,
+                semester_id     INTEGER REFERENCES semesters(id) ON DELETE CASCADE,
+                semester_number INTEGER DEFAULT NULL,
+                created_at      TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
                 UNIQUE(subject_code, semester_id)
             )
             """);
@@ -351,6 +354,50 @@ public class DatabaseInitializer {
         }
     }
 
+    /**
+     * Adds the semester_number column to subjects table if it does not exist.
+     * This column stores the preferred semester number (1-8) set at subject
+     * creation, used for auto-linking when an academic year is created.
+     */
+    private static void migrateSubjectsSemesterNumber(Connection conn) throws SQLException {
+        if (columnExists(conn, "subjects", "semester_number")) return;
+        System.out.println("Adding subjects.semester_number column...");
+        try (Statement st = conn.createStatement()) {
+            st.execute("ALTER TABLE subjects ADD COLUMN semester_number INTEGER DEFAULT NULL");
+        }
+        System.out.println("subjects.semester_number added.");
+    }
+
+    /**
+     * Links any unassigned subjects (semester_id IS NULL) to existing semesters
+     * if their stored semester_number matches a semester number in an academic year.
+     */
+    private static void autoLinkUnassignedSubjects(Connection conn) throws SQLException {
+        String sql = """
+            SELECT sub.id, sub.semester_number, sm.id AS target_sem_id
+            FROM subjects sub
+            JOIN semesters sm ON sub.semester_number = sm.semester_number
+            WHERE sub.semester_id IS NULL
+            """;
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            java.util.List<int[]> updates = new java.util.ArrayList<>();
+            while (rs.next()) {
+                updates.add(new int[]{rs.getInt("id"), rs.getInt("target_sem_id")});
+            }
+            if (!updates.isEmpty()) {
+                System.out.println("Auto-linking " + updates.size() + " unassigned subjects to existing semesters...");
+                try (PreparedStatement ps = conn.prepareStatement("UPDATE subjects SET semester_id = ? WHERE id = ?")) {
+                    for (int[] pair : updates) {
+                        ps.setInt(1, pair[1]);
+                        ps.setInt(2, pair[0]);
+                        ps.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
     private static void createIndexes(Statement stmt) throws SQLException {
         stmt.execute("CREATE INDEX IF NOT EXISTS idx_results_student ON exam_results(student_id)");
         stmt.execute("CREATE INDEX IF NOT EXISTS idx_results_subject ON exam_results(subject_id)");
@@ -373,22 +420,13 @@ public class DatabaseInitializer {
     }
 
     // =========================================================================
-    // Sample data
+    // Initial Seed Data (Admin Only)
     // =========================================================================
 
     private static void insertSampleData(Connection conn) throws SQLException {
-        // Only insert if tables are empty
+        // Only insert default admin if users table is empty
         if (tableIsEmpty(conn, "users")) {
-            insertSampleUsers(conn);
-        }
-        if (tableIsEmpty(conn, "students")) {
-            insertSampleStudents(conn);
-        }
-        if (tableIsEmpty(conn, "academic_years")) {
-            insertSampleAcademicStructure(conn);
-        }
-        if (tableIsEmpty(conn, "exam_results") && !tableIsEmpty(conn, "subjects")) {
-            insertSampleResults(conn);
+            insertDefaultAdminUser(conn);
         }
     }
 
@@ -399,9 +437,8 @@ public class DatabaseInitializer {
         }
     }
 
-    private static void insertSampleUsers(Connection conn) throws SQLException {
-        String adminHash   = BCrypt.hashpw("admin123", BCrypt.gensalt(12));
-        String studentHash = BCrypt.hashpw("student123", BCrypt.gensalt(12));
+    private static void insertDefaultAdminUser(Connection conn) throws SQLException {
+        String adminHash = BCrypt.hashpw("admin123", BCrypt.gensalt(12));
 
         String sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -409,171 +446,7 @@ public class DatabaseInitializer {
             ps.setString(2, adminHash);
             ps.setString(3, "ADMIN");
             ps.executeUpdate();
-
-            ps.setString(1, "john.doe@university.edu");
-            ps.setString(2, studentHash);
-            ps.setString(3, "STUDENT");
-            ps.executeUpdate();
         }
-        System.out.println("  ✓ Sample users inserted.");
-    }
-
-
-    private static void insertSampleStudents(Connection conn) throws SQLException {
-        String sql = """
-            INSERT INTO students (student_id, name, email, phone, gender)
-            VALUES (?, ?, ?, ?, ?)
-            """;
-        Object[][] data = {
-            {"ST001", "John Doe",     "john.doe@university.edu",     "555-0101", "Male"},
-            {"ST002", "Jane Smith",   "jane.smith@university.edu",   "555-0102", "Female"},
-            {"ST003", "Alex Brown",   "alex.brown@university.edu",   "555-0103", "Male"},
-            {"ST004", "Maria Garcia", "maria.garcia@university.edu", "555-0104", "Female"},
-            {"ST005", "Liam Johnson", "liam.johnson@university.edu", "555-0105", "Male"},
-        };
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (Object[] row : data) {
-                ps.setString(1, (String) row[0]);
-                ps.setString(2, (String) row[1]);
-                ps.setString(3, (String) row[2]);
-                ps.setString(4, (String) row[3]);
-                ps.setString(5, (String) row[4]);
-                ps.executeUpdate();
-            }
-        }
-        System.out.println("  ✓ Sample students inserted.");
-    }
-
-    /**
-     * Seeds: 2024-2025 -> Semester 1 & 2 with their subjects.
-     * Mirrors the intended workflow:
-     *   Step 1: academic year, Step 2: semesters, Step 3: subjects per semester.
-     */
-    private static void insertSampleAcademicStructure(Connection conn) throws SQLException {
-        int yearId;
-        try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO academic_years (year_name) VALUES (?)",
-                Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, DEFAULT_YEAR);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                keys.next();
-                yearId = keys.getInt(1);
-            }
-        }
-
-        int sem1Id;
-        int sem2Id;
-        try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO semesters (academic_year_id, semester_number) VALUES (?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, yearId);
-            ps.setInt(2, 1);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) { keys.next(); sem1Id = keys.getInt(1); }
-
-            ps.setInt(1, yearId);
-            ps.setInt(2, 2);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) { keys.next(); sem2Id = keys.getInt(1); }
-        }
-
-        String sql = """
-            INSERT INTO subjects (subject_code, subject_name, credit, department, semester_id)
-            VALUES (?, ?, ?, ?, ?)
-            """;
-        Object[][] data = {
-            {"CS101", "Java Programming",     4, "Computer Science",      sem1Id},
-            {"CS102", "Database Systems",     3, "Computer Science",      sem1Id},
-            {"CS105", "Web Development",      3, "Computer Science",      sem1Id},
-            {"CS103", "Software Engineering", 3, "Computer Science",      sem2Id},
-            {"CS104", "Computer Networks",    3, "Information Technology", sem2Id},
-        };
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (Object[] row : data) {
-                ps.setString(1, (String) row[0]);
-                ps.setString(2, (String) row[1]);
-                ps.setInt(3, (Integer) row[2]);
-                ps.setString(4, (String) row[3]);
-                ps.setInt(5, (Integer) row[4]);
-                ps.executeUpdate();
-            }
-        }
-
-        // A few standalone subjects (not yet attached to any semester).
-        // They can be attached from the academic year page.
-        String unassignedSql = """
-            INSERT INTO subjects (subject_code, subject_name, credit, department, semester_id)
-            VALUES (?, ?, ?, ?, NULL)
-            """;
-        Object[][] pool = {
-            {"CS201", "Artificial Intelligence",         3, "Computer Science"},
-            {"CS202", "Mobile Application Development",  3, "Information Technology"},
-        };
-        try (PreparedStatement ps = conn.prepareStatement(unassignedSql)) {
-            for (Object[] row : pool) {
-                ps.setString(1, (String) row[0]);
-                ps.setString(2, (String) row[1]);
-                ps.setInt(3, (Integer) row[2]);
-                ps.setString(4, (String) row[3]);
-                ps.executeUpdate();
-            }
-        }
-        System.out.println("  ✓ Sample academic year / semesters / subjects inserted.");
-    }
-
-    private static void insertSampleResults(Connection conn) throws SQLException {
-        int[] studentIds = fetchIds(conn, "students");
-        int[] subjectIds = fetchIds(conn, "subjects");
-
-        if (studentIds.length == 0 || subjectIds.length == 0) return;
-
-        String sql = """
-            INSERT INTO exam_results (student_id, subject_id, marks, total_marks, grade)
-            VALUES (?, ?, ?, ?, ?)
-            """;
-
-        // Sample pairs as (student index, subject index, marks, total).
-        // Pairs referencing missing records are skipped so startup never
-        // crashes on small databases.
-        int[][] pairs = {
-            {0, 0, 85, 100},
-            {0, 1, 78, 100},
-            {0, 2, 82, 100},
-            {1, 0, 92, 100},
-            {1, 1, 88, 100},
-            {1, 4, 76, 100},
-            {2, 0, 65, 100},
-            {2, 3, 72, 100},
-            {2, 4, 58, 100},
-        };
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (int[] pair : pairs) {
-                int sIdx = pair[0], subjIdx = pair[1];
-                if (sIdx >= studentIds.length || subjIdx >= subjectIds.length) continue;
-                int sId = studentIds[sIdx];
-                int subjId = subjectIds[subjIdx];
-                double marks = pair[2];
-                double total = pair[3];
-                String grade = ExamResultServiceImpl.computeGrade(marks, total);
-                ps.setInt(1, sId);
-                ps.setInt(2, subjId);
-                ps.setDouble(3, marks);
-                ps.setDouble(4, total);
-                ps.setString(5, grade);
-                ps.executeUpdate();
-            }
-        }
-        System.out.println("  ✓ Sample exam results inserted.");
-    }
-
-    private static int[] fetchIds(Connection conn, String table) throws SQLException {
-        try (Statement s = conn.createStatement();
-             ResultSet rs = s.executeQuery("SELECT id FROM " + table + " ORDER BY id")) {
-            java.util.List<Integer> ids = new java.util.ArrayList<>();
-            while (rs.next()) ids.add(rs.getInt(1));
-            return ids.stream().mapToInt(Integer::intValue).toArray();
-        }
+        System.out.println("  ✓ Default admin user inserted (admin@example.com).");
     }
 }

@@ -55,11 +55,20 @@ public class AcademicServlet extends HttpServlet {
                     unassignedSubjects.add(sub);
             }
 
+            // Collect distinct semester numbers for which subjects actually exist
+            java.util.Set<Integer> availableSemesterNumbers = new java.util.TreeSet<>();
+            for (common.Subject sub : allSubjects) {
+                if (sub.getSemesterNumber() != null && sub.getSemesterNumber() > 0) {
+                    availableSemesterNumbers.add(sub.getSemesterNumber());
+                }
+            }
+
             req.setAttribute("years", years);
             req.setAttribute("semsByYear", semsByYear);
             req.setAttribute("subjectsBySemester", subjectsBySemester);
             req.setAttribute("unassignedSubjects", unassignedSubjects);
             req.setAttribute("allSubjects", allSubjects);
+            req.setAttribute("availableSemesterNumbers", availableSemesterNumbers);
 
         } catch (RuntimeException e) {
             req.setAttribute("rmiError", "RMI server unavailable.");
@@ -81,8 +90,19 @@ public class AcademicServlet extends HttpServlet {
                 case "addYear" -> {
                     AcademicYear y = new AcademicYear();
                     y.setYearName(req.getParameter("yearName"));
-                    boolean ok = service.addAcademicYear(y);
-                    setFlash(req, ok, "ပညာသင်နှစ် အသစ် ထည့်သွင်းပြီးပါပြီ။", "ပညာသင်နှစ် ထည့်သွင်းမှု မအောင်မြင်ပါ။");
+                    // Optional semester numbers to auto-create and link subjects
+                    String[] semStrs = req.getParameterValues("semesterNumbers");
+                    int[] semNums = null;
+                    if (semStrs != null && semStrs.length > 0) {
+                        semNums = java.util.Arrays.stream(semStrs)
+                                .mapToInt(Integer::parseInt).toArray();
+                    }
+                    int linked = service.addAcademicYearWithAutoLink(y, semNums);
+                    String msg = "ပညာသင်နှစ် အသစ် ထည့်သွင်းပြီးပါပြီ။";
+                    if (semNums != null && semNums.length > 0) {
+                        msg += " Semester " + semNums.length + " ခု auto-create ပြီး ဘာသာရပ် " + linked + " ခု auto-ချိတ်ပြီးပါပြီ။";
+                    }
+                    setFlash(req, true, msg, "ပညာသင်နှစ် ထည့်သွင်းမှု မအောင်မြင်ပါ။");
                 }
                 case "updateYear" -> {
                     AcademicYear y = new AcademicYear();

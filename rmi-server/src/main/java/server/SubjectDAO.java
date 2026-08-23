@@ -15,7 +15,8 @@ public class SubjectDAO {
 
     private static final String SELECT_ALL = """
         SELECT sub.id, sub.subject_code, sub.subject_name, sub.credit,
-               sub.department, sub.semester_id, sub.created_at,
+               sub.department, sub.semester_id, sub.semester_number AS stored_sem_no,
+               sub.created_at,
                sm.academic_year_id, sm.semester_number, ay.year_name AS academic_year_name
         FROM subjects sub
         LEFT JOIN semesters sm      ON sub.semester_id = sm.id
@@ -50,6 +51,25 @@ public class SubjectDAO {
             while (rs.next()) list.add(mapRow(rs));
         } catch (SQLException e) {
             System.err.println("SubjectDAO.findUnassigned error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Returns subjects that have a specific stored semester_number and are not
+     * yet assigned to any semester. Used for auto-linking during academic year creation.
+     */
+    public List<Subject> findByStoredSemesterNumber(int semesterNumber) {
+        List<Subject> list = new ArrayList<>();
+        String sql = SELECT_ALL + " WHERE sub.semester_id IS NULL AND sub.semester_number = ? ORDER BY sub.subject_code";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, semesterNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("SubjectDAO.findByStoredSemesterNumber error: " + e.getMessage());
         }
         return list;
     }
@@ -178,8 +198,8 @@ public class SubjectDAO {
 
     public boolean insert(Subject s) {
         String sql = """
-            INSERT INTO subjects (subject_code, subject_name, credit, department, semester_id)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO subjects (subject_code, subject_name, credit, department, semester_id, semester_number)
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -193,13 +213,13 @@ public class SubjectDAO {
 
     public boolean update(Subject s) {
         String sql = """
-            UPDATE subjects SET subject_code=?, subject_name=?, credit=?, department=?, semester_id=?
+            UPDATE subjects SET subject_code=?, subject_name=?, credit=?, department=?, semester_id=?, semester_number=?
             WHERE id=?
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setSubjectParams(ps, s);
-            ps.setInt(6, s.getId());
+            ps.setInt(7, s.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("SubjectDAO.update error: " + e.getMessage());
@@ -236,6 +256,10 @@ public class SubjectDAO {
         ps.setString(4, s.getDepartment().trim());
         if (s.getSemesterId() > 0) ps.setInt(5, s.getSemesterId());
         else                       ps.setNull(5, java.sql.Types.INTEGER);
+        // semester_number: stored preferred semester (1-8), or NULL
+        Integer semNo = s.getSemesterNumber();
+        if (semNo != null && semNo > 0) ps.setInt(6, semNo);
+        else                            ps.setNull(6, java.sql.Types.INTEGER);
     }
 
     private Subject mapRow(ResultSet rs) throws SQLException {
@@ -251,8 +275,14 @@ public class SubjectDAO {
         int yearId = rs.getInt("academic_year_id");
         if (!rs.wasNull()) s.setAcademicYearId(yearId);
         s.setAcademicYearName(rs.getString("academic_year_name"));
-        int semNo = rs.getInt("semester_number");
-        if (!rs.wasNull()) s.setSemesterNumber(semNo);
+        // semester_number: prefer JOIN value (assigned), fall back to stored value
+        int joinSemNo = rs.getInt("semester_number");
+        if (!rs.wasNull()) {
+            s.setSemesterNumber(joinSemNo);        // from semesters JOIN
+        } else {
+            int stored = rs.getInt("stored_sem_no");
+            if (!rs.wasNull() && stored > 0) s.setSemesterNumber(stored); // stored at creation
+        }
         return s;
     }
 }
