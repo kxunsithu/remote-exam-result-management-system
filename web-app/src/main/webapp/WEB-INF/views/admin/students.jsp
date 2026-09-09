@@ -202,22 +202,7 @@
                         </table>
                       </div>
 
-                      <!-- Pagination Footer Bar -->
-                      <div
-                        class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-                        <div>
-                          Showing <%= students !=null && !students.isEmpty() ? 1 : 0 %> to <%= students !=null ?
-                              students.size() : 0 %> of <%= students !=null ? students.size() : 0 %> Entries
-                        </div>
-                        <div class="flex items-center gap-3">
-                          <select class="px-2 py-1 rounded bg-white border border-slate-300 text-slate-700 text-xs">
-                            <option selected>5</option>
-                            <option>10</option>
-                            <option>25</option>
-                          </select>
-                          <span>Page 1 of 1</span>
-                        </div>
-                      </div>
+
                     </div>
 
                   </div>

@@ -104,10 +104,10 @@
 
                     <!-- Quick Statistics Cards Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                      <!-- Card 1: CGPA -->
+                      <!-- Card 1: Overall GPA -->
                       <div class="p-5 roundedl bg-white border border-slate-200 shadow-sm space-y-3">
                         <div class="flex items-center justify-between">
-                          <span class="text-xs font-semibold text-slate-500">CGPA (4.0 Scale)</span>
+                          <span class="text-xs font-semibold text-slate-500">Overall GPA (4.0 Scale)</span>
                           <div
                             class="w-8 h-8 rounded bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -122,7 +122,7 @@
                           </div>
                           <span
                             class="px-2 py-0.5 rounded-full bg-blue-50 text-[10px] font-bold text-blue-700 border border-blue-200">Overall
-                            CGPA</span>
+                            GPA</span>
                         </div>
                       </div>
 

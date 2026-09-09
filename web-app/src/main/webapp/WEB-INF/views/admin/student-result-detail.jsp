@@ -203,7 +203,7 @@
                                                     <%= String.format("%.2f", cgpaObj) %>
                                                   </span>
                                                   <span
-                                                    class="text-[10px] text-blue-100 uppercase tracking-wide">CGPA</span>
+                                                    class="text-[10px] text-blue-100 uppercase tracking-wide">Overall GPA</span>
                                                 </div>
                                                 <% } %>
                                             </div>
@@ -1271,17 +1271,17 @@
                                     doc.write('<td class="num" style="border:1px solid #000; font-weight:bold;">' + totalGradePoint.toFixed(2) + '</td>');
                                     doc.write('</tr>');
 
-                                    // Cumulative GPA (overall across all semesters)
-                                    doc.write('<tr class="summary-row">');
-                                    doc.write('<td colspan="5" style="border:none;"></td>');
-                                    doc.write('<td class="summary-label" style="border:1px solid #000; font-weight:bold; text-align:right;">Cumulative GPA</td>');
-                                    doc.write('<td class="summary-val" style="border:1px solid #000;">' + displayCGPA + '</td>');
-                                    doc.write('</tr>');
-
-                                    // Overall GPA
+                                    // Overall GPA (overall CGPA across all semesters)
                                     doc.write('<tr class="summary-row">');
                                     doc.write('<td colspan="5" style="border:none;"></td>');
                                     doc.write('<td class="summary-label" style="border:1px solid #000; font-weight:bold; text-align:right;">Overall GPA</td>');
+                                    doc.write('<td class="summary-val" style="border:1px solid #000;">' + displayCGPA + '</td>');
+                                    doc.write('</tr>');
+
+                                    // Cumulative GPA (semester GPA)
+                                    doc.write('<tr class="summary-row">');
+                                    doc.write('<td colspan="5" style="border:none;"></td>');
+                                    doc.write('<td class="summary-label" style="border:1px solid #000; font-weight:bold; text-align:right;">Cumulative GPA</td>');
                                     doc.write('<td class="summary-val" style="border:1px solid #000;">' + overallGPA + '</td>');
                                     doc.write('</tr>');
 
