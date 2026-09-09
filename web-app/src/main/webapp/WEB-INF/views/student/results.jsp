@@ -638,14 +638,14 @@
 
                       doc.write('<tr>');
                       doc.write('<td colspan="5" style="border:none;"></td>');
-                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Overall GPA</td>');
-                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + overallGPA + '</td>');
+                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Cumulative GPA</td>');
+                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + displayCGPA + '</td>');
                       doc.write('</tr>');
 
                       doc.write('<tr>');
                       doc.write('<td colspan="5" style="border:none;"></td>');
-                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Cumulative GPA</td>');
-                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + displayCGPA + '</td>');
+                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Overall GPA</td>');
+                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + overallGPA + '</td>');
                       doc.write('</tr>');
 
                       doc.write('</tbody></table>');

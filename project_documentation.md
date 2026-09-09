@@ -871,7 +871,7 @@ The **Official Academic Transcript** is a printable A4-format document that can 
    - Specialization: Computer Science
 3. **Course Results Table**:
    - No., Course Code, Course Name, Academic Credit Units, Grade Obtained, Grade Score (4.0 scale), Grade Points (Credit × Grade Score)
-4. **Summary Row** — Total Credit Units, Total Grade Points, Cumulative GPA, Overall GPA
+4. **Summary Row** — Total Credit Units, Total Grade Points, Overall GPA, Overall GPA
 5. **Official Grading Scale Grid** — Reference table of all grades and their point values
 6. **Issue Date** and **Registrar Signature Block**
 

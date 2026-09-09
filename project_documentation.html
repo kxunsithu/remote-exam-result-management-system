@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Project Documentation</title>
+<style>
+    body {
+        font-family: 'Times New Roman', serif;
+        font-size: 11pt;
+        line-height: 1.4;
+        color: #000000;
+        margin: 1in;
+    }
+    h1 {
+        font-size: 20pt;
+        color: #1F497D;
+        border-bottom: 2px solid #1F497D;
+        padding-bottom: 5px;
+        margin-top: 20px;
+    }
+    h2 {
+        font-size: 16pt;
+        color: #1F497D;
+        border-bottom: 1px solid #C00000;
+        padding-bottom: 3px;
+        margin-top: 18px;
+    }
+    h3 {
+        font-size: 13pt;
+        color: #1F497D;
+        margin-top: 15px;
+    }
+    h4 {
+        font-size: 11pt;
+        font-weight: bold;
+        color: #333333;
+        margin-top: 12px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        font-size: 10pt;
+    }
+    th, td {
+        border: 1px solid #7A98B6;
+        padding: 6px 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #1F497D;
+        color: #FFFFFF;
+        font-weight: bold;
+    }
+    tr:nth-child(even) {
+        background-color: #F2F5F8;
+    }
+    code {
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 9.5pt;
+        background-color: #F0F4F8;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+    pre {
+        background-color: #F0F4F8;
+        border: 1px solid #D0D7DE;
+        padding: 10px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 9pt;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    blockquote {
+        border-left: 4px solid #1F497D;
+        margin: 10px 0;
+        padding-left: 10px;
+        color: #555555;
+        font-style: italic;
+    }
+</style>
+</head>
+<body>
+<h1 id="remote-exam-result-management-system-rerms">Remote Exam Result Management System (RERMS)</h1>
+<p><strong>University of Computer Studies, Hpa-an (UCS Hpa-an)</strong>
+Final Year Project Documentation — Academic Year 2024–2025</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Chapter</th>
+<th style="text-align: left;">Title</th>
+<th style="text-align: center;">Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Chapter 1</strong></td>
+<td style="text-align: left;"><strong>Introduction</strong></td>
+<td style="text-align: center;"><strong>4</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">1.1</td>
+<td style="text-align: left;">Exam Result Management System</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.2</td>
+<td style="text-align: left;">Objectives</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;">1.3</td>
+<td style="text-align: left;">System Development Environment</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Chapter 2</strong></td>
+<td style="text-align: left;"><strong>Remote Method Invocation (RMI)</strong></td>
+<td style="text-align: center;"><strong>6</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">2.1</td>
+<td style="text-align: left;">Remote Method Invocation (RMI)</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.2</td>
+<td style="text-align: left;">Design Issues For RMI</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.3</td>
+<td style="text-align: left;">Implementation of Remote Invocation Method (RMI)</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Chapter 3</strong></td>
+<td style="text-align: left;"><strong>Implementation</strong></td>
+<td style="text-align: center;"><strong>11</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Chapter 4</strong></td>
+<td style="text-align: left;"><strong>Conclusion</strong></td>
+<td style="text-align: center;"><strong>17</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-1-introduction">Chapter (1) Introduction</h2>
+<h3 id="11-exam-result-management-system">1.1 Exam Result Management System</h3>
+<p>The <strong>Remote Exam Result Management System (RERMS)</strong> is an enterprise-grade, distributed university management application developed for the University of Computer Studies, Hpa-an (UCS Hpa-an). The system is designed to manage student exam results securely and efficiently using a modern distributed architecture.</p>
+<p>Traditional exam result management in universities relies on manual, paper-based records. These records are prone to human error, data loss, and inconsistent grade calculations. There is also no standardized way for students to view their personal academic records on demand, nor to generate official printable transcripts.</p>
+<p>RERMS solves these problems by providing:</p>
+<ul>
+<li>A <strong>centralized digital platform</strong> where administrators can manage all student records, subjects, academic years, and exam results in one place.</li>
+<li>A <strong>secure student self-service portal</strong> that allows students to view their own results, CGPA, and print official academic transcripts at any time.</li>
+<li>An <strong>automated server-side grading engine</strong> that computes grades and CGPA consistently according to the official UCS Hpa-an 10-tier grading scale.</li>
+<li>A <strong>Role-Based Access Control (RBAC)</strong> system that strictly separates administrator and student capabilities.</li>
+</ul>
+<p>The core technology that powers the communication between the web front-end and the database server is <strong>Java Remote Method Invocation (Java RMI)</strong>, demonstrating how distributed systems can be applied to solve real-world academic management challenges.</p>
+<hr />
+<h3 id="12-objectives">1.2 Objectives</h3>
+<p>The primary objectives of this project are as follows:</p>
+<ol>
+<li>
+<p><strong>Implement Java RMI as Distributed Middleware</strong> — Use Java RMI (port 1099) as the communication protocol between the web application (client) and the business logic server, ensuring the web application never directly accesses the database.</p>
+</li>
+<li>
+<p><strong>Enforce Role-Based Access Control (RBAC)</strong> — Provide separate and secure portals for administrators and students, protected by a Jakarta Servlet <code>AuthFilter</code> that enforces session-based authentication.</p>
+</li>
+<li>
+<p><strong>Build an Automated Grading Engine</strong> — Implement a server-side grade calculation engine that converts raw marks into official UCS Hpa-an grades (A+ through F) and computes credit-weighted CGPA (on a 4.0 scale).</p>
+</li>
+<li>
+<p><strong>Design a Normalized Relational Database</strong> — Design and implement a normalized SQLite database with five tables: <code>users</code>, <code>students</code>, <code>academic_years</code>, <code>semesters</code>, <code>subjects</code>, and <code>exam_results</code>, enforcing referential integrity with foreign key constraints.</p>
+</li>
+<li>
+<p><strong>Enable Full Admin CRUD Operations</strong> — Allow administrators to create, read, update, and delete records for students, academic years, semesters, subjects, and exam results through an intuitive web interface.</p>
+</li>
+<li>
+<p><strong>Deliver a Student Self-Service Portal</strong> — Allow students to securely view their semester-wise results, CGPA, pass/fail status, and generate official A4-format academic transcripts with university header and registrar signature block.</p>
+</li>
+<li>
+<p><strong>Implement Secure Password Management</strong> — Store all passwords as BCrypt hashes (cost factor 12) to ensure no plain-text credentials are stored in the database.</p>
+</li>
+</ol>
+<hr />
+<h3 id="13-system-development-environment">1.3 System Development Environment</h3>
+<p>The system is built using the following development tools, frameworks, and technologies:</p>
+<h4 id="hardware-environment">Hardware Environment</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Component</th>
+<th style="text-align: left;">Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Processor</td>
+<td style="text-align: left;">Intel Core i5 / AMD Ryzen 5 or higher</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAM</td>
+<td style="text-align: left;">8 GB or higher</td>
+</tr>
+<tr>
+<td style="text-align: left;">Storage</td>
+<td style="text-align: left;">256 GB SSD or higher</td>
+</tr>
+<tr>
+<td style="text-align: left;">Network</td>
+<td style="text-align: left;">Local network (localhost for RMI)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="software-environment">Software Environment</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Layer</th>
+<th style="text-align: left;">Technology</th>
+<th style="text-align: left;">Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Programming Language</strong></td>
+<td style="text-align: left;">Java</td>
+<td style="text-align: left;">JDK 17 / 21</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Build Tool</strong></td>
+<td style="text-align: left;">Apache Maven</td>
+<td style="text-align: left;">3.8+</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Web Framework</strong></td>
+<td style="text-align: left;">Jakarta EE Servlets &amp; JSP</td>
+<td style="text-align: left;">Servlet 6.0 / JSP 3.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Web Server</strong></td>
+<td style="text-align: left;">Embedded Jetty / Apache Tomcat</td>
+<td style="text-align: left;">Tomcat 10</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RMI Middleware</strong></td>
+<td style="text-align: left;">Java RMI (JRMP)</td>
+<td style="text-align: left;">Built-in (JDK)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Database</strong></td>
+<td style="text-align: left;">SQLite</td>
+<td style="text-align: left;">3.x</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>JDBC Driver</strong></td>
+<td style="text-align: left;">Xerial SQLite-JDBC</td>
+<td style="text-align: left;">3.45.x</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Password Hashing</strong></td>
+<td style="text-align: left;">jBCrypt</td>
+<td style="text-align: left;">0.4</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frontend</strong></td>
+<td style="text-align: left;">HTML5, CSS3, Bootstrap 5, JavaScript</td>
+<td style="text-align: left;">Bootstrap 5.3</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Development IDE</strong></td>
+<td style="text-align: left;">IntelliJ IDEA / VS Code</td>
+<td style="text-align: left;">Latest</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Version Control</strong></td>
+<td style="text-align: left;">Git + GitHub</td>
+<td style="text-align: left;">Latest</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Containerization</strong></td>
+<td style="text-align: left;">Docker + Docker Compose</td>
+<td style="text-align: left;">Latest</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cloud Deployment</strong></td>
+<td style="text-align: left;">Railway</td>
+<td style="text-align: left;">Latest</td>
+</tr>
+</tbody>
+</table>
+<h4 id="project-structure-maven-multi-module">Project Structure (Maven Multi-Module)</h4>
+<pre><code>remote-exam-result-management-system/
+├── pom.xml                    ← Root Maven POM (Parent)
+├── common/                    ← Module 1: Shared Interfaces &amp; Models
+│   └── src/main/java/common/
+│       ├── ExamResultService.java   ← Remote interface
+│       ├── User.java
+│       ├── Student.java
+│       ├── Subject.java
+│       ├── ExamResult.java
+│       ├── AcademicYear.java
+│       └── Semester.java
+├── rmi-server/               ← Module 2: Business Logic &amp; Persistence
+│   └── src/main/java/server/
+│       ├── RMIServer.java
+│       ├── ExamResultServiceImpl.java
+│       ├── DatabaseConnection.java
+│       ├── DatabaseInitializer.java
+│       ├── UserDAO.java
+│       ├── StudentDAO.java
+│       ├── SubjectDAO.java
+│       ├── ExamResultDAO.java
+│       ├── AcademicYearDAO.java
+│       └── SemesterDAO.java
+└── web-app/                  ← Module 3: Jakarta Servlet/JSP Front-End
+    └── src/main/java/web/
+        ├── RMIClientManager.java
+        ├── LoginServlet.java
+        ├── LogoutServlet.java
+        ├── RegisterServlet.java
+        ├── AdminDashboardServlet.java
+        ├── StudentServlet.java
+        ├── SubjectServlet.java
+        ├── ExamResultServlet.java
+        ├── AcademicServlet.java
+        ├── StudentDashboardServlet.java
+        ├── StudentResultServlet.java
+        └── AuthFilter.java
+</code></pre>
+<hr />
+<h2 id="chapter-2-remote-method-invocation-rmi">Chapter (2) Remote Method Invocation (RMI)</h2>
+<h3 id="21-remote-method-invocation-rmi">2.1 Remote Method Invocation (RMI)</h3>
+<p><strong>Java Remote Method Invocation (Java RMI)</strong> is a Java API that allows an object running in one Java Virtual Machine (JVM) to invoke methods on an object running in another JVM, even across a network. It is Java's native implementation of the <strong>Remote Procedure Call (RPC)</strong> model in an object-oriented context.</p>
+<p>In Java RMI, the communication is transparent — the calling code looks almost identical to a regular local method call. Internally, RMI uses the <strong>Java Remote Method Protocol (JRMP)</strong> to serialize method arguments and return values and to transmit them over a network socket.</p>
+<h4 id="key-rmi-components">Key RMI Components</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Component</th>
+<th style="text-align: left;">Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Remote Interface</strong></td>
+<td style="text-align: left;">Defines the methods that can be called remotely. Must extend <code>java.rmi.Remote</code>. All methods must declare <code>throws RemoteException</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote Object (Stub)</strong></td>
+<td style="text-align: left;">A proxy object on the client side. When a remote method is called, the stub serializes the arguments and forwards the call to the server.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Skeleton</strong></td>
+<td style="text-align: left;">The server-side counterpart of the stub (handled automatically in modern Java). Receives the call, deserializes arguments, and invokes the actual method on the server object.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RMI Registry</strong></td>
+<td style="text-align: left;">A name service (like a phone book) that allows clients to look up remote objects by name. The server binds its object to the registry; the client performs a lookup.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>UnicastRemoteObject</strong></td>
+<td style="text-align: left;">The base class for remote objects. It exports the object over TCP and handles the underlying network communication.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="rmi-architecture-in-rerms">RMI Architecture in RERMS</h4>
+<pre><code>┌─────────────────────────────┐        ┌───────────────────────────────────┐
+│   Web Application (Client)  │        │    RMI Server (Server)            │
+│                             │        │                                   │
+│  Jakarta Servlet            │        │  ExamResultServiceImpl            │
+│       ↓                     │        │  (extends UnicastRemoteObject)    │
+│  RMIClientManager           │◄──────►│       ↓                           │
+│  (performs Registry lookup) │  JRMP  │  DAO Layer (UserDAO, StudentDAO,  │
+│       ↓                     │  :1099 │   SubjectDAO, ExamResultDAO, etc.)│
+│  ExamResultService (Stub)   │        │       ↓                           │
+│  (proxy to remote object)   │        │  SQLite Database (JDBC)           │
+└─────────────────────────────┘        └───────────────────────────────────┘
+</code></pre>
+<p>The Web Application never holds a direct JDBC connection to the SQLite database. All database interactions go exclusively through the RMI remote method calls.</p>
+<hr />
+<h3 id="22-design-issues-for-rmi">2.2 Design Issues For RMI</h3>
+<p>When designing a distributed system using Java RMI, several important issues must be considered:</p>
+<h4 id="221-serialization">2.2.1 Serialization</h4>
+<p>All objects passed as arguments or returned from remote methods must implement <code>java.io.Serializable</code>. In RERMS, all domain model classes (<code>User</code>, <code>Student</code>, <code>Subject</code>, <code>ExamResult</code>, <code>AcademicYear</code>, <code>Semester</code>) implement <code>Serializable</code> and declare a <code>serialVersionUID</code> to ensure version compatibility across JVMs.</p>
+<h4 id="222-remoteexception-handling">2.2.2 RemoteException Handling</h4>
+<p>All methods declared in a Remote interface must declare <code>throws RemoteException</code>. This is a checked exception that captures any network-level failure (e.g., server down, connection timeout). In RERMS, <code>RemoteException</code> is also used deliberately to carry server-side validation error messages back to the web client, since RMI serializes exception messages automatically.</p>
+<pre><code class="language-java">// Example: Server rejects duplicate student registration
+throw new RemoteException(&quot;This email is already registered.&quot;);
+</code></pre>
+<h4 id="223-rmi-registry-and-port-management">2.2.3 RMI Registry and Port Management</h4>
+<p>The RMI Registry must be started before any client can perform a lookup. In RERMS, the <code>RMIServer</code> starts the registry on <strong>port 1099</strong> (the default RMI registry port) and binds the service under the key <code>"ExamResultService"</code>. The web application client performs a lookup using <code>rmi://localhost:1099/ExamResultService</code>.</p>
+<h4 id="224-stub-caching-and-connection-reuse">2.2.4 Stub Caching and Connection Reuse</h4>
+<p>Creating an RMI connection for every HTTP request is expensive. RERMS implements a <strong>Singleton pattern</strong> in <code>RMIClientManager</code> — the remote service stub is looked up once and cached for the lifetime of the application. If the connection fails, the manager automatically attempts to reconnect.</p>
+<h4 id="225-security-considerations">2.2.5 Security Considerations</h4>
+<ul>
+<li><strong>Password hashing</strong>: BCrypt is used exclusively on the RMI Server, ensuring plain-text passwords never travel over the network or get stored in the database.</li>
+<li><strong>Session isolation</strong>: The web application enforces that students can only call <code>getStudentResults(studentDbId)</code> with their own session-bound student ID, preventing data leakage.</li>
+<li><strong>Input validation</strong>: All input validation (field presence, format, uniqueness) is performed on the RMI Server before any database operation, providing a single trusted layer of business logic.</li>
+</ul>
+<h4 id="226-database-connection-management">2.2.6 Database Connection Management</h4>
+<p>The SQLite database is accessed only from the RMI Server. WAL (Write-Ahead Logging) mode is enabled for better concurrent read performance, and foreign key constraints are enforced via <code>PRAGMA foreign_keys = ON</code>.</p>
+<hr />
+<h3 id="23-implementation-of-remote-invocation-method-rmi">2.3 Implementation of Remote Invocation Method (RMI)</h3>
+<p>This section describes how Java RMI is concretely implemented in RERMS across all three Maven modules.</p>
+<h4 id="step-1-define-the-remote-interface-common-module">Step 1 — Define the Remote Interface (<code>common</code> module)</h4>
+<p>The <code>ExamResultService</code> interface is the contract between the client (web app) and the server (RMI server). It extends <code>java.rmi.Remote</code> and declares all remotely callable methods, each throwing <code>RemoteException</code>.</p>
+<pre><code class="language-java">package common;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.List;
+
+public interface ExamResultService extends Remote {
+
+    // Authentication
+    User   login(String email, String password, String role) throws RemoteException;
+    boolean registerStudent(String email, String password) throws RemoteException;
+
+    // Student Management
+    List&lt;Student&gt; getAllStudents() throws RemoteException;
+    List&lt;Student&gt; searchStudents(String keyword) throws RemoteException;
+    Student       getStudentById(int id) throws RemoteException;
+    Student       getStudentByEmail(String email) throws RemoteException;
+    boolean       addStudent(Student student) throws RemoteException;
+    boolean       updateStudent(Student student) throws RemoteException;
+    boolean       deleteStudent(int id) throws RemoteException;
+
+    // Academic Year &amp; Semester Management
+    List&lt;AcademicYear&gt; getAllAcademicYears() throws RemoteException;
+    boolean            addAcademicYear(AcademicYear year) throws RemoteException;
+    int addAcademicYearWithAutoLink(AcademicYear year, int[] semesterNumbers) throws RemoteException;
+    boolean            deleteAcademicYear(int id) throws RemoteException;
+    List&lt;Semester&gt;     getSemestersByAcademicYear(int academicYearId) throws RemoteException;
+    boolean            addSemester(Semester semester) throws RemoteException;
+
+    // Subject Management
+    List&lt;Subject&gt; getAllSubjects() throws RemoteException;
+    boolean       addSubject(Subject subject) throws RemoteException;
+    boolean       updateSubject(Subject subject) throws RemoteException;
+    boolean       deleteSubject(int id) throws RemoteException;
+    int           assignSubjectsToSemester(int semesterId, int[] subjectIds) throws RemoteException;
+    boolean       detachSubjectFromSemester(int subjectId) throws RemoteException;
+
+    // Exam Result Management
+    List&lt;ExamResult&gt; getAllResults() throws RemoteException;
+    List&lt;ExamResult&gt; getStudentResults(int studentDbId) throws RemoteException;
+    boolean          addExamResult(ExamResult result) throws RemoteException;
+    boolean          updateExamResult(ExamResult result) throws RemoteException;
+    boolean          deleteExamResult(int id) throws RemoteException;
+
+    // Analytics
+    double calculateAverage(List&lt;ExamResult&gt; results) throws RemoteException;
+    double calculateCGPA(List&lt;ExamResult&gt; results) throws RemoteException;
+    String calculateOverallGrade(double averagePercentage) throws RemoteException;
+
+    // Dashboard Statistics
+    int              getTotalStudents() throws RemoteException;
+    int              getTotalSubjects() throws RemoteException;
+    int              getTotalResults() throws RemoteException;
+    List&lt;ExamResult&gt; getRecentResults(int limit) throws RemoteException;
+}
+</code></pre>
+<h4 id="step-2-implement-the-remote-object-rmi-server-module">Step 2 — Implement the Remote Object (<code>rmi-server</code> module)</h4>
+<p><code>ExamResultServiceImpl</code> extends <code>UnicastRemoteObject</code> (which makes it a network-exportable remote object) and implements <code>ExamResultService</code>. This class runs exclusively on the RMI Server.</p>
+<pre><code class="language-java">package server;
+
+import common.*;
+import org.mindrot.jbcrypt.BCrypt;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
+
+public class ExamResultServiceImpl
+        extends UnicastRemoteObject
+        implements ExamResultService {
+
+    private final UserDAO       userDAO       = new UserDAO();
+    private final StudentDAO    studentDAO    = new StudentDAO();
+    private final SubjectDAO    subjectDAO    = new SubjectDAO();
+    private final ExamResultDAO resultDAO     = new ExamResultDAO();
+    private final AcademicYearDAO academicYearDAO = new AcademicYearDAO();
+    private final SemesterDAO     semesterDAO     = new SemesterDAO();
+
+    public ExamResultServiceImpl() throws RemoteException {
+        super(); // Exports this object over UnicastRemoteObject
+    }
+
+    @Override
+    public User login(String email, String password, String role)
+            throws RemoteException {
+        User user = userDAO.findByEmailAndRole(email.trim(), role.trim().toUpperCase());
+        if (user == null) return null;
+        if (!BCrypt.checkpw(password, user.getPassword())) return null;
+        user.setPassword(null); // Never return the password hash
+        return user;
+    }
+
+    @Override
+    public boolean addExamResult(ExamResult result) throws RemoteException {
+        validateResult(result);
+        if (resultDAO.existsDuplicate(result.getStudentId(),
+                result.getSubjectId(), result.getExamType(), 0)) {
+            throw new RemoteException(&quot;A result for this student and subject already exists.&quot;);
+        }
+        // Grade is calculated exclusively on the server
+        result.setGrade(computeGrade(result.getMarks(), result.getTotalMarks()));
+        return resultDAO.insert(result);
+    }
+
+    // Grading engine — UCS Hpa-an official 10-tier scale
+    public static String computeGrade(double marks, double totalMarks) {
+        if (totalMarks &lt;= 0) return &quot;F&quot;;
+        double pct = (marks / totalMarks) * 100.0;
+        if (pct &gt;= 90) return &quot;A+&quot;;
+        if (pct &gt;= 80) return &quot;A&quot;;
+        if (pct &gt;= 75) return &quot;A-&quot;;
+        if (pct &gt;= 70) return &quot;B+&quot;;
+        if (pct &gt;= 65) return &quot;B&quot;;
+        if (pct &gt;= 60) return &quot;B-&quot;;
+        if (pct &gt;= 55) return &quot;C+&quot;;
+        if (pct &gt;= 50) return &quot;C&quot;;
+        if (pct &gt;= 40) return &quot;D&quot;;
+        return &quot;F&quot;;
+    }
+    // ... (all other method implementations)
+}
+</code></pre>
+<h4 id="step-3-start-the-rmi-registry-and-bind-the-service-rmiserver">Step 3 — Start the RMI Registry and Bind the Service (<code>RMIServer</code>)</h4>
+<pre><code class="language-java">package server;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class RMIServer {
+    private static final int RMI_PORT = 1099;
+
+    public static void main(String[] args) throws Exception {
+        // Initialize SQLite DB schema and seed data
+        DatabaseInitializer.initialize();
+
+        // Create and export the remote service object
+        ExamResultServiceImpl service = new ExamResultServiceImpl();
+
+        // Start local RMI registry on port 1099
+        Registry registry = LocateRegistry.createRegistry(RMI_PORT);
+
+        // Bind the service to the registry under the key &quot;ExamResultService&quot;
+        registry.rebind(&quot;ExamResultService&quot;, service);
+
+        System.out.println(&quot;RMI Registry started on port &quot; + RMI_PORT);
+        System.out.println(&quot;ExamResultService bound successfully. RMI Server is ready.&quot;);
+    }
+}
+</code></pre>
+<h4 id="step-4-look-up-the-remote-service-on-the-client-web-app-module">Step 4 — Look Up the Remote Service on the Client (<code>web-app</code> module)</h4>
+<p><code>RMIClientManager</code> is a Singleton that manages the remote stub. It performs the registry lookup once and caches the stub for reuse across all HTTP requests.</p>
+<pre><code class="language-java">package web;
+
+import common.ExamResultService;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class RMIClientManager {
+
+    private static ExamResultService service = null;
+    private static final String RMI_HOST = &quot;localhost&quot;;
+    private static final int    RMI_PORT = 1099;
+    private static final String SERVICE_NAME = &quot;ExamResultService&quot;;
+
+    // Singleton access — cached stub is reused for all HTTP requests
+    public static synchronized ExamResultService getService() {
+        if (service == null) {
+            try {
+                Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
+                service = (ExamResultService) registry.lookup(SERVICE_NAME);
+            } catch (Exception e) {
+                throw new RuntimeException(&quot;Cannot connect to RMI Server: &quot; + e.getMessage(), e);
+            }
+        }
+        return service;
+    }
+}
+</code></pre>
+<h4 id="step-5-call-remote-methods-from-servlets">Step 5 — Call Remote Methods from Servlets</h4>
+<p>Any Jakarta Servlet can invoke remote methods through <code>RMIClientManager.getService()</code>, exactly as if calling a local method:</p>
+<pre><code class="language-java">// Inside ExamResultServlet.java (doPost method)
+ExamResultService service = RMIClientManager.getService();
+
+ExamResult result = new ExamResult();
+result.setStudentId(Integer.parseInt(request.getParameter(&quot;studentId&quot;)));
+result.setSubjectId(Integer.parseInt(request.getParameter(&quot;subjectId&quot;)));
+result.setMarks(Double.parseDouble(request.getParameter(&quot;marks&quot;)));
+result.setTotalMarks(Double.parseDouble(request.getParameter(&quot;totalMarks&quot;)));
+result.setExamType(request.getParameter(&quot;examType&quot;));
+
+// Remote method call — grade is calculated and set by the server
+boolean success = service.addExamResult(result);
+</code></pre>
+<hr />
+<h2 id="chapter-3-implementation">Chapter (3) Implementation</h2>
+<p>This chapter presents the complete system implementation through a step-by-step walkthrough of each screen, demonstrating how users interact with the Remote Exam Result Management System (RERMS).</p>
+<hr />
+<h3 id="31-role-selection-page">3.1 Role Selection Page</h3>
+<p><strong>URL:</strong> <code>http://localhost:8080/remote-exam-result-management-system/</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│         [ INSERT ROLE SELECTION PAGE             │
+│               SCREENSHOT HERE ]                 │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>When a user first opens the system in a browser, they are greeted by the <strong>Role Selection Page</strong>. This page is the entry point to the entire system and requires the user to identify themselves before proceeding.</p>
+<p><strong>Page Elements:</strong>
+- A centered card with the university name and system title
+- Two clearly labelled role buttons: <strong>"Admin"</strong> and <strong>"Student"</strong>
+- Each button navigates to the respective login page</p>
+<p><strong>How it works:</strong>
+1. Open a browser and navigate to <code>http://localhost:8080/remote-exam-result-management-system/</code>
+2. The system displays two options: <strong>Admin</strong> and <strong>Student</strong>
+3. Click <strong>Admin</strong> to go to the Admin login page, or click <strong>Student</strong> to go to the Student login page</p>
+<hr />
+<h3 id="32-login-page">3.2 Login Page</h3>
+<p><strong>URL:</strong> <code>/login</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│           [ INSERT LOGIN PAGE                    │
+│               SCREENSHOT HERE ]                 │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Login Page</strong> is a glassmorphism-style form with a dark background. It accepts the user's email and password credentials. The login page is shared between Admin and Student roles but routes to different dashboards after successful authentication.</p>
+<p><strong>Page Elements:</strong>
+- Email address input field
+- Password input field (masked)
+- "Login" submit button
+- Link to the Student Registration page (for new students)</p>
+<p><strong>How to Login (Admin):</strong>
+1. Enter Email: <code>admin@example.com</code>
+2. Enter Password: <code>admin123</code>
+3. Click the <strong>Login</strong> button
+4. Upon success, the system redirects to the <strong>Admin Dashboard</strong></p>
+<p><strong>How to Login (Student):</strong>
+1. Enter Email: <code>john.doe@university.edu</code>
+2. Enter Password: <code>student123</code>
+3. Click the <strong>Login</strong> button
+4. Upon success, the system redirects to the <strong>Student Dashboard</strong></p>
+<p><strong>Backend Process:</strong>
+- The <code>LoginServlet</code> calls <code>RMIClientManager.getService().login(email, password, role)</code> via Java RMI
+- On the RMI Server, <code>ExamResultServiceImpl.login()</code> looks up the user by email and role in the <code>users</code> table
+- The submitted password is verified against the stored BCrypt hash using <code>BCrypt.checkpw()</code>
+- If credentials are valid, a session is created with the user's email, role, and student database ID (for students)
+- If credentials are invalid, an error message is displayed on the login page</p>
+<hr />
+<h3 id="33-student-registration-page">3.3 Student Registration Page</h3>
+<p><strong>URL:</strong> <code>/register</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│         [ INSERT STUDENT REGISTRATION            │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>New students who have been admitted by the Admin can create their own login accounts through the <strong>Registration Page</strong>. Students who are not in the Admin's admitted student list cannot register.</p>
+<p><strong>Page Elements:</strong>
+- Email address input field
+- Password input field
+- Confirm password input field
+- "Register" submit button</p>
+<p><strong>How to Register:</strong>
+1. Navigate to <code>http://localhost:8080/remote-exam-result-management-system/register</code>
+2. Enter your university email address (must match the email that the Admin entered in the student list)
+3. Enter a password (minimum 6 characters)
+4. Confirm the password
+5. Click <strong>Register</strong>
+6. If the email is in the admitted student list and not yet registered, the account is created and you are redirected to the login page</p>
+<p><strong>Security Rules:</strong>
+- The email must already exist in the <code>students</code> table (admission list check)
+- Duplicate registrations with the same email are rejected
+- The password is hashed using BCrypt (cost factor 12) before being stored in the <code>users</code> table</p>
+<hr />
+<h3 id="34-admin-dashboard">3.4 Admin Dashboard</h3>
+<p><strong>URL:</strong> <code>/admin/dashboard</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│           [ INSERT ADMIN DASHBOARD               │
+│               SCREENSHOT HERE ]                 │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>After a successful Admin login, the system redirects to the <strong>Admin Dashboard</strong>. This is the central control panel for the administrator.</p>
+<p><strong>Page Elements:</strong>
+- <strong>Left Sidebar Navigation</strong> with links to all admin sections (Dashboard, Students, Academics, Subjects, Results)
+- <strong>Statistics Cards</strong> showing live counts:
+  - Total Students registered in the system
+  - Total Subjects created
+  - Total Exam Results recorded
+- <strong>RMI Server Status Badge</strong> — displays <code>Java RMI Server Connected</code> in green if the RMI Server is reachable on port 1099
+- <strong>Quick Action Cards</strong> — shortcut buttons to navigate to Students, Subjects, and Results pages
+- <strong>Recent Exam Results Table</strong> — shows the 5 most recently entered exam results</p>
+<p><strong>How it works:</strong>
+1. The <code>AdminDashboardServlet</code> calls three remote methods via RMI: <code>getTotalStudents()</code>, <code>getTotalSubjects()</code>, <code>getTotalResults()</code>, and <code>getRecentResults(5)</code>
+2. All counts are fetched from the SQLite database through the RMI Server's DAO layer
+3. The JSP view renders the numbers dynamically into the statistics cards</p>
+<hr />
+<h3 id="35-student-management-page">3.5 Student Management Page</h3>
+<p><strong>URL:</strong> <code>/admin/students</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│        [ INSERT STUDENT MANAGEMENT               │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Student Management Page</strong> allows the Admin to manage all student profiles in the system. Students listed here are considered "admitted students" and are the only ones allowed to create portal accounts.</p>
+<p><strong>Page Elements:</strong>
+- <strong>Search Bar</strong> — live keyword search by student name or student ID
+- <strong>"Add Student" Button</strong> — opens a modal form to add a new student
+- <strong>Students Table</strong> showing: Roll No., Student Name, Email, Phone, Gender, and Action buttons (Edit / Delete)
+- <strong>Edit Modal</strong> — pre-filled form to update an existing student's details
+- <strong>Delete Confirmation Modal</strong> — confirms before permanently deleting a student</p>
+<p><strong>How to Add a Student:</strong>
+1. Click the <strong>"+ Add Student"</strong> button
+2. In the modal form, fill in:
+   - Student ID (Roll No.) — e.g., <code>ST001</code>
+   - Full Name
+   - Email Address
+   - Phone Number
+   - Gender
+3. Click <strong>"Save"</strong>
+4. The system calls <code>service.addStudent(student)</code> via RMI
+5. The RMI Server validates the data and checks for duplicate student ID or email
+6. On success, the student is added and the table refreshes</p>
+<p><strong>How to Edit a Student:</strong>
+1. Click the <strong>✏️ Edit</strong> button next to the student's row
+2. The edit modal opens pre-filled with the student's current data
+3. Modify the required fields and click <strong>"Update"</strong>
+4. The system calls <code>service.updateStudent(student)</code> via RMI</p>
+<p><strong>How to Delete a Student:</strong>
+1. Click the <strong>🗑️ Delete</strong> button next to the student's row
+2. A confirmation modal appears asking "Are you sure?"
+3. Click <strong>"Yes, Delete"</strong> to confirm
+4. The system calls <code>service.deleteStudent(id)</code> via RMI
+5. The student and all their associated exam results are deleted (CASCADE)</p>
+<p><strong>Live Search:</strong>
+- Type any keyword in the search bar (name or student ID)
+- The table filters in real-time using JavaScript without a page reload</p>
+<hr />
+<h3 id="36-academic-year-semester-management-page">3.6 Academic Year &amp; Semester Management Page</h3>
+<p><strong>URL:</strong> <code>/admin/academics</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│        [ INSERT ACADEMICS MANAGEMENT             │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Academics Page</strong> allows the Admin to create and manage academic years and their semesters. This is the structural foundation that subjects and exam results are built on top of.</p>
+<p><strong>Page Elements:</strong>
+- <strong>"Add Academic Year" Button</strong> — opens a modal to create a new academic year
+- <strong>Accordion List</strong> — each academic year expands to show its semesters and the subjects assigned to each semester
+- <strong>Assign Subjects Button</strong> — opens a modal to assign existing subjects to a semester
+- <strong>Detach Button</strong> — removes a subject from a semester (returns it to the unassigned pool)</p>
+<p><strong>How to Add an Academic Year:</strong>
+1. Click <strong>"+ Add Academic Year"</strong>
+2. Enter the academic year in format <code>YYYY-YYYY</code> (e.g., <code>2024-2025</code>)
+3. Select which semesters (1–8) to auto-create for this year
+4. Click <strong>"Save"</strong>
+5. The system calls <code>service.addAcademicYearWithAutoLink(year, semesterNumbers)</code> via RMI
+6. The RMI Server creates the academic year, creates the selected semesters, and automatically links any subjects whose stored semester number matches</p>
+<p><strong>How to Assign Subjects to a Semester:</strong>
+1. Click the <strong>"Assign Subjects"</strong> button inside a semester accordion
+2. A modal shows all available unassigned subjects
+3. Select the subjects to assign (checkboxes)
+4. Click <strong>"Assign"</strong>
+5. The system calls <code>service.assignSubjectsToSemester(semesterId, subjectIds)</code> via RMI</p>
+<hr />
+<h3 id="37-subject-management-page">3.7 Subject Management Page</h3>
+<p><strong>URL:</strong> <code>/admin/subjects</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│         [ INSERT SUBJECT MANAGEMENT              │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Subject Management Page</strong> allows the Admin to create and manage course subjects. Subjects are created independently and can later be assigned to semesters within academic years.</p>
+<p><strong>Page Elements:</strong>
+- <strong>"Add Subject" Button</strong> — opens a modal to create a new subject
+- <strong>Search Bar</strong> — keyword search by subject code or name
+- <strong>Subjects Table</strong> showing: Subject Code, Subject Name, Credits, Department, Semester No., and Action buttons</p>
+<p><strong>How to Add a Subject:</strong>
+1. Click the <strong>"+ Add Subject"</strong> button
+2. In the modal form, fill in:
+   - Subject Code (e.g., <code>CS101</code>)
+   - Subject Name (e.g., <code>Introduction to Programming</code>)
+   - Credit Units (1–6)
+   - Department (e.g., <code>Computer Science</code>)
+   - Semester Number (1–8)
+3. Click <strong>"Save"</strong>
+4. The system calls <code>service.addSubject(subject)</code> via RMI
+5. The RMI Server checks for duplicate subject codes and saves the subject</p>
+<p><strong>How to Edit / Delete a Subject:</strong>
+- Click <strong>✏️ Edit</strong> to open the edit modal with pre-filled data
+- Click <strong>🗑️ Delete</strong> to open the delete confirmation modal
+- Deleting a subject also deletes all associated exam results (CASCADE)</p>
+<hr />
+<h3 id="38-exam-result-management-page">3.8 Exam Result Management Page</h3>
+<p><strong>URL:</strong> <code>/admin/results</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│        [ INSERT EXAM RESULT MANAGEMENT           │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Exam Result Management Page</strong> is where the Admin enters, updates, and manages all exam results. The grade is automatically calculated by the RMI Server — the Admin only needs to enter the marks.</p>
+<p><strong>Page Elements:</strong>
+- <strong>Filter Bar</strong> — filter results by Student, Subject, Semester, and Academic Year
+- <strong>"Add Result" Button</strong> — opens a modal to enter a new exam result
+- <strong>Results Table</strong> showing: Student Name, Subject, Marks, Grade Badge, Exam Type, and Actions
+- <strong>Add/Edit Result Modal</strong> with dropdowns for Student, Subject, Exam Type, and input fields for Marks and Total Marks</p>
+<p><strong>How to Add an Exam Result:</strong>
+1. Click the <strong>"+ Add Result"</strong> button
+2. In the modal:
+   - Select the <strong>Student</strong> from the dropdown
+   - Select the <strong>Subject</strong> from the dropdown
+   - Select <strong>Exam Type</strong>: <code>REGULAR</code> or <code>RE-EXAM</code>
+   - Enter <strong>Marks Obtained</strong> (e.g., <code>85</code>)
+   - Enter <strong>Total Marks</strong> (e.g., <code>100</code>)
+3. Click <strong>"Save"</strong>
+4. The system sends the result to the RMI Server via <code>service.addExamResult(result)</code>
+5. The RMI Server:
+   - Validates the marks (marks ≤ total marks, no negatives)
+   - Checks for duplicate results (same student + subject + exam type)
+   - Calculates the grade automatically using <code>computeGrade(marks, totalMarks)</code>
+   - Saves the result with the computed grade to the database
+6. The table refreshes showing the new result with the auto-calculated grade badge</p>
+<p><strong>How to Filter Results:</strong>
+1. Use the dropdown filters at the top of the page:
+   - Select a <strong>Student</strong> to see only their results
+   - Select a <strong>Subject</strong> to see results for that subject
+   - Select a <strong>Semester</strong> to filter by semester
+   - Select an <strong>Academic Year</strong> to filter by year
+2. The table updates to show only matching results</p>
+<p><strong>Grade Auto-Calculation Example:</strong>
+| Marks Entered | Total Marks | Percentage | Auto-Calculated Grade |
+|:---:|:---:|:---:|:---:|
+| 92 | 100 | 92% | <strong>A+</strong> |
+| 83 | 100 | 83% | <strong>A</strong> |
+| 76 | 100 | 76% | <strong>A-</strong> |
+| 45 | 100 | 45% | <strong>D</strong> |
+| 35 | 100 | 35% | <strong>F</strong> |</p>
+<hr />
+<h3 id="39-student-dashboard">3.9 Student Dashboard</h3>
+<p><strong>URL:</strong> <code>/student/dashboard</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│          [ INSERT STUDENT DASHBOARD              │
+│               SCREENSHOT HERE ]                 │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>After a successful Student login, the system redirects to the <strong>Student Dashboard</strong>. This is the student's personal home page showing their academic summary at a glance.</p>
+<p><strong>Page Elements:</strong>
+- <strong>Hero Welcome Banner</strong> — displays the student's name, roll number, and avatar initials in a blue gradient card with a "View My Results" button
+- <strong>CGPA Card</strong> — shows the student's overall CGPA on the 4.0 scale (e.g., <code>3.75 / 4.0</code>)
+- <strong>Average Score Card</strong> — shows the overall percentage average and corresponding grade
+- <strong>Passed Subjects Card</strong> — shows passed vs. total subjects count (e.g., <code>5 / 5</code>)
+- <strong>Profile Info Card</strong> — displays email, phone, gender, and enrolment date
+- <strong>Recent Results Table</strong> — shows the 5 most recent exam results with subject code, name, marks, and grade badge</p>
+<p><strong>How it works:</strong>
+1. The <code>StudentDashboardServlet</code> retrieves the logged-in student's database ID from the HTTP session
+2. It calls <code>service.getStudentByEmail(sessionEmail)</code> to get the student's profile via RMI
+3. It calls <code>service.getStudentResults(studentDbId)</code> to get all the student's exam results via RMI
+4. It calls <code>service.calculateCGPA(results)</code> and <code>service.calculateAverage(results)</code> to compute the academic summary via RMI
+5. All data is passed to the JSP view for rendering</p>
+<hr />
+<h3 id="310-student-exam-results-page">3.10 Student Exam Results Page</h3>
+<p><strong>URL:</strong> <code>/student/results</code></p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│          [ INSERT STUDENT RESULTS                │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>My Results Page</strong> shows the student's complete academic record, organized by academic year and semester in an expandable accordion layout.</p>
+<p><strong>Page Elements:</strong>
+- <strong>Accordion by Academic Year</strong> — each academic year is a collapsible section
+- <strong>Semester Sub-Groups</strong> — within each year, results are grouped by semester
+- <strong>Results Table per Semester</strong> showing:
+  - Subject Code and Subject Name
+  - Marks Obtained / Total Marks
+  - Grade Badge (colour-coded)
+  - Pass / Fail Status Pill
+  - Exam Type (REGULAR / RE-EXAM)
+- <strong>"Print Transcript" Button</strong> — opens the official A4 print view</p>
+<p><strong>Grade Badge Colour Coding:</strong>
+| Grade | Badge Colour |
+|:---:|:---|
+| A+, A | 🟢 Green |
+| A-, B+, B, B- | 🔵 Blue |
+| C+, C | 🟡 Yellow |
+| D | 🟠 Orange |
+| F | 🔴 Red |</p>
+<p><strong>Privacy Protection:</strong>
+- Students can only see their own results
+- The <code>StudentResultServlet</code> retrieves the student's database ID from the session and calls <code>service.getStudentResults(studentDbId)</code> directly — there is no URL parameter for the student ID, making URL manipulation impossible</p>
+<hr />
+<h3 id="311-official-academic-transcript-print-view">3.11 Official Academic Transcript Print View</h3>
+<p><strong>URL:</strong> <code>/student/results</code> → Click "Print Transcript"</p>
+<blockquote>
+<p><strong>📸 Screenshot Placeholder</strong>
+<code>┌──────────────────────────────────────────────────┐
+│                                                  │
+│         [ INSERT PRINT TRANSCRIPT                │
+│               PAGE SCREENSHOT HERE ]            │
+│                                                  │
+└──────────────────────────────────────────────────┘</code></p>
+</blockquote>
+<p>The <strong>Official Academic Transcript</strong> is a printable A4-format document that can be printed directly from the browser or saved as a PDF using the browser's "Print to PDF" function.</p>
+<p><strong>Transcript Contents:</strong>
+1. <strong>University Header</strong> — University of Computer Studies (Hpa-an) name and "Academic Record" title
+2. <strong>Student Information Table</strong>:
+   - Roll Number / Student ID
+   - Full Name
+   - Academic Year
+   - Semester
+   - Degree Programme: Bachelor of Computer Science (B.C.Sc.)
+   - Specialization: Computer Science
+3. <strong>Course Results Table</strong>:
+   - No., Course Code, Course Name, Academic Credit Units, Grade Obtained, Grade Score (4.0 scale), Grade Points (Credit × Grade Score)
+4. <strong>Summary Row</strong> — Total Credit Units, Total Grade Points, Overall GPA, Overall GPA
+5. <strong>Official Grading Scale Grid</strong> — Reference table of all grades and their point values
+6. <strong>Issue Date</strong> and <strong>Registrar Signature Block</strong></p>
+<p><strong>How to Print / Save as PDF:</strong>
+1. On the Student Results page, click the <strong>"🖨️ Print Transcript"</strong> button
+2. The browser opens the print-optimized A4 view
+3. Use <code>Ctrl+P</code> (or <code>Cmd+P</code> on Mac) to open the browser print dialog
+4. Select <strong>"Save as PDF"</strong> as the printer destination to save a digital copy
+5. Click <strong>"Print"</strong> to send to a physical printer</p>
+<h2 id="chapter-4-conclusion">Chapter (4) Conclusion</h2>
+<p>The <strong>Remote Exam Result Management System (RERMS)</strong> was successfully designed, developed, and tested as a complete enterprise-grade distributed application for the University of Computer Studies, Hpa-an.</p>
+<h3 id="41-summary-of-achievements">4.1 Summary of Achievements</h3>
+<p>The following project objectives were fully achieved:</p>
+<ol>
+<li>
+<p>✅ <strong>Java RMI Distributed Middleware</strong> — Java RMI (port 1099) was successfully implemented as the sole communication bridge between the web application and the database server. The web application never holds a direct JDBC connection to the database.</p>
+</li>
+<li>
+<p>✅ <strong>Role-Based Access Control</strong> — A Jakarta Servlet <code>AuthFilter</code> enforces strict RBAC, separating administrator and student capabilities with session-based security and HTTP 403 responses for unauthorized access attempts.</p>
+</li>
+<li>
+<p>✅ <strong>Automated Grading Engine</strong> — A server-side grading engine consistently computes grades per the official UCS Hpa-an 10-tier scale and calculates credit-weighted CGPA on a 4.0 scale.</p>
+</li>
+<li>
+<p>✅ <strong>Normalized Relational Database</strong> — A 5-table SQLite schema with a clear <code>academic_years → semesters → subjects → exam_results</code> hierarchy was implemented with foreign key constraints, unique indexes, and WAL mode.</p>
+</li>
+<li>
+<p>✅ <strong>Full Admin CRUD Operations</strong> — Administrators can manage students, academic years, semesters, subjects, and exam results with full create, read, update, and delete capabilities, including multi-criteria search and filtering.</p>
+</li>
+<li>
+<p>✅ <strong>Student Self-Service Portal</strong> — Students can securely access their personal dashboard, view semester-wise results with colour-coded grade badges, and generate official A4 academic transcripts with university header, GPA summary, and registrar signature block.</p>
+</li>
+<li>
+<p>✅ <strong>Secure Password Management</strong> — All passwords are stored as BCrypt hashes (cost factor 12). Plain-text passwords are never stored, logged, or returned from the server.</p>
+</li>
+<li>
+<p>✅ <strong>Production Deployment</strong> — The system is containerized using Docker and deployable on Railway cloud infrastructure.</p>
+</li>
+</ol>
+<h3 id="42-lessons-learned">4.2 Lessons Learned</h3>
+<ul>
+<li><strong>RMI is an effective distributed middleware</strong> for intranet applications. Its transparency (remote calls look like local calls) greatly simplifies development, though careful attention to <code>RemoteException</code> handling and object serialization is required.</li>
+<li><strong>Separation of concerns</strong> through the three-module Maven structure (common, rmi-server, web-app) made the system maintainable and extensible.</li>
+<li><strong>Server-side validation</strong> as the single trusted layer (rather than relying on client-side JavaScript alone) is essential for security and data integrity in distributed systems.</li>
+</ul>
+<h3 id="43-future-improvements">4.3 Future Improvements</h3>
+<p>The following enhancements are planned for future development:</p>
+<ol>
+<li>
+<p><strong>PDF Export</strong> — Server-side PDF generation of official academic transcripts using Apache PDFBox or iText, allowing transcripts to be downloaded as <code>.pdf</code> files.</p>
+</li>
+<li>
+<p><strong>SSL/TLS for RMI</strong> — Enable <code>SslRMIClientSocketFactory</code> and <code>SslRMIServerSocketFactory</code> to encrypt all RMI communication over public networks, replacing the current plain JRMP protocol.</p>
+</li>
+<li>
+<p><strong>Email Notifications</strong> — Automated email alerts sent to students when new exam results are published, using Jakarta Mail (JavaMail API).</p>
+</li>
+<li>
+<p><strong>Mobile Companion App</strong> — A Flutter-based mobile application for students to conveniently check grades, CGPA, and download transcripts from their smartphones.</p>
+</li>
+<li>
+<p><strong>Advanced Analytics Dashboard</strong> — Charts and graphs for administrators showing grade distributions, pass/fail ratios, department-wise performance comparisons, and semester trends.</p>
+</li>
+</ol>
+<hr />
+<h2 id="references">References</h2>
+<ol>
+<li>
+<p>Oracle Corporation. (2024). <em>Java Remote Method Invocation (RMI) Specification</em>. Retrieved from https://docs.oracle.com/en/java/javase/21/docs/specs/rmi/</p>
+</li>
+<li>
+<p>Oracle Corporation. (2024). <em>Java SE 21 API Documentation — java.rmi Module</em>. Retrieved from https://docs.oracle.com/en/java/javase/21/docs/api/java.rmi/module-summary.html</p>
+</li>
+<li>
+<p>The Apache Software Foundation. (2024). <em>Apache Maven Documentation — Multi-Module Projects</em>. Retrieved from https://maven.apache.org/guides/mini/guide-multiple-modules.html</p>
+</li>
+<li>
+<p>Eclipse Foundation. (2024). <em>Jakarta EE 10 Platform Specification — Servlet 6.0</em>. Retrieved from https://jakarta.ee/specifications/servlet/6.0/</p>
+</li>
+<li>
+<p>SQLite Consortium. (2024). <em>SQLite Documentation</em>. Retrieved from https://www.sqlite.org/docs.html</p>
+</li>
+<li>
+<p>Xerial. (2024). <em>SQLite JDBC Driver for Java</em>. Retrieved from https://github.com/xerial/sqlite-jdbc</p>
+</li>
+<li>
+<p>Provos, N., &amp; Mazières, D. (1999). <em>A Future-Adaptable Password Scheme</em>. USENIX Annual Technical Conference. (jBCrypt implementation: https://www.mindrot.org/projects/jBCrypt/)</p>
+</li>
+<li>
+<p>Bootstrap Team. (2024). <em>Bootstrap 5 Documentation</em>. Retrieved from https://getbootstrap.com/docs/5.0/</p>
+</li>
+<li>
+<p>Coulouris, G., Dollimore, J., Kindberg, T., &amp; Blair, G. (2011). <em>Distributed Systems: Concepts and Design</em> (5th ed.). Addison-Wesley.</p>
+</li>
+<li>
+<p>Silberschatz, A., Korth, H. F., &amp; Sudarshan, S. (2020). <em>Database System Concepts</em> (7th ed.). McGraw-Hill.</p>
+</li>
+<li>
+<p>Bloch, J. (2018). <em>Effective Java</em> (3rd ed.). Addison-Wesley. <em>(Chapter on Serialization and RMI)</em></p>
+</li>
+</ol>
+<hr />
+<p><em>End of Documentation</em></p>
+<p><strong>Document prepared by:</strong> Final Year Project Team<br />
+<strong>University:</strong> University of Computer Studies, Hpa-an (UCS Hpa-an)<br />
+<strong>Academic Year:</strong> 2024–2025</p>
+</body>
+</html>
