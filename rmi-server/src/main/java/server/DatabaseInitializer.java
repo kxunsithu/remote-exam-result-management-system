@@ -373,6 +373,7 @@ public class DatabaseInitializer {
      * if their stored semester_number matches a semester number in an academic year.
      */
     private static void autoLinkUnassignedSubjects(Connection conn) throws SQLException {
+        // 1. Link unassigned subjects (semester_id IS NULL)
         String sql = """
             SELECT sub.id, sub.semester_number, sm.id AS target_sem_id
             FROM subjects sub
@@ -391,6 +392,51 @@ public class DatabaseInitializer {
                     for (int[] pair : updates) {
                         ps.setInt(1, pair[1]);
                         ps.setInt(2, pair[0]);
+                        ps.executeUpdate();
+                    }
+                }
+            }
+        }
+
+        // 2. Ensure every academic year semester has copies of all subjects belonging to its semester_number
+        String sqlMissing = """
+            SELECT sm.id AS sem_id, sm.academic_year_id, sm.semester_number,
+                   sub.subject_code, sub.subject_name, sub.credit, sub.department
+            FROM semesters sm
+            JOIN subjects sub ON (
+                sub.semester_number = sm.semester_number
+                OR sub.id IN (SELECT s2.id FROM subjects s2 JOIN semesters sm2 ON s2.semester_id = sm2.id WHERE sm2.semester_number = sm.semester_number)
+            )
+            WHERE NOT EXISTS (
+                SELECT 1 FROM subjects s3
+                WHERE s3.semester_id = sm.id AND lower(s3.subject_code) = lower(sub.subject_code)
+            )
+            GROUP BY sm.id, lower(sub.subject_code)
+            """;
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sqlMissing)) {
+            java.util.List<Object[]> toInsert = new java.util.ArrayList<>();
+            while (rs.next()) {
+                toInsert.add(new Object[]{
+                    rs.getString("subject_code"),
+                    rs.getString("subject_name"),
+                    rs.getInt("credit"),
+                    rs.getString("department"),
+                    rs.getInt("sem_id"),
+                    rs.getInt("semester_number")
+                });
+            }
+            if (!toInsert.isEmpty()) {
+                System.out.println("Auto-linking " + toInsert.size() + " missing subjects across academic years...");
+                String insSql = "INSERT INTO subjects (subject_code, subject_name, credit, department, semester_id, semester_number) VALUES (?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(insSql)) {
+                    for (Object[] row : toInsert) {
+                        ps.setString(1, (String) row[0]);
+                        ps.setString(2, (String) row[1]);
+                        ps.setInt(3, (Integer) row[2]);
+                        ps.setString(4, (String) row[3]);
+                        ps.setInt(5, (Integer) row[4]);
+                        ps.setInt(6, (Integer) row[5]);
                         ps.executeUpdate();
                     }
                 }
@@ -424,9 +470,12 @@ public class DatabaseInitializer {
     // =========================================================================
 
     private static void insertSampleData(Connection conn) throws SQLException {
-        // Only insert default admin if users table is empty
         if (tableIsEmpty(conn, "users")) {
             insertDefaultAdminUser(conn);
+        }
+
+        if (tableIsEmpty(conn, "students")) {
+            seedFullDataset(conn);
         }
     }
 
@@ -440,13 +489,215 @@ public class DatabaseInitializer {
     private static void insertDefaultAdminUser(Connection conn) throws SQLException {
         String adminHash = BCrypt.hashpw("admin123", BCrypt.gensalt(12));
 
-        String sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
+        String sql = "INSERT OR IGNORE INTO users (email, password, role) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "admin@example.com");
             ps.setString(2, adminHash);
             ps.setString(3, "ADMIN");
             ps.executeUpdate();
         }
-        System.out.println("  ✓ Default admin user inserted (admin@example.com).");
+        System.out.println("  ✓ Default admin user inserted (admin@example.com / admin123).");
+    }
+
+    private static class SubjectSeed {
+        String code; String name; int credit; String dept; int semId; int semNo;
+        SubjectSeed(String c, String n, int cr, String d, int sId, int sNo) {
+            code=c; name=n; credit=cr; dept=d; semId=sId; semNo=sNo;
+        }
+    }
+
+    public static void seedFullDataset(Connection conn) throws SQLException {
+        System.out.println("Seeding 50 students, academic structure, and exam results...");
+
+        // 1. Insert Academic Years
+        int year1Id = getOrInsertAcademicYear(conn, "2023-2024");
+        int year2Id = getOrInsertAcademicYear(conn, "2024-2025");
+
+        // 2. Insert Semesters
+        int sem1Id = getOrInsertSemester(conn, year1Id, 1);
+        int sem2Id = getOrInsertSemester(conn, year1Id, 2);
+        int sem3Id = getOrInsertSemester(conn, year2Id, 3);
+        int sem4Id = getOrInsertSemester(conn, year2Id, 4);
+
+        // 3. Insert Subjects for each semester
+        java.util.List<SubjectSeed> subjectSeeds = java.util.List.of(
+            // Semester 1
+            new SubjectSeed("CS101", "Programming Fundamentals", 3, "Computer Science", sem1Id, 1),
+            new SubjectSeed("CS102", "Discrete Mathematics", 3, "Mathematics", sem1Id, 1),
+            new SubjectSeed("CS103", "Digital Logic Design", 3, "Hardware Systems", sem1Id, 1),
+            new SubjectSeed("ENG101", "Technical English", 2, "Languages", sem1Id, 1),
+
+            // Semester 2
+            new SubjectSeed("CS104", "Data Structures & Algorithms", 4, "Computer Science", sem2Id, 2),
+            new SubjectSeed("CS105", "Object-Oriented Programming", 3, "Computer Science", sem2Id, 2),
+            new SubjectSeed("CS106", "Computer Architecture", 3, "Hardware Systems", sem2Id, 2),
+            new SubjectSeed("MTH102", "Linear Algebra & Calculus", 3, "Mathematics", sem2Id, 2),
+
+            // Semester 3
+            new SubjectSeed("CS201", "Database Management Systems", 4, "Computer Science", sem3Id, 3),
+            new SubjectSeed("CS202", "Web Engineering", 3, "Software Engineering", sem3Id, 3),
+            new SubjectSeed("CS203", "Operating Systems", 3, "Computer Science", sem3Id, 3),
+            new SubjectSeed("CS204", "Software Engineering", 3, "Software Engineering", sem3Id, 3),
+
+            // Semester 4
+            new SubjectSeed("CS205", "Computer Networks", 3, "Computer Science", sem4Id, 4),
+            new SubjectSeed("CS206", "Artificial Intelligence", 3, "Artificial Intelligence", sem4Id, 4),
+            new SubjectSeed("CS207", "Cyber Security", 3, "Information Technology", sem4Id, 4),
+            new SubjectSeed("CS208", "Cloud Computing", 3, "Information Technology", sem4Id, 4)
+        );
+
+        java.util.List<Integer> subjectIds = new java.util.ArrayList<>();
+        String insSubSql = "INSERT OR IGNORE INTO subjects (subject_code, subject_name, credit, department, semester_id, semester_number) VALUES (?, ?, ?, ?, ?, ?)";
+        String selSubSql = "SELECT id FROM subjects WHERE subject_code = ? AND semester_id = ?";
+
+        for (SubjectSeed ss : subjectSeeds) {
+            try (PreparedStatement ps = conn.prepareStatement(insSubSql)) {
+                ps.setString(1, ss.code);
+                ps.setString(2, ss.name);
+                ps.setInt(3, ss.credit);
+                ps.setString(4, ss.dept);
+                ps.setInt(5, ss.semId);
+                ps.setInt(6, ss.semNo);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = conn.prepareStatement(selSubSql)) {
+                ps.setString(1, ss.code);
+                ps.setInt(2, ss.semId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) subjectIds.add(rs.getInt(1));
+                }
+            }
+        }
+        System.out.println("  ✓ Academic years, semesters, and " + subjectIds.size() + " subjects ready.");
+
+        // 4. Seed 50 Students & User Accounts
+        String[] studentNames = {
+            "Aung Aung", "Kyaw Kyaw", "Thandar Htoo", "Su Su Hlaing", "Min Maw",
+            "Alexander Smith", "Emma Watson", "Ethan Brown", "Olivia Davis", "Noah Wilson",
+            "Liam Miller", "Sophia Taylor", "Benjamin Anderson", "Isabella Thomas", "Lucas Jackson",
+            "Mia White", "Mason Harris", "Charlotte Martin", "Ethan Clark", "Amelia Lewis",
+            "James Robinson", "Harper Walker", "Alexander Hall", "Evelyn Young", "Henry Allen",
+            "Abigail Wright", "Sebastian King", "Emily Scott", "Jack Green", "Elizabeth Baker",
+            "Owen Adams", "Camila Nelson", "Daniel Hill", "Ella Ramirez", "Matthew Campbell",
+            "Scarlett Mitchell", "Jackson Roberts", "Victoria Carter", "David Phillips", "Grace Evans",
+            "Joseph Turner", "Chloe Torres", "Samuel Parker", "Penelope Flores", "Sebastian Rivera",
+            "Layla Morris", "Logan Nguyen", "Zoey Murphy", "Jayden Cook", "Zin Mar Phyo"
+        };
+
+        String defaultStudentHash = BCrypt.hashpw("student123", BCrypt.gensalt(12));
+
+        String insStuSql = "INSERT OR IGNORE INTO students (student_id, name, email, phone, gender) VALUES (?, ?, ?, ?, ?)";
+        String selStuSql = "SELECT id FROM students WHERE student_id = ?";
+        String insUserSql = "INSERT OR IGNORE INTO users (email, password, role) VALUES (?, ?, ?)";
+
+        java.util.List<Integer> studentDbIds = new java.util.ArrayList<>();
+
+        for (int i = 0; i < 50; i++) {
+            String stuIdStr = String.format("STU-2024-%03d", i + 1);
+            String name = studentNames[i];
+            String email = String.format("student%02d@example.com", i + 1);
+            String phone = String.format("09-450000%03d", i + 1);
+            String gender = (i % 2 == 0) ? "Male" : "Female";
+
+            try (PreparedStatement ps = conn.prepareStatement(insStuSql)) {
+                ps.setString(1, stuIdStr);
+                ps.setString(2, name);
+                ps.setString(3, email);
+                ps.setString(4, phone);
+                ps.setString(5, gender);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(selStuSql)) {
+                ps.setString(1, stuIdStr);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        studentDbIds.add(rs.getInt(1));
+                    }
+                }
+            }
+
+            // User account for student login
+            try (PreparedStatement ps = conn.prepareStatement(insUserSql)) {
+                ps.setString(1, email);
+                ps.setString(2, defaultStudentHash);
+                ps.setString(3, "STUDENT");
+                ps.executeUpdate();
+            }
+        }
+
+        System.out.println("  ✓ 50 students & student user accounts created (Password: student123).");
+
+        // 5. Seed Exam Results for each student
+        String insResSql = "INSERT OR IGNORE INTO exam_results (student_id, subject_id, marks, total_marks, grade, exam_type) VALUES (?, ?, ?, ?, ?, ?)";
+        int resultCount = 0;
+
+        for (int sIdx = 0; sIdx < studentDbIds.size(); sIdx++) {
+            int studentDbId = studentDbIds.get(sIdx);
+
+            for (int subIdx = 0; subIdx < subjectIds.size(); subIdx++) {
+                int subjectDbId = subjectIds.get(subIdx);
+
+                // Deterministic marks formula for rich grade distribution (A+, A, A-, B+, B, B-, C+, C, D, F)
+                double baseMarks = 52.0 + ((sIdx * 11 + subIdx * 7 + (sIdx * subIdx)) % 47);
+                if (baseMarks > 98.0) baseMarks = 98.0;
+                double marks = Math.round(baseMarks * 10.0) / 10.0;
+                String grade = ExamResultServiceImpl.computeGrade(marks, 100.0);
+
+                try (PreparedStatement ps = conn.prepareStatement(insResSql)) {
+                    ps.setInt(1, studentDbId);
+                    ps.setInt(2, subjectDbId);
+                    ps.setDouble(3, marks);
+                    ps.setDouble(4, 100.0);
+                    ps.setString(5, grade);
+                    ps.setString(6, "REGULAR");
+                    ps.executeUpdate();
+                    resultCount++;
+                }
+            }
+        }
+
+        System.out.println("  ✓ " + resultCount + " exam results inserted across 50 students (" + subjectIds.size() + " subjects each).");
+    }
+
+    private static int getOrInsertAcademicYear(Connection conn, String yearName) throws SQLException {
+        String ins = "INSERT OR IGNORE INTO academic_years (year_name) VALUES (?)";
+        String sel = "SELECT id FROM academic_years WHERE year_name = ?";
+        try (PreparedStatement ps = conn.prepareStatement(ins)) {
+            ps.setString(1, yearName);
+            ps.executeUpdate();
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sel)) {
+            ps.setString(1, yearName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        throw new SQLException("Could not get or insert academic year: " + yearName);
+    }
+
+    private static int getOrInsertSemester(Connection conn, int academicYearId, int semesterNumber) throws SQLException {
+        String ins = "INSERT OR IGNORE INTO semesters (academic_year_id, semester_number) VALUES (?, ?)";
+        String sel = "SELECT id FROM semesters WHERE academic_year_id = ? AND semester_number = ?";
+        try (PreparedStatement ps = conn.prepareStatement(ins)) {
+            ps.setInt(1, academicYearId);
+            ps.setInt(2, semesterNumber);
+            ps.executeUpdate();
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sel)) {
+            ps.setInt(1, academicYearId);
+            ps.setInt(2, semesterNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        throw new SQLException("Could not get or insert semester: " + semesterNumber);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Executing standalone DatabaseInitializer seed task...");
+        initialize();
+        System.out.println("Done!");
     }
 }
+

@@ -168,13 +168,36 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
             if (created2 == null) continue;
             int semId = created2.getId();
 
-            // Step 5: Auto-assign unassigned subjects with matching semester_number
-            List<Subject> toLink = subjectDAO.findByStoredSemesterNumber(semNo);
-            for (Subject sub : toLink) {
-                if (subjectDAO.assignToSemester(sub.getId(), semId)) totalAssigned++;
-            }
+            // Step 5: Auto-assign/copy subjects with matching semester_number to this new semester
+            totalAssigned += linkSubjectsForSemester(semId, semNo);
         }
         return totalAssigned;
+    }
+
+    private int linkSubjectsForSemester(int semesterId, int semesterNumber) {
+        Semester sem = semesterDAO.findById(semesterId);
+        if (sem == null) return 0;
+        int targetYearId = sem.getAcademicYearId();
+
+        List<Subject> templates = subjectDAO.findTemplatesBySemesterNumber(semesterNumber);
+        int count = 0;
+        for (Subject sub : templates) {
+            if (!subjectDAO.codeExistsInSemester(sub.getSubjectCode(), semesterId, 0)) {
+                if (sub.getSemesterId() <= 0) {
+                    if (subjectDAO.assignToSemester(sub.getId(), semesterId)) count++;
+                } else {
+                    Subject copy = new Subject();
+                    copy.setSubjectCode(sub.getSubjectCode());
+                    copy.setSubjectName(sub.getSubjectName());
+                    copy.setCredit(sub.getCredit());
+                    copy.setDepartment(sub.getDepartment());
+                    copy.setSemesterNumber(semesterNumber);
+                    copy.setSemesterId(semesterId);
+                    if (subjectDAO.insert(copy)) count++;
+                }
+            }
+        }
+        return count;
     }
 
     @Override
@@ -227,10 +250,7 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
         if (ok) {
             Semester created = semesterDAO.findUnique(semester.getAcademicYearId(), semester.getSemesterNumber());
             if (created != null) {
-                List<Subject> toLink = subjectDAO.findByStoredSemesterNumber(semester.getSemesterNumber());
-                for (Subject sub : toLink) {
-                    subjectDAO.assignToSemester(sub.getId(), created.getId());
-                }
+                linkSubjectsForSemester(created.getId(), semester.getSemesterNumber());
             }
         }
         return ok;
@@ -248,7 +268,11 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
             throw new RemoteException("ယခုပညာသင်နှစ်တွင် Semester " + semester.getSemesterNumber() +
                     " ကို ထည့်သွင်းပြီးသား ဖြစ်နေပါသည်။");
         }
-        return semesterDAO.update(semester);
+        boolean ok = semesterDAO.update(semester);
+        if (ok) {
+            linkSubjectsForSemester(semester.getId(), semester.getSemesterNumber());
+        }
+        return ok;
     }
 
     @Override
@@ -460,11 +484,40 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     // Analytics
     // =========================================================================
 
+    /**
+     * Deduplicates results for subjects with retakes or re-exams.
+     * When a student retakes a course, the RETAKE/RE_EXAM attempt replaces previous attempts.
+     */
+    private List<ExamResult> getEffectiveResults(List<ExamResult> results) {
+        if (results == null || results.isEmpty()) return java.util.Collections.emptyList();
+        java.util.Map<String, ExamResult> map = new java.util.LinkedHashMap<>();
+        for (ExamResult r : results) {
+            if (r == null) continue;
+            String key = r.getSubjectId() > 0 ? ("id_" + r.getSubjectId()) : (r.getSubjectCode() != null ? r.getSubjectCode() : ("res_" + r.getId()));
+            if (!map.containsKey(key)) {
+                map.put(key, r);
+            } else {
+                ExamResult existing = map.get(key);
+                boolean isNewRetake = r.getExamType() != null && (r.getExamType().equalsIgnoreCase("RETAKE") || r.getExamType().equalsIgnoreCase("RE_EXAM"));
+                boolean isExistRetake = existing.getExamType() != null && (existing.getExamType().equalsIgnoreCase("RETAKE") || existing.getExamType().equalsIgnoreCase("RE_EXAM"));
+                if (isNewRetake && !isExistRetake) {
+                    map.put(key, r);
+                } else if (isNewRetake == isExistRetake) {
+                    if (r.getId() > existing.getId() || r.getMarks() > existing.getMarks()) {
+                        map.put(key, r);
+                    }
+                }
+            }
+        }
+        return new java.util.ArrayList<>(map.values());
+    }
+
     @Override
     public double calculateAverage(List<ExamResult> results) throws RemoteException {
-        if (results == null || results.isEmpty()) return 0.0;
-        double totalObtained = results.stream().mapToDouble(ExamResult::getMarks).sum();
-        double totalPossible = results.stream().mapToDouble(ExamResult::getTotalMarks).sum();
+        List<ExamResult> effective = getEffectiveResults(results);
+        if (effective.isEmpty()) return 0.0;
+        double totalObtained = effective.stream().mapToDouble(ExamResult::getMarks).sum();
+        double totalPossible = effective.stream().mapToDouble(ExamResult::getTotalMarks).sum();
         if (totalPossible == 0) return 0.0;
         return Math.round((totalObtained / totalPossible) * 10000.0) / 100.0;
     }
@@ -473,12 +526,14 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
     public String calculateOverallGrade(double averagePercentage) throws RemoteException {
         return computeGrade(averagePercentage, 100.0);
     }
+
     @Override
     public double calculateCGPA(List<ExamResult> results) throws RemoteException {
-        if (results == null || results.isEmpty()) return 0.0;
+        List<ExamResult> effective = getEffectiveResults(results);
+        if (effective.isEmpty()) return 0.0;
         double totalGradePoints = 0.0;
         int    totalCredits     = 0;
-        for (ExamResult r : results) {
+        for (ExamResult r : effective) {
             int credit = r.getSubjectCredit();
             if (credit <= 0) continue;  // skip if credit info unavailable
             totalGradePoints += gradeToPoints(r.getGrade()) * credit;
@@ -605,13 +660,31 @@ public class ExamResultServiceImpl extends UnicastRemoteObject implements ExamRe
         Subject subject = subjectDAO.findById(r.getSubjectId());
         if (subject == null)
             throw new RemoteException("ရွေးချယ်ထားသော ဘာသာရပ်ကို ရှာမတွေ့ပါ။");
-        if (subject.getSemesterId() <= 0)
-            throw new RemoteException("ဘာသာရပ် (" + subject.getSubjectName() +
-                    ") ကို ပညာသင်နှစ်၏ Semester တွင် အရင်ထည့်သွင်းပါ။");
-        // Derive academic year / semester from the subject for display consistency
-        r.setAcademicYearId(subject.getAcademicYearId() != null ? subject.getAcademicYearId() : 0);
-        r.setAcademicYear(subject.getAcademicYearName());
-        r.setSemester(subject.getSemesterNumber() != null ? subject.getSemesterNumber() : 0);
+
+        int targetSemId = r.getSemesterId() > 0 ? r.getSemesterId() : subject.getSemesterId();
+
+        if (targetSemId > 0) {
+            Semester sem = semesterDAO.findById(targetSemId);
+            if (sem != null) {
+                r.setSemesterId(targetSemId);
+                r.setAcademicYearId(sem.getAcademicYearId());
+                r.setAcademicYear(sem.getAcademicYearName());
+                r.setSemester(sem.getSemesterNumber());
+                if (subject.getSemesterId() <= 0) {
+                    subjectDAO.assignToSemester(subject.getId(), targetSemId);
+                }
+            } else {
+                r.setAcademicYearId(subject.getAcademicYearId() != null ? subject.getAcademicYearId() : 0);
+                r.setAcademicYear(subject.getAcademicYearName() != null ? subject.getAcademicYearName() : "General");
+                r.setSemester(subject.getSemesterNumber() != null ? subject.getSemesterNumber() : 1);
+            }
+        } else if (subject.getSemesterNumber() != null && subject.getSemesterNumber() > 0) {
+            r.setSemester(subject.getSemesterNumber());
+            r.setAcademicYear(subject.getAcademicYearName() != null ? subject.getAcademicYearName() : "General");
+        } else {
+            r.setSemester(1);
+            r.setAcademicYear("General");
+        }
     }
 
     private String subjectDisplayName(int subjectId) {

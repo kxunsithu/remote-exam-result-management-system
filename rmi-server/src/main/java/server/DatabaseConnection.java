@@ -16,11 +16,15 @@ public class DatabaseConnection {
         if (envPath != null && !envPath.isBlank()) {
             return envPath;
         }
-        File cwd = new File(".").getAbsoluteFile();
-        if (cwd.getName().equals("rmi-server") || cwd.getName().equals("web-app")) {
-            return new File(cwd.getParentFile(), "data/remote_exam_result.db").getAbsolutePath();
+        try {
+            File dir = new File(".").getCanonicalFile();
+            if ("rmi-server".equals(dir.getName()) || "web-app".equals(dir.getName())) {
+                return new File(dir.getParentFile(), "data/remote_exam_result.db").getCanonicalPath();
+            }
+            return new File(dir, "data/remote_exam_result.db").getCanonicalPath();
+        } catch (Exception e) {
+            return new File("data/remote_exam_result.db").getAbsolutePath();
         }
-        return new File("data/remote_exam_result.db").getAbsolutePath();
     }
 
     private static String getJdbcUrl() {

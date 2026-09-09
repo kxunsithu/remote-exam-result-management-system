@@ -39,12 +39,12 @@
                           <main class="flex-1 flex flex-col min-w-0">
                             <%@ include file="header.jsp" %>
 
-                              <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+                              <div class="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
                                 <!-- Breadcrumb Nav -->
                                 <div class="flex items-center justify-between text-xs text-slate-500">
                                   <div class="flex items-center gap-2">
                                     <a href="${pageContext.request.contextPath}/admin/dashboard"
-                                      class="hover:text-slate-900 transition-colors">ဒက်ရှ်ဘုတ်</a>
+                                      class="hover:text-slate-900 transition-colors">ပင်မစာမျက်နှာ</a>
                                     <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none"
                                       stroke="currentColor" stroke-width="2">
                                       <polyline points="9 18 15 12 9 6" />
@@ -84,7 +84,8 @@
                                           <line x1="21" y1="21" x2="16.65" y2="16.65" />
                                         </svg>
                                         <input type="text" name="search" placeholder="ဘာသာရပ် ရှာဖွေရန်..."
-                                          value="<%= request.getAttribute("searchKeyword") !=null ? request.getAttribute("searchKeyword") : "" %>"
+                                          value="<%= request.getAttribute(" searchKeyword") !=null ?
+                                          request.getAttribute("searchKeyword") : "" %>"
                                         class="w-full pl-10 pr-4 py-2.5 rounded bg-slate-50 border border-slate-300
                                         text-slate-900 text-xs placeholder-slate-400 focus:outline-none
                                         focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all"/>
@@ -115,8 +116,7 @@
                                 </div>
 
                                 <!-- Subjects Data Table Card -->
-                                <div
-                                  class="roundedl bg-white border border-slate-200 shadow-sm overflow-hidden">
+                                <div class="roundedl bg-white border border-slate-200 shadow-sm overflow-hidden">
                                   <div class="overflow-x-auto">
                                     <table class="w-full text-left text-xs text-slate-700">
                                       <thead
@@ -142,11 +142,10 @@
                                             boolean hasUnassigned = false;
                                             java.time.LocalDateTime earliest = null;
                                             for (common.Subject x : grp) {
-                                            if (x.getSemesterId() > 0 && x.getAcademicYearName() != null) {
-                                            int semNo = x.getSemesterNumber() != null ? x.getSemesterNumber() : 0;
+                                            if (x.getSemesterNumber() != null && x.getSemesterNumber() > 0) {
+                                            int semNo = x.getSemesterNumber();
                                             if (assignmentsJson.length() > 1) assignmentsJson.append(",");
-                                            assignmentsJson.append("{\"y\":\"").append(esc(x.getAcademicYearName()))
-                                            .append("\",\"s\":").append(semNo).append("}");
+                                            assignmentsJson.append("{\"s\":").append(semNo).append("}");
                                             } else {
                                             hasUnassigned = true;
                                             }
@@ -180,9 +179,7 @@
                                                 <% Integer dispSemNo=s.getSemesterNumber(); if (dispSemNo !=null &&
                                                   dispSemNo> 0) { %>
                                                   <span
-                                                    class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 border border-amber-200 text-amber-700">Sem
-                                                    <%= dispSemNo %>
-                                                  </span>
+                                                    class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 border border-amber-200 text-amber-700">Semester <%= dispSemNo %></span>
                                                   <% } else { %>
                                                     <span class="text-slate-400">—</span>
                                                     <% } %>
@@ -230,7 +227,7 @@
                                                     data-department="<%= s.getDepartment() %>"
                                                     data-assignments="<%= esc(assignmentsJson.toString()) %>"
                                                     data-unassigned="<%= hasUnassigned %>"
-                                                    data-created="<%= earliest != null ? earliest.toString().replace("T", " ") : "-" %>"
+                                                    data-created='<%= earliest != null ? earliest.toString().replace("T", " ") : "-" %>'
                                                     title="အသေးစိတ်ကြည့်ရန်">
                                                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
                                                       stroke="currentColor" stroke-width="2">
@@ -273,8 +270,11 @@
                             <div class="modal-accent"></div>
                             <div class="modal-header-custom">
                               <div class="modal-header-icon">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.2">
+                                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                  <path d="M2 17l10 5 10-5" />
+                                  <path d="M2 12l10 5 10-5" />
                                 </svg>
                               </div>
                               <div class="modal-title-group">
@@ -282,8 +282,10 @@
                                 <p class="modal-subtitle">Add New Subject</p>
                               </div>
                               <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.5">
+                                  <line x1="18" y1="6" x2="6" y2="18" />
+                                  <line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
                               </button>
                             </div>
@@ -292,17 +294,23 @@
                               <div class="modal-body space-y-4">
                                 <div class="grid grid-cols-2 gap-3">
                                   <div>
-                                    <label class="form-label" for="add-subjectCode">သင်္ကေတ (Code) <span class="text-red-500">*</span></label>
-                                    <input type="text" id="add-subjectCode" name="subjectCode" placeholder="e.g. CST-101" required />
+                                    <label class="form-label" for="add-subjectCode">သင်္ကေတ (Code) <span
+                                        class="text-red-500">*</span></label>
+                                    <input type="text" id="add-subjectCode" name="subjectCode"
+                                      placeholder="e.g. CST-101" required />
                                   </div>
                                   <div>
-                                    <label class="form-label" for="add-credit">ခရက်ဒစ် <span class="text-red-500">*</span></label>
-                                    <input type="number" id="add-credit" name="credit" min="1" max="10" value="3" required />
+                                    <label class="form-label" for="add-credit">ခရက်ဒစ် <span
+                                        class="text-red-500">*</span></label>
+                                    <input type="number" id="add-credit" name="credit" min="1" max="10" value="3"
+                                      required />
                                   </div>
                                 </div>
                                 <div>
-                                  <label class="form-label" for="add-subjectName">ဘာသာရပ် အမည် <span class="text-red-500">*</span></label>
-                                  <input type="text" id="add-subjectName" name="subjectName" placeholder="e.g. Java Programming" required />
+                                  <label class="form-label" for="add-subjectName">ဘာသာရပ် အမည် <span
+                                      class="text-red-500">*</span></label>
+                                  <input type="text" id="add-subjectName" name="subjectName"
+                                    placeholder="e.g. Java Programming" required />
                                 </div>
                                 <div>
                                   <label class="form-label" for="add-department">ဌာန (Department)</label>
@@ -314,20 +322,25 @@
                                   </select>
                                 </div>
                                 <div>
-                                  <label class="form-label" for="add-semesterNumber">Semester <span class="text-red-500">*</span></label>
+                                  <label class="form-label" for="add-semesterNumber">Semester <span
+                                      class="text-red-500">*</span></label>
                                   <select id="add-semesterNumber" name="semesterNumber" required>
                                     <option value="">-- ရွေးချယ်ပါ --</option>
                                     <% for (int i=1; i <=8; i++) { %>
-                                      <option value="<%= i %>">Semester <%= i %></option>
-                                    <% } %>
+                                      <option value="<%= i %>">Semester <%= i %>
+                                      </option>
+                                      <% } %>
                                   </select>
                                 </div>
                               </div>
                               <div class="modal-footer">
-                                <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">မထည့်သွင်းပါ</button>
+                                <button type="button" class="btn-outline-custom"
+                                  data-bs-dismiss="modal">မထည့်သွင်းပါ</button>
                                 <button type="submit" class="btn-primary-custom">
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
                                   </svg>
                                   ထည့်သွင်းမည်
                                 </button>
@@ -341,12 +354,15 @@
                       <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered" style="max-width: 30rem;">
                           <div class="modal-content">
-                            <div class="modal-accent" style="background: linear-gradient(90deg, rgb(99 102 241), rgb(168 85 247));"></div>
+                            <div class="modal-accent"
+                              style="background: linear-gradient(90deg, rgb(99 102 241), rgb(168 85 247));"></div>
                             <div class="modal-header-custom">
-                              <div class="modal-header-icon" style="background: rgb(245 243 255); color: rgb(99 102 241); border-color: rgb(221 214 254);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                              <div class="modal-header-icon"
+                                style="background: rgb(245 243 255); color: rgb(99 102 241); border-color: rgb(221 214 254);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.2">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                               </div>
                               <div class="modal-title-group">
@@ -354,8 +370,10 @@
                                 <p class="modal-subtitle">Edit Subject</p>
                               </div>
                               <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.5">
+                                  <line x1="18" y1="6" x2="6" y2="18" />
+                                  <line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
                               </button>
                             </div>
@@ -365,16 +383,19 @@
                               <div class="modal-body space-y-4">
                                 <div class="grid grid-cols-2 gap-3">
                                   <div>
-                                    <label class="form-label" for="edit-subjectCode">သင်္ကေတ <span class="text-red-500">*</span></label>
+                                    <label class="form-label" for="edit-subjectCode">သင်္ကေတ <span
+                                        class="text-red-500">*</span></label>
                                     <input type="text" id="edit-subjectCode" name="subjectCode" required />
                                   </div>
                                   <div>
-                                    <label class="form-label" for="edit-credit">ခရက်ဒစ် <span class="text-red-500">*</span></label>
+                                    <label class="form-label" for="edit-credit">ခရက်ဒစ် <span
+                                        class="text-red-500">*</span></label>
                                     <input type="number" id="edit-credit" name="credit" min="1" max="10" required />
                                   </div>
                                 </div>
                                 <div>
-                                  <label class="form-label" for="edit-subjectName">ဘာသာရပ် အမည် <span class="text-red-500">*</span></label>
+                                  <label class="form-label" for="edit-subjectName">ဘာသာရပ် အမည် <span
+                                      class="text-red-500">*</span></label>
                                   <input type="text" id="edit-subjectName" name="subjectName" required />
                                 </div>
                                 <div>
@@ -387,21 +408,27 @@
                                   </select>
                                 </div>
                                 <div>
-                                  <label class="form-label" for="edit-semesterNumber">Semester <span class="text-red-500">*</span></label>
+                                  <label class="form-label" for="edit-semesterNumber">Semester <span
+                                      class="text-red-500">*</span></label>
                                   <select id="edit-semesterNumber" name="semesterNumber" required>
                                     <option value="">-- ရွေးချယ်ပါ --</option>
                                     <% for (int i=1; i <=8; i++) { %>
-                                      <option value="<%= i %>">Semester <%= i %></option>
-                                    <% } %>
+                                      <option value="<%= i %>">Semester <%= i %>
+                                      </option>
+                                      <% } %>
                                   </select>
                                 </div>
                               </div>
                               <div class="modal-footer">
-                                <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">မပြင်ဆင်ပါ</button>
-                                <button type="submit" class="btn-primary-custom" style="background: rgb(99 102 241); box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                                    <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                                <button type="button" class="btn-outline-custom"
+                                  data-bs-dismiss="modal">မပြင်ဆင်ပါ</button>
+                                <button type="submit" class="btn-primary-custom"
+                                  style="background: rgb(99 102 241); box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                    <polyline points="17 21 17 13 7 13 7 21" />
+                                    <polyline points="7 3 7 8 15 8" />
                                   </svg>
                                   ပြင်ဆင်မည်
                                 </button>
@@ -420,24 +447,31 @@
                               <input type="hidden" name="action" value="delete" />
                               <input type="hidden" name="id" id="delete-subject-id" />
                               <div class="modal-body text-center" style="padding: 2rem 1.5rem 1.25rem;">
-                                <div class="w-14 h-14 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mx-auto mb-4">
-                                  <svg class="w-7 h-7 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"/>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                <div
+                                  class="w-14 h-14 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mx-auto mb-4">
+                                  <svg class="w-7 h-7 text-red-500" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path
+                                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                                   </svg>
                                 </div>
                                 <h5 class="text-base font-bold text-slate-900 mb-1.5">ဖျက်ရန် အတည်ပြုပါ</h5>
                                 <p class="text-xs text-slate-500 leading-relaxed">
-                                  ဘာသာရပ် <strong id="delete-subject-name" class="text-red-600 font-semibold"></strong> ကို ဖျက်ရန် သေချာပါသလား?<br/>
-                                  <span class="text-slate-400 mt-1 block">ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြင်ဆင်၍ မရနိုင်ပါ။</span>
+                                  ဘာသာရပ် <strong id="delete-subject-name" class="text-red-600 font-semibold"></strong>
+                                  ကို ဖျက်ရန် သေချာပါသလား?<br />
+                                  <span class="text-slate-400 mt-1 block">ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြင်ဆင်၍
+                                    မရနိုင်ပါ။</span>
                                 </p>
                               </div>
                               <div class="modal-footer">
-                                <button type="button" class="btn-outline-custom flex-1 justify-center" data-bs-dismiss="modal">မဖျက်ပါ</button>
+                                <button type="button" class="btn-outline-custom flex-1 justify-center"
+                                  data-bs-dismiss="modal">မဖျက်ပါ</button>
                                 <button type="submit" class="btn-danger-custom flex-1 justify-center">
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <polyline points="3 6 5 6 21 6"/>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
                                   </svg>
                                   ဖျက်မည်
                                 </button>
@@ -451,11 +485,16 @@
                       <div class="modal fade" id="viewSubjectModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered" style="max-width: 26rem;">
                           <div class="modal-content">
-                            <div class="modal-accent" style="background: linear-gradient(90deg, rgb(217 119 6), rgb(245 158 11));"></div>
+                            <div class="modal-accent"
+                              style="background: linear-gradient(90deg, rgb(217 119 6), rgb(245 158 11));"></div>
                             <div class="modal-header-custom">
-                              <div class="modal-header-icon" style="background: rgb(255 251 235); color: rgb(217 119 6); border-color: rgb(253 230 138);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                              <div class="modal-header-icon"
+                                style="background: rgb(255 251 235); color: rgb(217 119 6); border-color: rgb(253 230 138);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.2">
+                                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                  <path d="M2 17l10 5 10-5" />
+                                  <path d="M2 12l10 5 10-5" />
                                 </svg>
                               </div>
                               <div class="modal-title-group">
@@ -463,31 +502,39 @@
                                 <p class="modal-subtitle">Subject Details</p>
                               </div>
                               <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2.5">
+                                  <line x1="18" y1="6" x2="6" y2="18" />
+                                  <line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
                               </button>
                             </div>
                             <div class="modal-body">
                               <div class="space-y-0 text-xs rounded-lg border border-slate-200 overflow-hidden">
-                                <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
+                                <div
+                                  class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
                                   <span class="text-slate-500 font-medium">သင်္ကေတ</span>
                                   <strong id="view-subjectCode" class="text-blue-600 font-mono font-bold"></strong>
                                 </div>
-                                <div class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200">
+                                <div
+                                  class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200">
                                   <span class="text-slate-500 font-medium">အမည်</span>
                                   <strong id="view-subjectName" class="text-slate-900 font-semibold"></strong>
                                 </div>
-                                <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
+                                <div
+                                  class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
                                   <span class="text-slate-500 font-medium">ခရက်ဒစ်</span>
-                                  <span id="view-credit" class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-200"></span>
+                                  <span id="view-credit"
+                                    class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-200"></span>
                                 </div>
-                                <div class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200">
+                                <div
+                                  class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200">
                                   <span class="text-slate-500 font-medium">ဌာန</span>
                                   <span id="view-department" class="text-slate-700"></span>
                                 </div>
-                                <div class="flex items-start justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
-                                  <span class="text-slate-500 font-medium">Semesters</span>
+                                <div
+                                  class="flex items-start justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
+                                  <span class="text-slate-500 font-medium">Semester</span>
                                   <div id="view-assignments" class="text-right space-y-1"></div>
                                 </div>
                                 <div class="flex items-center justify-between px-4 py-2.5 bg-white">
@@ -545,25 +592,19 @@
                           let assignments = [];
                           try { assignments = JSON.parse(d.assignments || '[]'); } catch (err) { assignments = []; }
 
-                          if (!assignments.length && d.unassigned !== 'true') {
-                            wrap.innerHTML = '<span style="color: #94a3b8;">-</span>';
-                            return;
-                          }
                           if (assignments.length) {
                             const seen = {};
                             assignments.forEach(function (a) {
-                              const key = (a.y || '-') + '|' + a.s;
-                              if (seen[key]) return;
+                              const key = a.s;
+                              if (!key || seen[key]) return;
                               seen[key] = true;
                               const row = document.createElement('div');
-                              row.className = 'd-flex align-items-center gap-1';
-                              row.innerHTML =
-                                '<span style="font-size: 0.8125rem; color: #334155;">' + (a.y || '-') + '</span>' +
-                                '<span class="badge badge-warning" style="font-size: 0.72rem;">Sem ' + (a.s || '-') + '</span>';
+                              row.className = 'd-flex align-items-center justify-content-end';
+                              row.innerHTML = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-700">Semester ' + key + '</span>';
                               wrap.appendChild(row);
                             });
                           }
-                          if (d.unassigned === 'true') {
+                          if (!wrap.children.length) {
                             const un = document.createElement('div');
                             un.innerHTML = '<span class="badge" style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem;">မထည့်ရသေးပါ</span>';
                             wrap.appendChild(un.firstChild);

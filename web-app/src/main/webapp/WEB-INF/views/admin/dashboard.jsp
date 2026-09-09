@@ -19,82 +19,62 @@
               <main class="flex-1 flex flex-col min-w-0">
                 <%@ include file="header.jsp" %>
 
-                  <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+                  <div class="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
                     <!-- Breadcrumb & Nav Row -->
                     <div class="flex items-center justify-between text-xs text-slate-500">
                       <div class="flex items-center gap-2">
-                        <span>ဒက်ရှ်ဘုတ်</span>
+                        <span>ပင်မစာမျက်နှာ</span>
                         <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
                           <polyline points="9 18 15 12 9 6" />
                         </svg>
                         <span class="text-slate-900 font-medium">ပင်မအကျဉ်းချုပ်</span>
                       </div>
-                      <div class="flex items-center gap-1">
-                        <button onclick="history.back()" aria-label="Go back" type="button"
-                          class="w-7 h-7 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-sm">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5">
-                            <line x1="19" y1="12" x2="5" y2="12" />
-                            <polyline points="12 19 5 12 12 5" />
-                          </svg>
-                        </button>
-                        <button onclick="history.forward()" aria-label="Go forward" type="button"
-                          class="w-7 h-7 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-sm">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5">
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                            <polyline points="12 5 19 12 12 19" />
-                          </svg>
-                        </button>
-                      </div>
+
                     </div>
 
-                    <!-- Welcome Banner -->
-                    <div
-                      class="p-6 roundedl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md space-y-4">
-                      <div class="flex items-start gap-4">
-                        <div
-                          class="w-14 h-14 roundedl bg-white/20 border border-white/30 flex items-center justify-center text-white shrink-0 shadow-inner">
-                          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                            <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                          </svg>
-                        </div>
-                        <div class="space-y-1">
-                          <div class="flex items-center gap-2 flex-wrap">
-                            <span
-                              class="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/30 text-[10px] font-bold text-white">UCS
-                              (Hpa-an)</span>
-                            <span class="text-xs text-blue-100">University of Computer Studies (Hpa-an)</span>
-                          </div>
-                          <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                            ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) — စာမေးပွဲရလဒ် စီမံခန့်ခွဲမှု စနစ်
-                          </h1>
-                        </div>
+                    <!-- Hero Banner — Full-size Signboard Image -->
+                    <div class="roundedl overflow-hidden shadow-xl border border-slate-800 relative"
+                      style="min-height: 320px; max-height: 820px;">
+                      <!-- Full-size signboard image -->
+                      <img src="${pageContext.request.contextPath}/assets/images/uni.jpg"
+                        alt="ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) Signboard" class="w-full h-full object-cover object-center"
+                        style="min-height: 320px; max-height: 820px;" />
+
+                      <!-- Gradient overlay — only at bottom for text legibility -->
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/40 to-transparent">
                       </div>
 
-                      <p class="text-xs sm:text-sm text-blue-100 leading-relaxed max-w-3xl">
-                        ကြိုဆိုပါသည်၊ <strong class="text-white font-bold">Administrator</strong>။
-                        ကျောင်းသားအချက်အလက်များ၊ ဘာသာရပ်များ၊ သင်ရိုးညွှန်းတမ်းနှင့် စာမေးပွဲရလဒ်များကို
-                        အချိန်နှင့်တပြေးညီ လွယ်ကူစွာ စီမံခန့်ခွဲနိုင်ပါသည်။
-                      </p>
+                      <!-- Text content anchored at the bottom -->
+                      <div class="absolute bottom-0 left-0 right-0 px-6 py-5 z-10">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+                          <div class="flex items-center gap-4">
+                            <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="UCS Hpa-an Logo"
+                              class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white/50 shadow-lg shrink-0" />
+                            <div>
+                              <span
+                                class="inline-block px-2.5 py-0.5 rounded-full bg-white/15 border border-white/25 text-[10px] font-bold text-blue-100 mb-1 backdrop-blur-sm">
+                                University of Computer Studies (Hpa-an) — Admin Portal
+                              </span>
+                              <h1 class="text-xl sm:text-2xl font-extrabold text-white drop-shadow-lg">
+                                ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)
+                              </h1>
+                              <p class="text-xs text-blue-200 mt-0.5">
+                                စာမေးပွဲရလဒ် စီမံခန့်ခွဲမှု စနစ်
+                              </p>
+                            </div>
+                          </div>
 
-                      <div class="flex items-center gap-3 flex-wrap pt-3 border-t border-white/20">
-                        <span
-                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-semibold text-white">
-                          <svg class="w-3.5 h-3.5 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                            <polyline points="22,6 12,13 2,6" />
-                          </svg>
-                          admin@example.com
-                        </span>
-                        <span
-                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-300/30 text-xs font-semibold text-white">
-                          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                          Java RMI Server Connected
-                        </span>
+                          <a href="${pageContext.request.contextPath}/admin/results"
+                            class="px-4 py-2.5 rounded-lg bg-white hover:bg-blue-50 text-blue-700 text-xs font-bold shadow-lg flex items-center gap-2 transition-all shrink-0 border border-white/80">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2.5">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            <span>ရလဒ်များ စီမံရန်</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
 
@@ -115,7 +95,8 @@
                         </div>
                         <div class="flex items-baseline justify-between">
                           <span class="text-2xl font-black text-slate-900">
-                            <%= request.getAttribute("totalStudents") !=null ? request.getAttribute("totalStudents") : "0" %>
+                            <%= request.getAttribute("totalStudents") !=null ? request.getAttribute("totalStudents")
+                              : "0" %>
                           </span>
                           <span
                             class="text-xs font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်
@@ -138,7 +119,8 @@
                         </div>
                         <div class="flex items-baseline justify-between">
                           <span class="text-2xl font-black text-slate-900">
-                            <%= request.getAttribute("totalSubjects") !=null ? request.getAttribute("totalSubjects") : "0" %>
+                            <%= request.getAttribute("totalSubjects") !=null ? request.getAttribute("totalSubjects")
+                              : "0" %>
                           </span>
                           <span
                             class="text-xs font-semibold text-purple-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်
@@ -160,7 +142,8 @@
                         </div>
                         <div class="flex items-baseline justify-between">
                           <span class="text-2xl font-black text-slate-900">
-                            <%= request.getAttribute("totalResults") !=null ? request.getAttribute("totalResults") : "0" %>
+                            <%= request.getAttribute("totalResults") !=null ? request.getAttribute("totalResults") : "0"
+                              %>
                           </span>
                           <span
                             class="text-xs font-semibold text-emerald-600 group-hover:translate-x-1 transition-transform">ကြည့်ရန်

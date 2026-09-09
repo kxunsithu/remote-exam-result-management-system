@@ -30,17 +30,22 @@
                   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                   <title>ကျွန်ုပ်၏ ရလဒ်များ — RERMS</title>
                   <%@ include file="../common/tailwind-setup.jsp" %>
-                  <style>
-                    .year-card-body { display: block; }
-                    .year-card-body.collapsed-body { display: none; }
-                  </style>
+                    <style>
+                      .year-card-body {
+                        display: block;
+                      }
+
+                      .year-card-body.collapsed-body {
+                        display: none;
+                      }
+                    </style>
                 </head>
 
                 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased">
                   <div class="min-h-screen flex flex-col">
                     <%@ include file="navbar.jsp" %>
 
-                      <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+                      <main class="flex-1 p-4 sm:p-6 w-full max-w-7xl mx-auto space-y-6">
 
                         <% if (request.getAttribute("rmiError") !=null) { %>
                           <div
@@ -60,7 +65,7 @@
                             <div class="flex items-center justify-between text-xs text-slate-500">
                               <div class="flex items-center gap-2">
                                 <a href="${pageContext.request.contextPath}/student/dashboard"
-                                  class="hover:text-slate-900 transition-colors">ဒက်ရှ်ဘုတ်</a>
+                                  class="hover:text-slate-900 transition-colors">ပင်မစာမျက်နှာ</a>
                                 <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none"
                                   stroke="currentColor" stroke-width="2">
                                   <polyline points="9 18 15 12 9 6" />
@@ -88,69 +93,85 @@
                               </div>
                             </div>
 
-                            <!-- Student Info Header Card -->
+                            <!-- Hero Banner — Full-size Signboard Image -->
                             <% if (student !=null) { long totalSubj=results !=null ? results.size() : 0; long
                               passSubj=results !=null ? results.stream().filter(r ->
                               "PASS".equals(r.getStatus())).count() : 0;
                               String initial = student.getName() != null && !student.getName().isEmpty()
                               ? String.valueOf(student.getName().charAt(0)).toUpperCase() : "S";
                               %>
-                              <div
-                                class="p-6 roundedl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 border border-blue-500/20 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
-                                <div class="flex items-center gap-4">
-                                  <div
-                                    class="w-12 h-12 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-lg font-extrabold text-white shadow-inner shrink-0 backdrop-blur-sm">
-                                    <%= initial %>
-                                  </div>
-                                  <div>
-                                    <h2 class="text-base font-extrabold text-white">
-                                      <%= student.getName() %>
-                                    </h2>
-                                    <span class="text-xs font-mono font-bold text-blue-100">
-                                      <%= student.getStudentId() %>
-                                    </span>
-                                  </div>
+                              <div class="roundedl overflow-hidden shadow-xl border border-slate-800 relative"
+                                style="min-height: 280px; max-height: 380px;">
+                                <!-- Full-size signboard image -->
+                                <img src="${pageContext.request.contextPath}/assets/images/uni.jpg"
+                                  alt="ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) Signboard"
+                                  class="w-full h-full object-cover object-center"
+                                  style="min-height: 280px; max-height: 380px;" />
+
+                                <!-- Gradient overlay — bottom fade -->
+                                <div
+                                  class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/50 to-transparent">
                                 </div>
 
-                                <div class="flex items-center gap-6 text-center flex-wrap sm:flex-nowrap">
-                                  <div>
-                                    <span class="block text-lg font-extrabold text-white">
-                                      <%= totalSubj %>
-                                    </span>
-                                    <span
-                                      class="block text-[10px] text-blue-100 uppercase tracking-wider font-semibold">စုစုပေါင်း
-                                      ဘာသာ</span>
-                                  </div>
-                                  <div class="w-px h-8 bg-blue-400/40 hidden sm:block"></div>
-                                  <div>
-                                    <span class="block text-lg font-extrabold text-emerald-300">
-                                      <%= totalSubj> 0 ? String.format("%.0f", (double)passSubj/totalSubj*100) : "0" %>%
-                                    </span>
-                                    <span
-                                      class="block text-[10px] text-blue-100 uppercase tracking-wider font-semibold">အောင်မြင်မှုနှုန်း</span>
-                                  </div>
-                                  <% if (avgObj !=null) { %>
-                                    <div class="w-px h-8 bg-blue-400/40 hidden sm:block"></div>
-                                    <div>
-                                      <span class="block text-lg font-extrabold text-white">
-                                        <%= String.format("%.1f%%", avgObj) %>
+                                <!-- Text content anchored at the bottom -->
+                                <div class="absolute bottom-0 left-0 right-0 px-6 py-5 z-10">
+                                  <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+
+                                    <!-- Student Identity -->
+                                    <div class="flex items-center gap-3.5">
+                                      <div
+                                        class="w-11 h-11 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-base font-extrabold text-white shadow-inner shrink-0 backdrop-blur-sm">
+                                        <%= initial %>
+                                      </div>
+                                      <div>
+                                        <h2
+                                          class="text-lg sm:text-xl font-extrabold text-white drop-shadow-lg leading-tight">
+                                          <%= student.getName() %>
+                                        </h2>
+                                        <span class="text-xs font-mono font-bold text-blue-200">
+                                          <%= student.getStudentId() %>
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <!-- Stats Pills -->
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                      <span
+                                        class="px-3 py-1.5 rounded-lg bg-white/15 border border-white/25 backdrop-blur-sm text-center">
+                                        <span class="block text-sm font-extrabold text-white">
+                                          <%= totalSubj %>
+                                        </span>
+                                        <span class="block text-[10px] text-blue-200 font-semibold">စုစုပေါင်း</span>
                                       </span>
                                       <span
-                                        class="block text-[10px] text-blue-100 uppercase tracking-wider font-semibold">ပျမ်းမျှ
-                                        အမှတ်</span>
-                                    </div>
-                                    <% } %>
-                                      <% if (cgpaObj !=null && cgpaObj> 0) { %>
-                                        <div class="w-px h-8 bg-blue-400/40 hidden sm:block"></div>
-                                        <div>
-                                          <span class="block text-lg font-extrabold text-white">
-                                            <%= String.format("%.2f", cgpaObj) %>
+                                        class="px-3 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-sm text-center">
+                                        <span class="block text-sm font-extrabold text-emerald-300">
+                                          <%= totalSubj> 0 ? String.format("%.0f", (double)passSubj/totalSubj*100) : "0"
+                                            %>%
+                                        </span>
+                                        <span class="block text-[10px] text-blue-200 font-semibold">အောင်</span>
+                                      </span>
+                                      <% if (avgObj !=null) { %>
+                                        <span
+                                          class="px-3 py-1.5 rounded-lg bg-white/15 border border-white/25 backdrop-blur-sm text-center">
+                                          <span class="block text-sm font-extrabold text-white">
+                                            <%= String.format("%.1f%%", avgObj) %>
                                           </span>
-                                          <span
-                                            class="block text-[10px] text-blue-100 uppercase tracking-wider font-semibold">CGPA
-                                            / 4.0</span>
-                                        </div>
+                                          <span class="block text-[10px] text-blue-200 font-semibold">ပျမ်းမျှ</span>
+                                        </span>
                                         <% } %>
+                                          <% if (cgpaObj !=null && cgpaObj> 0) { %>
+                                            <span
+                                              class="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-400/30 backdrop-blur-sm text-center">
+                                              <span class="block text-sm font-extrabold text-white">
+                                                <%= String.format("%.2f", cgpaObj) %>
+                                              </span>
+                                              <span class="block text-[10px] text-blue-200 font-semibold">CGPA</span>
+                                            </span>
+                                            <% } %>
+                                    </div>
+
+                                  </div>
                                 </div>
                               </div>
                               <% } %>
@@ -225,7 +246,7 @@
                                         <button
                                           class="w-full px-5 py-4 bg-slate-100/80 hover:bg-slate-200/60 border-b border-slate-200 flex items-center justify-between cursor-pointer transition-colors text-left"
                                           type="button" onclick="toggleYearCard(this)"
-                                          aria-expanded="<%= yearIdx == 0 ? "true" : "false" %>">
+                                          aria-expanded='<%= yearIdx == 0 ? "true" : "false" %>'>
                                           <div class="flex items-center gap-3">
                                             <svg class="w-4 h-4 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none"
                                               stroke="currentColor" stroke-width="2.5">
@@ -243,63 +264,79 @@
                                           </span>
                                         </button>
 
-                                        <div class="year-card-body <%= yearIdx == 0 ? "" : "collapsed-body" %>" id="<%= collapseId %>">
-                                            <div class="divide-y divide-slate-200 bg-slate-50/50">
-                                              <% for (java.util.Map.Entry<Integer, java.util.List<common.ExamResult>>
-                                                semEntry : bySem.entrySet()) {
-                                                int sem = semEntry.getKey();
-                                                java.util.List<common.ExamResult> semResults = semEntry.getValue();
-                                                  %>
-                                                  <div class="sem-block">
-                                                    <!-- Semester Header Bar -->
-                                                    <div
-                                                      class="sem-header px-5 py-3 bg-slate-100/90 flex items-center justify-between border-b border-slate-200">
-                                                      <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                                                        <h4 class="text-xs font-bold text-slate-900">Semester <%= sem %>
-                                                        </h4>
-                                                        <span class="text-[11px] text-slate-500">(<%= semResults.size()
-                                                            %> ဘာသာ)</span>
-                                                      </div>
-
-                                                      <button type="button"
-                                                        class="px-3 py-1 rounded bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                                                        onclick="printSemesterResult('<%= student != null ? student.getName().replace("'", "\\'") : "" %>', '<%= student != null ? student.getStudentId() : "" %>', '<%= year %>', '<%= sem %>', this)"
-                                                        title="ဤ Semester ရလဒ် ပုံနှိပ်ထုတ်ယူရန်">
-                                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                                                          stroke="currentColor" stroke-width="2">
-                                                          <polyline points="6 9 6 2 18 2 18 9" />
-                                                          <path
-                                                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                                                          <rect x="6" y="14" width="12" height="8" />
-                                                        </svg>
-                                                        <span>Print</span>
-                                                      </button>
+                                        <div class='year-card-body <%= yearIdx == 0 ? "" : " collapsed-body" %>' id="<%=
+                                            collapseId %>">
+                                          <div class="divide-y divide-slate-200 bg-slate-50/50">
+                                            <% for (java.util.Map.Entry<Integer, java.util.List<common.ExamResult>>
+                                              semEntry : bySem.entrySet()) {
+                                              int sem = semEntry.getKey();
+                                              java.util.List<common.ExamResult> semResults = semEntry.getValue();
+                                                String semCgpaStr = (cgpaObj != null && cgpaObj > 0) ?
+                                                String.format("%.2f", cgpaObj) : "";
+                                                String studentNameEscaped = (student != null && student.getName() !=
+                                                null) ? student.getName().replace("'", "\\'") : "";
+                                                String studentIdStr = (student != null && student.getStudentId() !=
+                                                null) ? student.getStudentId() : "";
+                                                %>
+                                                <div class="sem-block">
+                                                  <!-- Semester Header Bar -->
+                                                  <div
+                                                    class="sem-header px-5 py-3 bg-slate-100/90 flex items-center justify-between border-b border-slate-200">
+                                                    <div class="flex items-center gap-2">
+                                                      <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                                                      <h4 class="text-xs font-bold text-slate-900">Semester <%= sem %>
+                                                      </h4>
+                                                      <span class="text-[11px] text-slate-500">(<%= semResults.size() %>
+                                                          ဘာသာ)</span>
                                                     </div>
 
-                                                    <!-- Result Table Header Row -->
-                                                    <div
-                                                      class="grid grid-cols-12 px-5 py-2.5 bg-slate-100 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                                                      <div class="col-span-5 sm:col-span-6">ဘာသာရပ်</div>
-                                                      <div class="col-span-3 sm:col-span-2 text-center">ရမှတ်</div>
-                                                      <div class="col-span-2 text-center">Grade</div>
-                                                      <div class="col-span-2 text-center">အခြေအနေ</div>
-                                                    </div>
+                                                    <button type="button"
+                                                      class="px-3 py-1 rounded bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                                                      onclick="printSemesterResult('<%= studentNameEscaped %>', '<%= studentIdStr %>', '<%= year %>', '<%= sem %>', this, '<%= semCgpaStr %>')"
+                                                      title="ဤ Semester ရလဒ် ပုံနှိပ်ထုတ်ယူရန်">
+                                                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2">
+                                                        <polyline points="6 9 6 2 18 2 18 9" />
+                                                        <path
+                                                          d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                                        <rect x="6" y="14" width="12" height="8" />
+                                                      </svg>
+                                                      <span>Print</span>
+                                                    </button>
+                                                  </div>
 
-                                                    <!-- Result Items -->
-                                                    <div class="divide-y divide-slate-200">
-                                                      <% for (common.ExamResult r : semResults) { boolean isPass="PASS".equals(r.getStatus()); int sCredit=r.getSubjectCredit()> 0 ?
-                                                        r.getSubjectCredit() : 3;
-                                                        %>
+                                                  <!-- Result Table Header Row -->
+                                                  <div
+                                                    class="grid grid-cols-12 px-5 py-2.5 bg-slate-100 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                                                    <div class="col-span-5 sm:col-span-6">ဘာသာရပ်</div>
+                                                    <div class="col-span-3 sm:col-span-2 text-center">ရမှတ်</div>
+                                                    <div class="col-span-2 text-center">Grade</div>
+                                                    <div class="col-span-2 text-center">အခြေအနေ</div>
+                                                  </div>
+
+                                                  <!-- Result Items -->
+                                                  <div class="divide-y divide-slate-200">
+                                                    <% for (common.ExamResult r : semResults) { boolean isPass="PASS"
+                                                      .equals(r.getStatus()); int sCredit=r.getSubjectCredit()> 0 ?
+                                                      r.getSubjectCredit() : 3;
+                                                      String gVal = r.getGrade() != null ? r.getGrade() : "";
+                                                      %>
+                                                      <% String sNameVal=r.getSubjectName() !=null ? r.getSubjectName()
+                                                        : "-" ; String sCodeVal=r.getSubjectCode() !=null ?
+                                                        r.getSubjectCode() : "" ; String sTypeVal=r.getExamType() !=null
+                                                        ? r.getExamType() : "REGULAR" ; %>
                                                         <div
                                                           class="result-row grid grid-cols-12 px-5 py-3 items-center hover:bg-slate-50 transition-colors"
-                                                          data-credit="<%= sCredit %>">
+                                                          data-credit="<%= sCredit %>" data-marks="<%= r.getMarks() %>"
+                                                          data-totalmarks="<%= r.getTotalMarks() %>"
+                                                          data-grade="<%= gVal %>" data-subjname="<%= sNameVal %>"
+                                                          data-subjcode="<%= sCodeVal %>"
+                                                          data-examtype="<%= sTypeVal %>">
                                                           <div class="col-span-5 sm:col-span-6 pr-2">
                                                             <div
                                                               class="subj-name text-xs font-semibold text-slate-900 flex items-center gap-1.5 flex-wrap">
-                                                              <span>
-                                                                <%= r.getSubjectName() !=null ? r.getSubjectName() : "-"
-                                                                  %>
+                                                              <span class="subj-title">
+                                                                <%= sNameVal %>
                                                               </span>
                                                               <% String et=r.getExamType(); if ("RE_EXAM".equals(et)) {
                                                                 %>
@@ -317,7 +354,7 @@
                                                           </div>
 
                                                           <div
-                                                            class="col-span-3 sm:col-span-2 text-center text-xs font-bold text-slate-900">
+                                                            class="col-span-3 sm:col-span-2 text-center text-xs font-bold text-slate-900 marks-cell">
                                                             <%= (int)r.getMarks() %><span
                                                                 class="text-slate-400 font-normal">/<%=
                                                                   (int)r.getTotalMarks() %></span>
@@ -341,10 +378,10 @@
                                                           </div>
                                                         </div>
                                                         <% } %>
-                                                    </div>
                                                   </div>
-                                                  <% } %>
-                                            </div>
+                                                </div>
+                                                <% } %>
+                                          </div>
                                         </div>
                                       </div>
                                       <% yearIdx++; } } %>
@@ -424,51 +461,95 @@
                       }
                     }
 
-                    function printSemesterResult(studentName, rollNo, year, sem, btn) {
+                    function printSemesterResult(studentName, rollNo, year, sem, btn, overallCGPA) {
                       var semBlock = btn.closest('.sem-block');
                       if (!semBlock) return;
 
                       var rows = semBlock.querySelectorAll('.result-row');
-                      var tableRows = '';
-                      var sr = 1;
-                      var totalCredits = 0;
-                      var totalGradePoint = 0;
 
                       function gradeToScore(grade) {
                         var map = { 'A+': 4.00, 'A': 4.00, 'A-': 3.67, 'B+': 3.33, 'B': 3.00, 'B-': 2.67, 'C+': 2.33, 'C': 2.00, 'D': 1.00, 'F': 0, 'F/Abs/I': 0 };
                         return map[grade] !== undefined ? map[grade] : 0;
                       }
 
+                      // Build itemMap keyed by subject code.
+                      // Retake entries replace the regular entry — each subject counted once
+                      // with the latest grade, preventing double-counting of credits/grade points.
+                      var itemMap = {};
+                      var itemOrder = [];
+
                       for (var i = 0; i < rows.length; i++) {
                         var r = rows[i];
+                        var subjNameAttr = r.getAttribute('data-subjname');
+                        var subjCodeAttr = r.getAttribute('data-subjcode');
+                        var subjTitleSpan = r.querySelector('.subj-title');
                         var nameEl = r.querySelector('.subj-name');
-                        var name = nameEl ? nameEl.childNodes[0].textContent.trim() : '-';
-                        var code = r.querySelector('.subj-code') ? r.querySelector('.subj-code').textContent.trim() : '-';
+                        var name = (subjNameAttr && subjNameAttr.trim() !== '') ? subjNameAttr.trim() : (subjTitleSpan ? subjTitleSpan.textContent.trim() : (nameEl ? nameEl.textContent.replace(/RE-EXAM|RETAKE/g, '').trim() : '-'));
+                        var code = (subjCodeAttr && subjCodeAttr.trim() !== '') ? subjCodeAttr.trim() : (r.querySelector('.subj-code') ? r.querySelector('.subj-code').textContent.trim() : '-');
+
+                        var marksAttr = r.getAttribute('data-marks');
+                        var totalMarksAttr = r.getAttribute('data-totalmarks');
+                        var gradeAttr = r.getAttribute('data-grade');
+                        var et = r.getAttribute('data-examtype') || '';
+
                         var gradeEl = r.querySelector('.grade-cell');
-                        var grade = gradeEl ? gradeEl.textContent.trim() : '-';
+                        var gradeSpan = gradeEl ? gradeEl.querySelector('span') : null;
+                        var gradeFromDom = gradeSpan ? gradeSpan.textContent.trim() : (gradeEl ? gradeEl.textContent.trim() : '-');
+                        var grade = (gradeAttr && gradeAttr.trim() !== '') ? gradeAttr.trim() : gradeFromDom;
+
+                        var obtained = (marksAttr !== null && marksAttr !== '') ? parseFloat(marksAttr) : 0;
+                        var total = (totalMarksAttr !== null && totalMarksAttr !== '') ? parseFloat(totalMarksAttr) : 100;
+                        var pct = total > 0 ? (obtained / total * 100) : 0;
+
                         var creditAttr = r.getAttribute('data-credit');
                         var credit = (creditAttr && parseInt(creditAttr, 10) > 0) ? parseInt(creditAttr, 10) : 3;
 
-                        var gradeObtained = grade && grade !== '-' ? grade : 'F';
+                        var gradeObtained = (grade && grade !== '-') ? grade : (function (p) {
+                          if (p >= 90) return 'A+'; if (p >= 80) return 'A'; if (p >= 75) return 'A-';
+                          if (p >= 70) return 'B+'; if (p >= 65) return 'B'; if (p >= 60) return 'B-';
+                          if (p >= 55) return 'C+'; if (p >= 50) return 'C'; if (p >= 40) return 'D'; return 'F';
+                        })(pct);
                         var gradeScore = gradeToScore(gradeObtained);
                         var gradePoint = gradeScore * credit;
+                        var isRetake = et && et.trim() !== '' && et.trim().toUpperCase() !== 'REGULAR';
 
-                        totalCredits += credit;
-                        totalGradePoint += gradePoint;
+                        if (!itemMap[code]) {
+                          itemMap[code] = { name: name, code: code, credit: credit, grade: gradeObtained, gradeScore: gradeScore, gradePoint: gradePoint, et: et };
+                          itemOrder.push(code);
+                        } else if (isRetake) {
+                          // Retake replaces the original — update grade/score/point for calculation
+                          itemMap[code].grade = gradeObtained;
+                          itemMap[code].gradeScore = gradeScore;
+                          itemMap[code].gradePoint = gradePoint;
+                          itemMap[code].et = et;
+                        }
+                      }
 
+                      // Build table rows and totals from deduplicated itemMap
+                      var tableRows = '';
+                      var totalCredits = 0;
+                      var totalGradePoint = 0;
+                      var sr = 1;
+
+                      for (var j = 0; j < itemOrder.length; j++) {
+                        var item = itemMap[itemOrder[j]];
+                        var etStr = (item.et && item.et.trim() !== '' && item.et.trim().toUpperCase() !== 'REGULAR') ? ' (' + item.et.trim().replace('_', '-') + ')' : '';
                         tableRows +=
                           '<tr>' +
                           '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + (sr++) + '</td>' +
-                          '<td style="padding:7px 8px; font-family:monospace; font-weight:bold; border:1px solid #000;">' + code + '</td>' +
-                          '<td style="padding:7px 8px; border:1px solid #000;">' + name + '</td>' +
-                          '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + credit + '</td>' +
-                          '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + gradeObtained + '</td>' +
-                          '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + gradeScore.toFixed(2) + '</td>' +
-                          '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + gradePoint.toFixed(2) + '</td>' +
+                          '<td style="padding:7px 8px; font-family:monospace; font-weight:bold; border:1px solid #000;">' + item.code + '</td>' +
+                          '<td style="padding:7px 8px; border:1px solid #000;">' + item.name + etStr + '</td>' +
+                          '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + item.credit + '</td>' +
+                          '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + item.grade + '</td>' +
+                          '<td style="text-align:center; padding:7px 8px; border:1px solid #000;">' + item.gradeScore.toFixed(2) + '</td>' +
+                          '<td style="text-align:center; padding:7px 8px; font-weight:bold; border:1px solid #000;">' + item.gradePoint.toFixed(2) + '</td>' +
                           '</tr>';
+                        totalCredits += item.credit;
+                        totalGradePoint += item.gradePoint;
                       }
 
-                      var semesterGPA = totalCredits > 0 ? (totalGradePoint / totalCredits).toFixed(2) : '0.00';
+                      var overallGPA = totalCredits > 0 ? (totalGradePoint / totalCredits).toFixed(2) : '0.00';
+                      var displayCGPA = (overallCGPA && overallCGPA !== '') ? parseFloat(overallCGPA).toFixed(2) : overallGPA;
                       var issueDate = new Date();
                       var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                       var issueDateStr = issueDate.getDate() + '-' + months[issueDate.getMonth()] + '-' + issueDate.getFullYear();
@@ -532,18 +613,7 @@
                       doc.write('<td class="colon">:</td>');
                       doc.write('<td class="value">' + sem + '</td>');
                       doc.write('</tr>');
-                      doc.write('<tr>');
-                      doc.write('<td class="label">Degree Program</td>');
-                      doc.write('<td class="colon">:</td>');
-                      doc.write('<td class="value">(B.C.Sc.)</td>');
-                      doc.write('<td></td><td></td><td></td>');
-                      doc.write('</tr>');
-                      doc.write('<tr>');
-                      doc.write('<td class="label">Specialization</td>');
-                      doc.write('<td class="colon">:</td>');
-                      doc.write('<td class="value">Computer Science</td>');
-                      doc.write('<td></td><td></td><td></td>');
-                      doc.write('</tr>');
+
                       doc.write('</table>');
 
                       doc.write('<table class="result-table">');
@@ -568,14 +638,14 @@
 
                       doc.write('<tr>');
                       doc.write('<td colspan="5" style="border:none;"></td>');
-                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Cumulative GPA</td>');
-                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + semesterGPA + '</td>');
+                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Overall GPA</td>');
+                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + overallGPA + '</td>');
                       doc.write('</tr>');
 
                       doc.write('<tr>');
                       doc.write('<td colspan="5" style="border:none;"></td>');
-                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Overall GPA</td>');
-                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + semesterGPA + '</td>');
+                      doc.write('<td style="border:1px solid #000; font-weight:bold; text-align:right; padding:5px 8px;">Cumulative GPA</td>');
+                      doc.write('<td style="border:1px solid #000; text-align:center; font-weight:bold;">' + displayCGPA + '</td>');
                       doc.write('</tr>');
 
                       doc.write('</tbody></table>');

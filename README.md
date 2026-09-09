@@ -7,12 +7,14 @@ A complete, enterprise-grade university management project demonstrating **Java 
 ## 🌟 Features
 
 ### 🔐 Authentication & Authorization
+
 - **Role-Based Access Control**: Separate portals for `ADMIN` and `STUDENT`.
 - **BCrypt Password Hashing**: Passwords stored as salted BCrypt hashes (no plain-text storage).
 - **Session Security**: Session invalidation on logout and strict URL protection via Jakarta Servlet Filter (`AuthFilter`).
 - **Student Privacy Protection**: Students can **ONLY** view their own results bound to their session email (no parameter tampering by ID in URL).
 
 ### 👨‍💼 Admin Management Capabilities
+
 - **Dashboard Overview**: Live counter stats (Total Students, Subjects, Results) and recent exam evaluations.
 - **Student CRUD**: Full creation, viewing, keyword searching, updating, and deletion of student profiles.
 - **Subject CRUD**: Management of subject codes, credit values, departments, and semesters.
@@ -20,6 +22,7 @@ A complete, enterprise-grade university management project demonstrating **Java 
 - **Automated Grading Engine**: Admins input raw marks and total marks. Grade calculation is performed **exclusively by the RMI Server**.
 
 ### 🎓 Student Portal Capabilities
+
 - **Academic Summary**: Overall GPA/percentage, overall grade, total credit count, and Pass/Fail evaluation.
 - **Detailed Transcript**: Line-by-line mark breakdown per subject with credit display.
 - **Printable Transcripts**: One-click printable transcript view.
@@ -39,6 +42,7 @@ graph TD
 ```
 
 ### 🛰️ Java RMI Communication Flow
+
 1. **RMI Server Initialization**: The RMI Server initializes the SQLite database, binds `ExamResultServiceImpl` to the local RMI Registry on port `1099` under the key `"ExamResultService"`.
 2. **Web Client Connection**: When a user performs an action in the Web App (e.g., login, grade calculation, student lookup), the Jakarta Servlet calls `RMIClientManager.getService()`.
 3. **Remote Call Execution**: `RMIClientManager` looks up the stub from `rmi://localhost:1099/ExamResultService` and invokes methods remotely.
@@ -48,7 +52,7 @@ graph TD
 
 ## 🗄️ Database Design
 
-**Database Location**: `data/remote_exam_result.db`  
+**Database Location**: `data/remote_exam_result.db`\
 **Driver**: SQLite JDBC Driver (`org.xerial:sqlite-jdbc`)
 
 ```mermaid
@@ -98,8 +102,9 @@ erDiagram
 ```
 
 ### 📊 Grading Scale (Calculated by RMI Server)
+
 | Marks Percentage | Grade | Status |
-| :--- | :---: | :---: |
+| --- | --- | --- |
 | **90% – 100%** | **A+** | PASS |
 | **80% – 89%** | **A** | PASS |
 | **75% – 79%** | **B+** | PASS |
@@ -196,21 +201,26 @@ remote-exam-result-management-system/
 ## 🚀 How to Run the Project
 
 ### Step 1: Build the Maven Multi-Module Project
+
 From the project root directory, run:
+
 ```bash
 mvn clean install
 ```
 
 ### Step 2: Start the RMI Server
+
 > **IMPORTANT**: The RMI Server **MUST** be started **BEFORE** the Web Application.
 
 Run:
+
 ```bash
 cd rmi-server
 mvn exec:java -Dexec.mainClass="server.RMIServer"
 ```
 
 Expected output:
+
 ```text
 =======================================================
   Remote Exam Result Management System — RMI Server    
@@ -231,15 +241,20 @@ RMI Server is ready.
 ```
 
 ### Step 3: Run the Web Application
+
 Open a new terminal window at the project root and run:
+
 ```bash
 cd web-app
 mvn exec:java
 ```
-*(Or deploy `web-app/target/remote-exam-result-management-system.war` to your local Apache Tomcat 10 installation)*.
+
+*(Or deploy* `web-app/target/remote-exam-result-management-system.war` *to your local Apache Tomcat 10 installation)*.
 
 ### Step 4: Access the System in Browser
+
 Open your browser and navigate to:
+
 ```text
 http://localhost:8080/remote-exam-result-management-system/
 ```
@@ -248,24 +263,32 @@ http://localhost:8080/remote-exam-result-management-system/
 
 ## 🔑 Default Login Accounts
 
-| Role | Email | Password | Access Rights |
-| :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@example.com` | `admin123` | Full administrative CRUD & statistics |
-| **STUDENT** | `john.doe@university.edu` | `student123` | View own exam results & academic profile (linked to student ST001 John Doe) |
-| **Other students** | `jane.smith@university.edu`, etc. | *(Register via /register)* | Personal transcript view after registration |
+| Role | Email | Password | Access Rights |  |
+| --- | --- | --- | --- | --- |
+| **ADMIN** | `admin@example.com` |  | `admin123` | Full administrative CRUD & statistics |
+| **STUDENT** | `john.doe@university.edu` | `student123` | View own exam results & academic profile (linked to student ST001 John Doe) |  |
+| **Other students** | `jane.smith@university.edu`, etc. | *(Register via /register)* | Personal transcript view after registration |  |
 
 ---
 
 ## 🧪 Testing Checklist
 
 - [x] **Maven Build**: Multi-module parent build compiles cleanly without errors.
+
 - [x] **RMI Server Startup**: Port 1099 registry creation and service binding confirmed.
+
 - [x] **SQLite Auto-Init**: Schema auto-creation, WAL mode, foreign key enforcement, and seeding.
+
 - [x] **Authentication**: Validated login with BCrypt hashing and invalid credential rejections.
+
 - [x] **RBAC & Security**: Servlet AuthFilter blocks unauthorized URL manipulation (HTTP 403).
+
 - [x] **Student Management**: Admin student CRUD and search operations.
+
 - [x] **Subject Management**: Admin subject CRUD and search operations.
+
 - [x] **Exam Result Management**: Admin result creation, automatic grade calculation by server, and search/filter.
+
 - [x] **Student Result Privacy**: Ensures student only accesses their own grade data via session.
 
 ---

@@ -23,12 +23,7 @@
 
     <!-- Brand -->
     <a href="${pageContext.request.contextPath}/admin/dashboard" class="admin-brand">
-      <div class="admin-brand-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
-      </div>
+<img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="UCS Hpa-an Logo" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-slate-200 mr-2" />
       <div class="admin-brand-text">
         <span class="admin-brand-title">UCS (Hpa-an)</span>
         <span class="admin-brand-sub">ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</span>

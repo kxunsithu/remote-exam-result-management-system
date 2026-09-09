@@ -21,7 +21,7 @@
             }
           },
           fontFamily: {
-            sans: ['Inter', 'Noto Sans Myanmar', 'system-ui', 'sans-serif'],
+            sans: ['Pyidaungsu', 'Padauk', 'Noto Sans Myanmar', 'Inter', 'system-ui', 'sans-serif'],
             mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
           }
         }
@@ -31,11 +31,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <!-- Bootstrap JS only (no Bootstrap CSS — using Tailwind for all styling) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
+    /* ── Global Font & Line Height Fix for Myanmar Script ── */
+    html, body {
+      font-family: 'Pyidaungsu', 'Padauk', 'Noto Sans Myanmar', 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.65;
+    }
+    .leading-tight {
+      line-height: 1.45 !important;
+    }
+    .leading-none {
+      line-height: 1.35 !important;
+    }
+    h1, h2, h3, h4, h5, h6, p, span, div, a, button, label, input, select {
+      padding-bottom: 0.5px;
+    }
+
     /* ══════════════════════════════════════════════
      Bootstrap collapse & modal compat (no Bootstrap CSS)
   ══════════════════════════════════════════════ */

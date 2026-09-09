@@ -19,7 +19,7 @@
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>ကျောင်းသား ဒက်ရှ်ဘုတ် — ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</title>
+          <title>ကျောင်းသား ပင်မစာမျက်နှာ — ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</title>
           <%@ include file="../common/tailwind-setup.jsp" %>
         </head>
 
@@ -27,7 +27,7 @@
           <div class="min-h-screen flex flex-col">
             <%@ include file="navbar.jsp" %>
 
-              <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+              <main class="flex-1 p-4 sm:p-6 w-full max-w-7xl mx-auto space-y-6">
 
                 <% if (request.getAttribute("rmiError") !=null) { %>
                   <div
@@ -51,45 +51,54 @@
                           stroke-width="2">
                           <polyline points="9 18 15 12 9 6" />
                         </svg>
-                        <span class="text-slate-900 font-medium">ဒက်ရှ်ဘုတ်</span>
+                        <span class="text-slate-900 font-medium">ပင်မစာမျက်နှာ</span>
                       </div>
                     </div>
 
-                    <!-- Hero Banner Card -->
-                    <div
-                      class="p-6 sm:p-8 roundedl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 border border-blue-500/20 shadow-md relative overflow-hidden">
-                      <div
-                        class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                        <div class="flex items-center gap-4">
-                          <div
-                            class="w-14 h-14 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-xl font-extrabold text-white shadow-inner backdrop-blur-sm">
-                            <%= student !=null && student.getName() !=null && !student.getName().isEmpty() ?
-                              student.getName().substring(0, 1).toUpperCase() : "S" %>
-                          </div>
-                          <div>
-                            <span
-                              class="inline-block px-2.5 py-0.5 rounded-full bg-white/15 border border-white/20 text-[10px] font-bold text-blue-50 mb-1">
-                              University of Computer Studies (Hpa-an)
-                            </span>
-                            <h1 class="text-xl sm:text-2xl font-extrabold text-white">
-                              မင်္ဂလာပါ၊ <%= student !=null ? student.getName() : "Student" %>
-                            </h1>
-                            <p class="text-xs text-blue-100 mt-0.5">
-                              ခုံနံပါတ်: <span class="font-mono font-bold text-white">
-                                <%= student !=null ? student.getStudentId() : "-" %>
-                              </span>
-                            </p>
-                          </div>
-                        </div>
+                    <!-- Hero Banner — Full-size Signboard Image -->
+                    <div class="roundedl overflow-hidden shadow-xl border border-slate-800 relative"
+                      style="min-height: 320px; max-height: 820px;">
+                      <!-- Full-size signboard image -->
+                      <img src="${pageContext.request.contextPath}/assets/images/uni.jpg"
+                        alt="ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ) Signboard" class="w-full h-full object-cover object-center"
+                        style="min-height: 320px; max-height: 820px;" />
 
-                        <a href="${pageContext.request.contextPath}/student/results"
-                          class="px-4 py-2.5 rounded bg-white hover:bg-slate-50 text-blue-700 text-xs font-bold shadow-md flex items-center gap-2 transition-all">
-                          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                          </svg>
-                          <span>ကျွန်ုပ်၏ ရလဒ်များ ကြည့်ရန် →</span>
-                        </a>
+                      <!-- Gradient overlay — only at bottom for text legibility -->
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/40 to-transparent">
+                      </div>
+
+                      <!-- Text content anchored at the bottom -->
+                      <div class="absolute bottom-0 left-0 right-0 px-6 py-5 z-10">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+                          <div class="flex items-center gap-4">
+                            <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="UCS Hpa-an Logo"
+                              class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white/50 shadow-lg shrink-0" />
+                            <div>
+                              <span
+                                class="inline-block px-2.5 py-0.5 rounded-full bg-white/15 border border-white/25 text-[10px] font-bold text-blue-100 mb-1 backdrop-blur-sm">
+                                University of Computer Studies (Hpa-an)
+                              </span>
+                              <h1 class="text-xl sm:text-2xl font-extrabold text-white drop-shadow-lg">
+                                မင်္ဂလာပါ <%= student !=null ? student.getName() : "Student" %>
+                              </h1>
+                              <p class="text-xs text-blue-200 mt-0.5">
+                                ခုံနံပါတ် - <span class="font-mono font-bold text-white">
+                                  <%= student !=null ? student.getStudentId() : "-" %>
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <a href="${pageContext.request.contextPath}/student/results"
+                            class="px-4 py-2.5 rounded-lg bg-white hover:bg-blue-50 text-blue-700 text-xs font-bold shadow-lg flex items-center gap-2 transition-all shrink-0 border border-white/80">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2.5">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            <span>ကျွန်ုပ်၏ ရလဒ်များ</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
 
@@ -134,7 +143,8 @@
                           <div class="text-2xl font-extrabold text-slate-900">
                             <%= avgObj !=null ? String.format("%.1f%%", avgObj) : "0.0%" %>
                           </div>
-                          <span class="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-700">Grade
+                          <span
+                            class="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-700">Grade
                             <%= overallGrade !=null ? overallGrade : "-" %>
                           </span>
                         </div>
@@ -164,10 +174,10 @@
                     </div>
 
                     <!-- Content Layout Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      <!-- Left: Student Profile Card -->
-                      <div class="lg:col-span-5">
-                        <div class="p-6 roundedl bg-white border border-slate-200 shadow-sm h-full space-y-4">
+                    <div class="grid grid-cols-1 gap-6">
+                      <!-- Student Profile Card -->
+                      <div>
+                        <div class="p-6 roundedl bg-white border border-slate-200 shadow-sm space-y-4">
                           <h3 class="text-sm font-bold text-slate-900 border-b border-slate-200 pb-3">ကိုယ်ရေး အချက်အလက်
                             (Profile)</h3>
                           <% if (student !=null) { %>
@@ -186,8 +196,8 @@
                               </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4 text-xs">
-                              <div class="col-span-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                              <div>
                                 <span class="block text-[11px] text-slate-500 mb-0.5">အီးမေးလ်</span>
                                 <span class="font-medium text-slate-800 break-all">
                                   <%= student.getEmail() %>
@@ -205,7 +215,7 @@
                                   <%= student.getGender() !=null ? student.getGender() : "N/A" %>
                                 </span>
                               </div>
-                              <div class="col-span-2">
+                              <div>
                                 <span class="block text-[11px] text-slate-500 mb-0.5">စတင် ဝင်ရောက်သည့်နေ့</span>
                                 <span class="font-medium text-slate-800">
                                   <%= student.getCreatedAt() !=null ? student.getCreatedAt().toLocalDate() : "N/A" %>
@@ -217,74 +227,6 @@
                                 ကျောင်းသား အချက်အလက် မတွေ့ရှိပါ။
                               </div>
                               <% } %>
-                        </div>
-                      </div>
-
-                      <!-- Right: Recent Exam Results Preview -->
-                      <div class="lg:col-span-7">
-                        <div
-                          class="roundedl bg-white border border-slate-200 shadow-sm h-full overflow-hidden flex flex-col">
-                          <div class="p-5 border-b border-slate-200 flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-slate-900">လတ်တလော စာမေးပွဲရလဒ်များ</h3>
-                            <a href="${pageContext.request.contextPath}/student/results"
-                              class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                              အားလုံးကြည့်ရန် →
-                            </a>
-                          </div>
-
-                          <div class="overflow-x-auto flex-1">
-                            <table class="w-full text-left text-xs text-slate-700">
-                              <thead
-                                class="bg-slate-100/90 text-slate-700 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-                                <tr>
-                                  <th class="py-3 px-4">သင်္ကေတ</th>
-                                  <th class="py-3 px-4">ဘာသာရပ်</th>
-                                  <th class="py-3 px-4 text-center">ရမှတ်</th>
-                                  <th class="py-3 px-4 text-center">Grade</th>
-                                  <th class="py-3 px-4 text-center">အခြေအနေ</th>
-                                </tr>
-                              </thead>
-                              <tbody class="divide-y divide-slate-200">
-                                <% if (results !=null && !results.isEmpty()) { int count=0; for (common.ExamResult r :
-                                  results) { if (count++>= 5) break;
-                                  boolean isPass = "PASS".equalsIgnoreCase(r.getStatus());
-                                  %>
-                                  <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3 px-4 font-mono font-bold text-blue-600">
-                                      <%= r.getSubjectCode() !=null ? r.getSubjectCode() : "-" %>
-                                    </td>
-                                    <td class="py-3 px-4 font-semibold text-slate-900">
-                                      <%= r.getSubjectName() !=null ? r.getSubjectName() : "-" %>
-                                    </td>
-                                    <td class="py-3 px-4 text-center font-bold text-slate-900">
-                                      <%= (int)r.getMarks() %> / <%= (int)r.getTotalMarks() %>
-                                    </td>
-                                    <td class="py-3 px-4 text-center">
-                                      <span
-                                        class="px-2 py-0.5 rounded-md font-mono font-bold text-xs bg-slate-100 text-slate-700 border border-slate-200">
-                                        <%= r.getGrade() !=null ? r.getGrade() : "-" %>
-                                      </span>
-                                    </td>
-                                    <td class="py-3 px-4 text-center">
-                                      <% if (isPass) { %>
-                                        <span
-                                          class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">အောင်</span>
-                                        <% } else { %>
-                                          <span
-                                            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 border border-red-200 text-red-700">ကျ</span>
-                                          <% } %>
-                                    </td>
-                                  </tr>
-                                  <% } } else { %>
-                                    <tr>
-                                      <td colspan="5" class="text-center py-8 text-slate-500">
-                                        ရလဒ် မရှိသေးပါ
-                                      </td>
-                                    </tr>
-                                    <% } %>
-                              </tbody>
-                            </table>
-                          </div>
                         </div>
                       </div>
                     </div>

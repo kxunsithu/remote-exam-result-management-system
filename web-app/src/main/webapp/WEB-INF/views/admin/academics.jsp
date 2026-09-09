@@ -23,10 +23,15 @@
                               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                               <title>ပညာသင်နှစ်များ — RERMS Admin</title>
                               <%@ include file="../common/tailwind-setup.jsp" %>
-                              <style>
-                                .year-card-body { display: block; }
-                                .year-card-body.collapsed-body { display: none; }
-                              </style>
+                                <style>
+                                  .year-card-body {
+                                    display: block;
+                                  }
+
+                                  .year-card-body.collapsed-body {
+                                    display: none;
+                                  }
+                                </style>
                             </head>
 
                             <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased">
@@ -36,12 +41,12 @@
                                   <main class="flex-1 flex flex-col min-w-0">
                                     <%@ include file="header.jsp" %>
 
-                                      <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+                                      <div class="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
                                         <!-- Breadcrumb Nav -->
                                         <div class="flex items-center justify-between text-xs text-slate-500">
                                           <div class="flex items-center gap-2">
                                             <a href="${pageContext.request.contextPath}/admin/dashboard"
-                                              class="hover:text-slate-900 transition-colors">ဒက်ရှ်ဘုတ်</a>
+                                              class="hover:text-slate-900 transition-colors">ပင်မစာမျက်နှာ</a>
                                             <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none"
                                               stroke="currentColor" stroke-width="2">
                                               <polyline points="9 18 15 12 9 6" />
@@ -117,7 +122,8 @@
                                             </div>
                                             <p class="text-xs">အဆင့် ၁ - <a
                                                 href="${pageContext.request.contextPath}/admin/subjects"
-                                                class="text-blue-600 hover:underline font-semibold">ဘာသာရပ်များ</a> အရင် create
+                                                class="text-blue-600 hover:underline font-semibold">ဘာသာရပ်များ</a> အရင်
+                                              create
                                               လုပ်ပါ၊ ပြီးမှ ပညာသင်နှစ် ထည့်သွင်းပါ။</p>
                                           </div>
                                           <% } else { int yearIdx=0; for (common.AcademicYear y : years) {
@@ -130,7 +136,9 @@
                                               class="rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden space-y-0"
                                               data-year-id="<%= y.getId() %>">
                                               <!-- Year Header -->
-                                              <div class="w-full px-5 py-4 bg-slate-100/80 hover:bg-slate-200/60 border-b border-slate-200 flex items-center justify-between cursor-pointer transition-colors" onclick="toggleYearCard(this)" aria-expanded="<%= yearIdx == 0 ? "true" : "false" %>">
+                                              <div
+                                                class="w-full px-5 py-4 bg-slate-100/80 hover:bg-slate-200/60 border-b border-slate-200 flex items-center justify-between cursor-pointer transition-colors"
+                                                 onclick="toggleYearCard(this)" aria-expanded='<%= yearIdx == 0 ? "true" : "false" %>'>
                                                 <div class="flex items-center gap-3">
                                                   <svg class="w-4 h-4 text-blue-600 shrink-0" viewBox="0 0 24 24"
                                                     fill="none" stroke="currentColor" stroke-width="2">
@@ -139,8 +147,11 @@
                                                     <line x1="8" y1="2" x2="8" y2="6" />
                                                     <line x1="3" y1="10" x2="21" y2="10" />
                                                   </svg>
-                                                  <h3 class="text-sm font-extrabold text-slate-900">ပညာသင်နှစ် <%= y.getYearName() %></h3>
-                                                  <span class="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-bold text-blue-700">
+                                                  <h3 class="text-sm font-extrabold text-slate-900">ပညာသင်နှစ် <%=
+                                                      y.getYearName() %>
+                                                  </h3>
+                                                  <span
+                                                    class="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-bold text-blue-700">
                                                     <%= sems.size() %> Semester · <%= y.getSubjectCount() %> ဘာသာရပ်
                                                   </span>
                                                 </div>
@@ -176,7 +187,8 @@
                                               </div>
 
                                               <!-- Semesters Content -->
-                                              <div class="year-card-body <%= yearIdx == 0 ? "" : "collapsed-body" %>" id="<%= collapseId %>">
+                                              <div class='year-card-body<%= yearIdx == 0 ? "" : " collapsed-body" %>'
+                                                id="<%= collapseId %>">
                                                   <div class="divide-y divide-slate-200 bg-slate-50/50">
                                                     <% for (common.Semester s : sems) { java.util.List<common.Subject>
                                                       semSubjects = subjectsBySemester != null
@@ -188,8 +200,11 @@
                                                         <div class="flex items-center justify-between">
                                                           <div class="flex items-center gap-2.5">
                                                             <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                                                            <h4 class="text-xs font-bold text-slate-900">Semester <%= s.getSemesterNumber() %></h4>
-                                                            <span class="text-[11px] text-slate-500">(<%= semSubjects.size() %> ဘာသာရပ်)</span>
+                                                            <h4 class="text-xs font-bold text-slate-900">Semester <%=
+                                                                s.getSemesterNumber() %>
+                                                            </h4>
+                                                            <span class="text-[11px] text-slate-500">(<%=
+                                                                semSubjects.size() %> ဘာသာရပ်)</span>
                                                           </div>
 
                                                           <div class="flex items-center gap-1.5">
@@ -335,7 +350,8 @@
                                               class="col-span-4 text-xs text-slate-500 p-3 bg-slate-50 rounded border border-slate-200 text-center">
                                               ဘာသာရပ် မရှိသေးပါ။ <a
                                                 href="${pageContext.request.contextPath}/admin/subjects"
-                                                class="text-blue-600 hover:underline font-semibold">ဘာသာရပ်များ page</a> မှ အရင်
+                                                class="text-blue-600 hover:underline font-semibold">ဘာသာရပ်များ page</a>
+                                              မှ အရင်
                                               create လုပ်ပါ။
                                             </div>
                                             <% } else { %>
@@ -416,7 +432,8 @@
                                             d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                                         </svg>
                                       </div>
-                                      <h5 class="text-base font-bold text-slate-900 mb-1">ပညာသင်နှစ် ပယ်ဖျက်ရန် အတည်ပြုပါ
+                                      <h5 class="text-base font-bold text-slate-900 mb-1">ပညာသင်နှစ် ပယ်ဖျက်ရန်
+                                        အတည်ပြုပါ
                                       </h5>
                                       <p class="text-xs text-slate-500 mb-6">
                                         <strong id="delete-year-name" class="text-red-600"></strong> ကို ပယ်ဖျက်ပါက
@@ -455,10 +472,13 @@
                                           for="edit-sem-number">Semester *</label>
                                         <select name="semesterNumber" id="edit-sem-number" required
                                           class="w-full px-3.5 py-2.5 rounded bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-blue-500">
-                                          <% for (int i=1; i <=8; i++) { %>
-                                            <option value="<%= i %>">Semester <%= i %>
-                                            </option>
-                                            <% } %>
+                                           <% if (availableSemesterNumbers.isEmpty()) { %>
+                                             <option value="">(ဘာသာရပ် မရှိသေးပါ - ဘာသာရပ်များ page မှ အရင်ထည့်ပါ)</option>
+                                             <% } else { %>
+                                               <% for (Integer sn : availableSemesterNumbers) { %>
+                                                 <option value="<%= sn %>">Semester <%= sn %></option>
+                                                 <% } %>
+                                                   <% } %>
                                         </select>
                                       </div>
 
@@ -491,7 +511,8 @@
                                             d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                                         </svg>
                                       </div>
-                                      <h5 class="text-base font-bold text-slate-900 mb-1">Semester ပယ်ဖျက်ရန် အတည်ပြုပါ</h5>
+                                      <h5 class="text-base font-bold text-slate-900 mb-1">Semester ပယ်ဖျက်ရန် အတည်ပြုပါ
+                                      </h5>
                                       <p class="text-xs text-slate-500 mb-6">
                                         <strong id="delete-sem-name" class="text-red-600"></strong> ကို ပယ်ဖျက်ပါက ၎င်း၏
                                         ဘာသာရပ်နှင့် ရလဒ်များ ပျက်သွားမည်။ သေချာပါသလား။

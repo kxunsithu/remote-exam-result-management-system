@@ -103,7 +103,9 @@ public class ExamResult implements Serializable {
      * Returns pass/fail status. Pass threshold is 50% (C grade or better).
      */
     public String getStatus() {
-        return marks >= 50.0 ? "PASS" : "FAIL";
+        if (totalMarks <= 0) return "FAIL";
+        double pct = (marks / totalMarks) * 100.0;
+        return pct >= 50.0 ? "PASS" : "FAIL";
     }
 
     /**

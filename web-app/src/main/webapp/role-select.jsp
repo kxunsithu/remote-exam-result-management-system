@@ -14,6 +14,12 @@
 
   <div class="w-full max-w-lg bg-white border border-slate-200 roundedl p-8 shadow-xl">
 
+        <div class="text-center mb-6">
+      <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="UCS Hpa-an Logo" class="w-16 h-16 rounded-full object-cover mx-auto mb-3 shadow-md border-2 border-slate-200" />
+      <h1 class="text-lg font-extrabold text-slate-900 leading-normal pb-0.5">ကွန်ပျူတာတက္ကသိုလ် (ဘားအံ)</h1>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">Remote Exam Result Management System</p>
+    </div>
+
     <!-- Role Cards -->
     <div class="space-y-3.5">
       <!-- Admin Card -->
@@ -31,7 +37,7 @@
         </div>
         <div class="flex flex-col">
           <strong class="text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Admin</strong>
-          <span class="text-xs text-slate-500">ဆရာ / စီမံခန့်ခွဲသူ ဘက် — ဝင်ရောက်မည်</span>
+          <span class="text-xs text-slate-500">ဆရာ / စီမံခန့်ခွဲသူ </span>
         </div>
         <div class="ml-auto text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -56,7 +62,7 @@
         <div class="flex flex-col">
           <strong
             class="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Student</strong>
-          <span class="text-xs text-slate-500">ကျောင်းသား / သူ ဘက် — ဝင်ရောက်မည်</span>
+          <span class="text-xs text-slate-500">ကျောင်းသား / သူ </span>
         </div>
         <div class="ml-auto text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

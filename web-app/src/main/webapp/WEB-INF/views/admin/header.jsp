@@ -1,25 +1,25 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
-<% common.User headerUser=(common.User) session.getAttribute("user");
-   String headerEmail=headerUser !=null ? headerUser.getEmail() : "" ;
-   String headerInitial=(headerEmail !=null && !headerEmail.isEmpty()) ? headerEmail.substring(0, 1).toUpperCase() : "A" ;
-   String headerTitle=(String) request.getAttribute("headerTitle");
-   if (headerTitle==null) {
-     String pTitle=(String) request.getAttribute("pageTitle");
-     if ("Student Management".equalsIgnoreCase(pTitle)) {
-       headerTitle="ဝင်ခွင့်ရကျောင်းသားများ စီမံခန့်ခွဲမှု" ;
-     } else if ("Subject Management".equalsIgnoreCase(pTitle)) {
-       headerTitle="ဘာသာရပ်များ စီမံခန့်ခွဲမှု" ;
-     } else if ("Exam Results".equalsIgnoreCase(pTitle) || "ရလဒ်အသေးစိတ်".equalsIgnoreCase(pTitle)) {
-       headerTitle="စာမေးပွဲရလဒ်များ စီမံခန့်ခွဲမှု" ;
-     } else {
-       headerTitle="ဒက်ရှ်ဘုတ်" ;
+  <% common.User headerUser = (common.User) session.getAttribute("user");
+     String headerEmail = headerUser != null ? headerUser.getEmail() : "";
+     String headerInitial = (headerEmail != null && !headerEmail.isEmpty()) ? headerEmail.substring(0, 1).toUpperCase() : "A";
+     String headerTitle = (String) request.getAttribute("headerTitle");
+     if (headerTitle == null) {
+       String pTitle = (String) request.getAttribute("pageTitle");
+       if ("Student Management".equalsIgnoreCase(pTitle)) {
+         headerTitle = "ကျောင်းသား/သူများ စီမံခန့်ခွဲမှု";
+       } else if ("Subject Management".equalsIgnoreCase(pTitle)) {
+         headerTitle = "ဘာသာရပ်များ စီမံခန့်ခွဲမှု";
+       } else if ("Exam Results".equalsIgnoreCase(pTitle) || "ရလဒ်အသေးစိတ်".equalsIgnoreCase(pTitle)) {
+         headerTitle = "စာမေးပွဲရလဒ်များ စီမံခန့်ခွဲမှု";
+       } else {
+         headerTitle = "ပင်မစာမျက်နှာ";
+       }
      }
-   }
-   String globalFlashSuccess=(String) session.getAttribute("flashSuccess");
-   String globalFlashError=(String) session.getAttribute("flashError");
-   session.removeAttribute("flashSuccess");
-   session.removeAttribute("flashError");
-%>
+     String globalFlashSuccess = (String) session.getAttribute("flashSuccess");
+     String globalFlashError = (String) session.getAttribute("flashError");
+     session.removeAttribute("flashSuccess");
+     session.removeAttribute("flashError");
+  %>
     <!-- Top Header Bar -->
     <header
       class="flex items-center justify-between py-3.5 px-6 bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
@@ -48,8 +48,7 @@
         <% if (globalFlashSuccess !=null) { %>
           <div
             class="pointer-events-auto rounded p-3.5 bg-white border border-emerald-200 text-slate-800 text-xs font-medium shadow-xl flex items-center gap-3 backdrop-blur-lg flash-alert transition-all">
-            <div
-              class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                 <polyline points="20 6 9 17 4 12" />
               </svg>

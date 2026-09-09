@@ -35,8 +35,10 @@ public class ExamResultServlet extends HttpServlet {
                 int sDbId = Integer.parseInt(studentId);
                 Student student = service.getStudentById(sDbId);
                 List<ExamResult> studentResults = service.getStudentResults(sDbId);
+                double cgpa = service.calculateCGPA(studentResults);
                 req.setAttribute("studentInfo", student);
                 req.setAttribute("studentResults", studentResults);
+                req.setAttribute("cgpa", cgpa);
                 // Dropdown data for the add-result modal (Academic Year -> Semester -> Subject)
                 req.setAttribute("students", service.getAllStudents());
                 req.setAttribute("subjects", service.getAllSubjects());
@@ -56,6 +58,8 @@ public class ExamResultServlet extends HttpServlet {
             }
 
             req.setAttribute("subjects", service.getAllSubjects());
+            req.setAttribute("academicYears", service.getAllAcademicYears());
+            req.setAttribute("semesters", service.getAllSemesters());
             req.setAttribute("results", service.getAllResults());
 
         } catch (RuntimeException e) {
@@ -76,7 +80,15 @@ public class ExamResultServlet extends HttpServlet {
             ExamResultService service = RMIClientManager.getService();
 
             if ("delete".equals(action)) {
-                int id = Integer.parseInt(req.getParameter("id"));
+                String idParam = req.getParameter("id");
+                if (idParam == null || idParam.isBlank()) {
+                    req.getSession().setAttribute("flashError", "ဖျက်ရမည့် ရလဒ် ID မတွေ့ပါ။ ထပ်မံကြိုးစားပါ။");
+                    resp.sendRedirect(studentIdParam != null && !studentIdParam.isBlank()
+                        ? req.getContextPath() + "/admin/results?action=studentDetail&studentId=" + studentIdParam
+                        : req.getContextPath() + "/admin/results");
+                    return;
+                }
+                int id = Integer.parseInt(idParam);
                 boolean ok = service.deleteExamResult(id);
                 setFlash(req, ok, "Result deleted successfully.", "Failed to delete result.");
             } else {
@@ -110,17 +122,17 @@ public class ExamResultServlet extends HttpServlet {
         ExamResult r = new ExamResult();
         String sId = req.getParameter("studentId");
         String subjId = req.getParameter("subjectId");
+        String semId = req.getParameter("semesterId");
         String marks = req.getParameter("marks");
         String totalMarks = req.getParameter("totalMarks");
 
-        if (sId != null && !sId.isBlank())     r.setStudentId(Integer.parseInt(sId));
-        if (subjId != null && !subjId.isBlank()) r.setSubjectId(Integer.parseInt(subjId));
-        if (marks != null && !marks.isBlank())  r.setMarks(Double.parseDouble(marks));
+        if (sId != null && !sId.isBlank())       r.setStudentId(Integer.parseInt(sId));
+        if (subjId != null && !subjId.isBlank())   r.setSubjectId(Integer.parseInt(subjId));
+        if (semId != null && !semId.isBlank())     r.setSemesterId(Integer.parseInt(semId));
+        if (marks != null && !marks.isBlank())    r.setMarks(Double.parseDouble(marks));
         if (totalMarks != null && !totalMarks.isBlank()) r.setTotalMarks(Double.parseDouble(totalMarks));
-        // Academic year & semester are derived from the subject on the server
         String examType = req.getParameter("examType");
         if (examType != null && !examType.isBlank()) r.setExamType(examType.trim());
-        // Grade is calculated server-side; leave it null here
         return r;
     }
 

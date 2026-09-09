@@ -52,7 +52,7 @@ Admin သည် စနစ်တစ်ခုလုံး၏ ကျောင်း
 
 ---
 
-### ၃.၂။ Admin ပင်မ ဒက်ရှ်ဘုတ် (Admin Dashboard & Overview Analytics)
+### ၃.၂။ Admin ပင်မ ပင်မစာမျက်နှာ (Admin Dashboard & Overview Analytics)
 - **စနစ် အခြေအနေ အနှစ်ချုပ် (Overview Stats)**:
   - **ကျောင်းသား/သူ ဦးရေ (Total Students)**: စနစ်တွင် စာရင်းသွင်းထားသော စုစုပေါင်း ကျောင်းသား အရေအတွက်။
   - **ဘာသာရပ် အရေအတွက် (Total Subjects)**: သင်ရိုးညွှန်းတမ်းတွင် ထည့်သွင်းထားသော စုစုပေါင်း ဘာသာရပ် အရေအတွက်။
@@ -135,7 +135,7 @@ Admin သည် စနစ်တစ်ခုလုံး၏ ကျောင်း
 
 ---
 
-### ၄.၂။ ကျောင်းသား ပင်မ ဒက်ရှ်ဘုတ် (Student Dashboard)
+### ၄.၂။ ကျောင်းသား ပင်မ ပင်မစာမျက်နှာ (Student Dashboard)
 - **Hero Welcome Banner Card**:
   - Primary Blue Gradient အလှဆင် ထားပြီး ကျောင်းသား အမည်၊ ခုံနံပါတ်၊ Avatar Initials နှင့် ရလဒ်များဆီ သို့ တိုက်ရိုက်သွားရန် Button။
 - **Academic Summary Statistics Cards**:

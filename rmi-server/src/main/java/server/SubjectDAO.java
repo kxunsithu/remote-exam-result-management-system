@@ -74,6 +74,35 @@ public class SubjectDAO {
         return list;
     }
 
+    /**
+     * Returns distinct subject templates for a given semester number (1-8),
+     * matching both unassigned subjects and subjects already assigned to other academic years.
+     */
+    public List<Subject> findTemplatesBySemesterNumber(int semesterNumber) {
+        List<Subject> list = new ArrayList<>();
+        String sql = SELECT_ALL + """
+            WHERE (sub.semester_number = ? OR sm.semester_number = ?)
+            ORDER BY sub.subject_code, sub.id
+            """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, semesterNumber);
+            ps.setInt(2, semesterNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                java.util.Set<String> seenCodes = new java.util.HashSet<>();
+                while (rs.next()) {
+                    Subject s = mapRow(rs);
+                    if (s.getSubjectCode() != null && seenCodes.add(s.getSubjectCode().trim().toLowerCase())) {
+                        list.add(s);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SubjectDAO.findTemplatesBySemesterNumber error: " + e.getMessage());
+        }
+        return list;
+    }
+
     public List<Subject> findBySemester(int semesterId) {
         List<Subject> list = new ArrayList<>();
         String sql = SELECT_ALL + " WHERE sub.semester_id = ? ORDER BY sub.subject_code";
@@ -137,6 +166,24 @@ public class SubjectDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, academicYearId);
+            ps.setString(2, subjectCode.trim());
+            ps.setInt(3, excludeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true when the subject code is already used within the specific semester.
+     */
+    public boolean codeExistsInSemester(String subjectCode, int semesterId, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM subjects WHERE semester_id = ? AND lower(subject_code) = lower(?) AND id != ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, semesterId);
             ps.setString(2, subjectCode.trim());
             ps.setInt(3, excludeId);
             try (ResultSet rs = ps.executeQuery()) {

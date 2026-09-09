@@ -18,13 +18,14 @@ public class ExamResultDAO {
                er.grade, er.exam_type, er.created_at,
                s.name AS student_name, s.student_id AS student_code,
                sub.subject_name, sub.subject_code, sub.credit AS subject_credit,
-               sub.semester_id, sm.semester_number, sm.academic_year_id,
-               ay.year_name AS academic_year_name
+               sub.semester_id, COALESCE(sm.semester_number, sub.semester_number, 1) AS semester_number,
+               sm.academic_year_id,
+               COALESCE(ay.year_name, 'General') AS academic_year_name
         FROM exam_results er
-        JOIN students s       ON er.student_id = s.id
-        JOIN subjects sub     ON er.subject_id = sub.id
-        JOIN semesters sm     ON sub.semester_id = sm.id
-        JOIN academic_years ay ON sm.academic_year_id = ay.id
+        JOIN students s          ON er.student_id = s.id
+        JOIN subjects sub        ON er.subject_id = sub.id
+        LEFT JOIN semesters sm     ON sub.semester_id = sm.id
+        LEFT JOIN academic_years ay ON sm.academic_year_id = ay.id
         """;
 
     public List<ExamResult> findAll() {
@@ -168,18 +169,22 @@ public class ExamResultDAO {
         }
     }
 
-    /**
-     * Duplicate check: same student + same subject + same exam type.
-     * The academic year/semester are implied by the subject.
-     */
     public boolean existsDuplicate(int studentId, int subjectId, String examType, int excludeId) {
-        String sql = "SELECT COUNT(*) FROM exam_results WHERE student_id = ? AND subject_id = ? AND exam_type = ? AND id != ?";
+        String sql = """
+            SELECT COUNT(*) FROM exam_results er
+            JOIN subjects sub ON er.subject_id = sub.id
+            WHERE er.student_id = ?
+              AND (er.subject_id = ? OR sub.subject_code = (SELECT subject_code FROM subjects WHERE id = ?))
+              AND er.exam_type = ?
+              AND er.id != ?
+            """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, studentId);
             ps.setInt(2, subjectId);
-            ps.setString(3, examType != null && !examType.isBlank() ? examType : "REGULAR");
-            ps.setInt(4, excludeId);
+            ps.setInt(3, subjectId);
+            ps.setString(4, examType != null && !examType.isBlank() ? examType : "REGULAR");
+            ps.setInt(5, excludeId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }

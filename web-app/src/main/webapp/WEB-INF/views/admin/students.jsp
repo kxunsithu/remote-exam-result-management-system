@@ -20,17 +20,17 @@
               <main class="flex-1 flex flex-col min-w-0">
                 <%@ include file="header.jsp" %>
 
-                  <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+                  <div class="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
                     <!-- Breadcrumb Row -->
                     <div class="flex items-center justify-between text-xs text-slate-500">
                       <div class="flex items-center gap-2">
                         <a href="${pageContext.request.contextPath}/admin/dashboard"
-                          class="hover:text-slate-900 transition-colors">ဒက်ရှ်ဘုတ်</a>
+                          class="hover:text-slate-900 transition-colors">ပင်မစာမျက်နှာ</a>
                         <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
                           <polyline points="9 18 15 12 9 6" />
                         </svg>
-                        <span class="text-slate-900 font-medium">ဝင်ခွင့်ရကျောင်းသားများ</span>
+                        <span class="text-slate-900 font-medium">ကျောင်းသား/သူများ</span>
                       </div>
 
                       <div class="flex items-center gap-1">
@@ -65,7 +65,8 @@
                               <line x1="21" y1="21" x2="16.65" y2="16.65" />
                             </svg>
                             <input type="text" name="search" placeholder="ကျောင်းသားကို ရှာဖွေရန်..."
-                              value="<%= request.getAttribute("searchKeyword") !=null ? request.getAttribute("searchKeyword") : "" %>"
+                              value="<%= request.getAttribute(" searchKeyword") !=null ?
+                              request.getAttribute("searchKeyword") : "" %>"
                             class="w-full pl-10 pr-4 py-2.5 rounded bg-slate-50 border border-slate-300 text-slate-900
                             text-xs placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2
                             focus:ring-blue-500/15 transition-all"/>
@@ -142,8 +143,8 @@
                                       data-bs-toggle="modal" data-bs-target="#editStudentModal"
                                       data-id="<%= s.getId() %>" data-studentid="<%= s.getStudentId() %>"
                                       data-name="<%= s.getName() %>" data-email="<%= s.getEmail() %>"
-                                      data-phone="<%= s.getPhone() != null ? s.getPhone() : "" %>"
-                                      data-gender="<%= s.getGender() != null ? s.getGender() : "" %>"
+                                      data-phone='<%= s.getPhone() != null ? s.getPhone() : "" %>'
+                                      data-gender='<%= s.getGender() != null ? s.getGender() : "" %>'
                                       title="ပြင်ဆင်ရန်">
                                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
@@ -230,9 +231,12 @@
                 <div class="modal-accent"></div>
                 <div class="modal-header-custom">
                   <div class="modal-header-icon">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                      <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <line x1="19" y1="8" x2="19" y2="14" />
+                      <line x1="22" y1="11" x2="16" y2="11" />
                     </svg>
                   </div>
                   <div class="modal-title-group">
@@ -240,8 +244,10 @@
                     <p class="modal-subtitle">Add New Student</p>
                   </div>
                   <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
                 </div>
@@ -250,7 +256,8 @@
                   <div class="modal-body space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                       <div class="col-span-2 sm:col-span-1">
-                        <label class="form-label" for="add-studentId">ခုံနံပါတ် (Roll No.) <span class="text-red-500">*</span></label>
+                        <label class="form-label" for="add-studentId">ခုံနံပါတ် (Roll No.) <span
+                            class="text-red-500">*</span></label>
                         <input type="text" id="add-studentId" name="studentId" placeholder="e.g. ST001" required />
                       </div>
                       <div class="col-span-2 sm:col-span-1">
@@ -264,7 +271,8 @@
                       </div>
                     </div>
                     <div>
-                      <label class="form-label" for="add-name">အမည် အပြည့်အစုံ <span class="text-red-500">*</span></label>
+                      <label class="form-label" for="add-name">အမည် အပြည့်အစုံ <span
+                          class="text-red-500">*</span></label>
                       <input type="text" id="add-name" name="name" placeholder="ကျောင်းသားအမည်" required />
                     </div>
                     <div>
@@ -279,8 +287,10 @@
                   <div class="modal-footer">
                     <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">မထည့်သွင်းပါ</button>
                     <button type="submit" class="btn-primary-custom">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
                       ထည့်သွင်းမည်
                     </button>
@@ -294,12 +304,15 @@
           <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width: 30rem;">
               <div class="modal-content">
-                <div class="modal-accent" style="background: linear-gradient(90deg, rgb(99 102 241), rgb(168 85 247));"></div>
+                <div class="modal-accent" style="background: linear-gradient(90deg, rgb(99 102 241), rgb(168 85 247));">
+                </div>
                 <div class="modal-header-custom">
-                  <div class="modal-header-icon" style="background: rgb(245 243 255); color: rgb(99 102 241); border-color: rgb(221 214 254);">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  <div class="modal-header-icon"
+                    style="background: rgb(245 243 255); color: rgb(99 102 241); border-color: rgb(221 214 254);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </div>
                   <div class="modal-title-group">
@@ -307,8 +320,10 @@
                     <p class="modal-subtitle">Edit Student Information</p>
                   </div>
                   <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
                 </div>
@@ -318,7 +333,8 @@
                   <div class="modal-body space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                       <div class="col-span-2 sm:col-span-1">
-                        <label class="form-label" for="edit-studentId">ခုံနံပါတ် <span class="text-red-500">*</span></label>
+                        <label class="form-label" for="edit-studentId">ခုံနံပါတ် <span
+                            class="text-red-500">*</span></label>
                         <input type="text" id="edit-studentId" name="studentId" required />
                       </div>
                       <div class="col-span-2 sm:col-span-1">
@@ -346,10 +362,13 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">မပြင်ဆင်ပါ</button>
-                    <button type="submit" class="btn-primary-custom" style="background: rgb(99 102 241); box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    <button type="submit" class="btn-primary-custom"
+                      style="background: rgb(99 102 241); box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
                       </svg>
                       ပြင်ဆင်မည်
                     </button>
@@ -368,25 +387,29 @@
                   <input type="hidden" name="action" value="delete" />
                   <input type="hidden" name="id" id="delete-student-id" />
                   <div class="modal-body text-center" style="padding: 2rem 1.5rem 1.25rem;">
-                    <div class="w-14 h-14 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mx-auto mb-4">
-                      <svg class="w-7 h-7 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="3 6 5 6 21 6"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    <div
+                      class="w-14 h-14 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-7 h-7 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                       </svg>
                     </div>
                     <h5 class="text-base font-bold text-slate-900 mb-1.5">ဖျက်ရန် အတည်ပြုပါ</h5>
                     <p class="text-xs text-slate-500 leading-relaxed">
                       ကျောင်းသား <strong id="delete-student-name" class="text-red-600 font-semibold"></strong> ကို
-                      ဖျက်ရန် သေချာပါသလား?<br/>
+                      ဖျက်ရန် သေချာပါသလား?<br />
                       <span class="text-slate-400 mt-1 block">ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြင်ဆင်၍ မရနိုင်ပါ။</span>
                     </p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn-outline-custom flex-1 justify-center" data-bs-dismiss="modal">မဖျက်ပါ</button>
+                    <button type="button" class="btn-outline-custom flex-1 justify-center"
+                      data-bs-dismiss="modal">မဖျက်ပါ</button>
                     <button type="submit" class="btn-danger-custom flex-1 justify-center">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <polyline points="3 6 5 6 21 6"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
                       </svg>
                       ဖျက်မည်
                     </button>
@@ -400,12 +423,14 @@
           <div class="modal fade" id="viewStudentModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width: 26rem;">
               <div class="modal-content">
-                <div class="modal-accent" style="background: linear-gradient(90deg, rgb(5 150 105), rgb(16 185 129));"></div>
+                <div class="modal-accent" style="background: linear-gradient(90deg, rgb(5 150 105), rgb(16 185 129));">
+                </div>
                 <div class="modal-header-custom">
                   <div class="modal-header-icon modal-header-icon-green">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
                     </svg>
                   </div>
                   <div class="modal-title-group">
@@ -413,8 +438,10 @@
                     <p class="modal-subtitle">Student Profile Details</p>
                   </div>
                   <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
                 </div>
@@ -438,7 +465,8 @@
                     </div>
                     <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
                       <span class="text-slate-500 font-medium">လိင်</span>
-                      <span id="view-gender" class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-semibold"></span>
+                      <span id="view-gender"
+                        class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-semibold"></span>
                     </div>
                     <div class="flex items-center justify-between px-4 py-2.5 bg-white">
                       <span class="text-slate-500 font-medium">ထည့်သွင်းသည့်ရက်</span>

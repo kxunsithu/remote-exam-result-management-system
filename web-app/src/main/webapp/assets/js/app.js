@@ -132,3 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// ── Password Visibility Toggle ─────────────────────────────
+function togglePasswordVisibility(inputId, btn) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+
+  var eyeIcon = btn ? btn.querySelector('.eye-icon') : null;
+  var eyeOffIcon = btn ? btn.querySelector('.eye-off-icon') : null;
+
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (eyeIcon) eyeIcon.style.display = 'none';
+    if (eyeOffIcon) eyeOffIcon.style.display = 'inline-block';
+  } else {
+    input.type = 'password';
+    if (eyeIcon) eyeIcon.style.display = 'inline-block';
+    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+  }
+}
+window.togglePasswordVisibility = togglePasswordVisibility;
